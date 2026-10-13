@@ -1,0 +1,948 @@
+=== day
+n: 2
+title: Style it
+subtitle: CSS
+hours: 3 hours
+page: show.html
+slot: css | css | style.css
+file: style.css = css
+refs: @page
+
+--- intro
+Yesterday's page works, but it looks plain. Today you give it colours, fonts, spacing and a card design with **CSS**, the language that says how things *look*.
+
+The HTML is the same Friends page you built yesterday (our tidy copy of it). You only write CSS today, in a file called **style.css**. To see which classes and elements you can style, open the **show.html (whole page)** tab above the code box.
+
+At the end you choose your own colours. They'll follow you through the rest of the course.
+
+--- default css
+/* style.css: how ShowShelf looks */
+
+--- template
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Friends · ShowShelf</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <a href="index.html" class="logo">ShowShelf</a>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="about.html">About me</a>
+    </nav>
+  </header>
+
+  <main>
+    <article class="show">
+      <h1>Friends</h1>
+      <p class="meta">NBC · 1994–2004 · about 22 minutes per episode</p>
+
+      <img class="poster" src="poster.svg" alt="Poster for Friends">
+
+      <p>
+        Six friends in their twenties and thirties share apartments, jobs,
+        break-ups and <em>a lot of coffee</em> in <strong>New York City</strong>.
+      </p>
+
+      <section>
+        <h2>Genres</h2>
+        <ul>
+          <li>Comedy</li>
+          <li>Romance</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Main cast</h2>
+        <ul>
+          <li>Jennifer Aniston as Rachel Green</li>
+          <li>Courteney Cox as Monica Geller</li>
+          <li>Lisa Kudrow as Phoebe Buffay</li>
+          <li>Matt LeBlanc as Joey Tribbiani</li>
+          <li>Matthew Perry as Chandler Bing</li>
+          <li>David Schwimmer as Ross Geller</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Seasons</h2>
+        <table>
+          <tr><th>Season</th><th>Episodes</th><th>Year</th></tr>
+          <tr><td>1</td><td>24</td><td>1994</td></tr>
+          <tr><td>2</td><td>24</td><td>1995</td></tr>
+          <tr><td>3</td><td>25</td><td>1996</td></tr>
+        </table>
+      </section>
+
+      <p>
+        Want more? <a href="https://www.tvmaze.com/shows/431/friends">Read about it on TVmaze</a>.
+      </p>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <p>ShowShelf · Web Dev in 11 Days</p>
+  </footer>
+</body>
+</html>
+
+
+=== step first-rule
+title: Your first CSS rule
+minutes: 15
+slot: css
+--- explain
+CSS is written as **rules**. A rule says *which* elements to style, and *how*:
+
+```css
+body {
+  background-color: lightyellow;
+}
+```
+
+- `body` is the **selector**: which elements this rule is for. `body` is the whole visible page.
+- Inside the curly brackets `{ }` are **declarations**: a **property**, a colon `:`, a **value**, and a semicolon `;` at the end.
+
+How does the page know about style.css? Open the **show.html (whole page)** tab: in the `<head>` there is `<link rel="stylesheet" href="style.css">`. That line connects the two files.
+
+### Colours
+You can write colours as names (`lavender`, `mintcream`, `white`) or as **hex codes**, a `#` and six characters, like `#f6f5fb`. Hex codes give you millions of colours. Search the web for "colour picker" to find the code of any colour you like.
+--- task
+Give the page a light background colour of your choice, using the `body` selector.
+
+Some ideas: `#f6f5fb` (light violet), `#fdf6e3` (cream), `#eef6f3` (mint), `lavender`.
+--- hint
+Write the selector `body`, then `{`, then the declaration `background-color: #f6f5fb;` and finally `}`.
+--- hint
+```css
+body {
+  background-color: #f6f5fb;
+}
+```
+--- solution
+/* style.css: how ShowShelf looks */
+
+body {
+  background-color: #f6f5fb;
+}
+--- check
+t.expect(/body\s*\{/.test(t.clean), "Start a rule for the whole page with the selector `body` and curly brackets: `body { ... }`.");
+const bg = t.css("body", "background-color");
+if (t.isTransparent(bg)) {
+  t.expect(!/background-colou?r\s*:[^;{}]*$/m.test(t.clean) || /;/.test(t.clean), "End the declaration with a semicolon `;`.");
+  t.expect(!/background-colour/.test(t.clean), "CSS uses American spelling: `background-color` (no u).");
+  t.fail("The background hasn't changed yet. Inside `body { }` write `background-color:` then a colour and `;`.");
+}
+t.expect(!t.isWhite(bg), "That's white, the same as before. Pick a light colour with a little tint, for example `#f6f5fb`.");
+t.expect(t.light(bg) > 0.55, "That colour is quite dark: black text on it will be hard to read. Pick a light colour for now. (There's a dark mode challenge later today.)");
+--- learned
+You wrote a **rule**: a selector, then declarations inside `{ }`. Each declaration is `property: value;`. The browser applied it to every `body` (there's one) straight away.
+--- summary
+A CSS rule: `selector { property: value; }`.
+--- mistakes
+- British spelling: `background-colour` doesn't work in CSS.
+- Forgetting the `;` or the closing `}`.
+- A space inside the hex code: `# f6f5fb`.
+
+
+=== step text
+title: Text colour and font
+minutes: 15
+slot: css
+--- explain
+One rule can hold many declarations. Put each on its own line:
+
+```css
+body {
+  background-color: lightyellow;
+  color: #333333;
+  font-family: Georgia, serif;
+  line-height: 1.5;
+}
+```
+
+- `color` is the **text** colour. (The background has its own property.)
+- `font-family` is a list of fonts, in order of preference. The browser uses the first one the computer has. The last one should be a general family like `sans-serif` or `serif`.
+- `line-height` is the space between lines. `1.5` means one and a half times the text size. More space makes long text easier to read.
+
+`system-ui` means "the normal font of this computer", a safe and clean choice.
+--- task
+In your `body` rule, add:
+
+- a dark text `color` (not pure black: try `#1c1b29`)
+- a `font-family` without little "feet", for example `system-ui, Arial, sans-serif`
+- a `line-height` of about `1.6`
+--- hint
+Add three new lines inside the same `body { }` rule, under your background colour. Each ends with `;`.
+--- hint
+```css
+body {
+  background-color: #f6f5fb;
+  color: #1c1b29;
+  font-family: system-ui, Arial, sans-serif;
+  line-height: 1.6;
+}
+```
+--- solution-replace
+  background-color: #f6f5fb;
+}
+=>
+  background-color: #f6f5fb;
+  color: #1c1b29;
+  font-family: system-ui, Arial, sans-serif;
+  line-height: 1.6;
+}
+--- check
+const ff = t.css("body", "font-family");
+t.expect(/font-family\s*:/.test(t.clean), "Add a `font-family` declaration to the body rule.");
+t.expect(!/^"?times/i.test(ff) && ff !== "serif", "The font still looks like the default. Try `font-family: system-ui, Arial, sans-serif;` and check the commas and the `;`.");
+const lh = t.css("body", "line-height");
+t.expect(lh !== "normal", "Add a `line-height`, for example `line-height: 1.6;`.");
+t.expect(parseFloat(lh) >= 1.3 * t.px("body", "font-size"), "Make the line height a bit bigger, around `1.5` or `1.6`.");
+const c = t.css("body", "color");
+t.expect(!t.same(c, "rgb(0, 0, 0)"), "Set a text `color` too. Try a very dark colour that isn't pure black, like `#1c1b29`.");
+t.expect(t.light(c) < 0.45, "That text colour is quite light. Use a dark colour so the text stays easy to read.");
+t.expect(!t.isTransparent(t.css("body", "background-color")), "Keep your background colour from the last step.");
+--- learned
+The whole page changed from one rule, because the text elements **inherit** the font and colour of the `body` they're inside. That's the "cascading" in *Cascading Style Sheets*.
+--- summary
+`color`, `font-family` and `line-height` style text. Elements inherit them from `body`.
+--- mistakes
+- A second `body { }` rule for each property (works, but keep them together).
+- Missing commas between fonts: `system-ui Arial sans-serif`.
+- Writing `font: Arial;` instead of `font-family`.
+
+
+=== step headings
+title: Colour the headings
+minutes: 10
+slot: css
+--- explain
+A selector can be any element name: `h1`, `p`, `li`, `table`... The rule then styles **every** element with that name.
+
+To give several selectors the same style, separate them with commas:
+
+```css
+h1, h2 {
+  color: darkgreen;
+}
+```
+
+This is the same as writing one rule for `h1` and another for `h2`, just shorter.
+
+A new rule goes under the previous one, after its `}`. Leave an empty line between rules to keep things readable.
+--- task
+Give all `h1` and `h2` headings an accent colour of your choice, in one rule. Try a strong colour, like violet `#5b3fd6`.
+--- hint
+The selector is `h1, h2`. Inside it, one declaration: `color: ...;`.
+--- hint
+```css
+h1, h2 {
+  color: #5b3fd6;
+}
+```
+--- solution-append
+h1, h2 {
+  color: #5b3fd6;
+}
+--- check
+const h1 = t.css("h1", "color"), h2 = t.css("h2", "color"), body = t.css("body", "color");
+t.expect(!t.same(h1, body), "The `h1` still has the same colour as the rest of the text. Add a rule with the selector `h1, h2` and a `color`.");
+t.expect(t.same(h1, h2), "The `h2` headings should have the same colour as the `h1`. Use one rule for both: `h1, h2 { ... }` (with a comma).");
+t.expect(t.light(h1) < 0.8, "That heading colour is very light and hard to read on a light background. Pick a stronger colour.");
+--- learned
+An **element selector** (`h1`) styles every element of that kind. A comma lets one rule serve several selectors.
+--- summary
+Element selectors like `h1` style every element of that kind. Commas group selectors.
+--- mistakes
+- A space instead of a comma: `h1 h2` means "an h2 inside an h1", which doesn't exist here.
+
+
+=== step classes
+title: Style by class
+minutes: 15
+slot: css
+--- explain
+Remember `class="meta"` from yesterday? Now it pays off. To select elements by class, write a **dot** and the class name:
+
+```css
+.meta {
+  color: grey;
+}
+```
+
+`.meta` means "every element with `class="meta"`". Only that line changes, not the other paragraphs.
+
+### Sizes
+Sizes need a **unit**. The most common:
+
+- `px`: pixels, the dots on the screen. `16px` is normal text size.
+- `%`: a percentage of the space available.
+
+`font-size` sets the text size. Always write the unit: `14px`, not `14`.
+--- task
+Make the facts line (`class="meta"`) smaller and grey: a grey `color` like `#676580` and a `font-size` of `14px`.
+--- hint
+The selector is `.meta` (with a dot). Inside: `color` and `font-size`.
+--- hint
+```css
+.meta {
+  color: #676580;
+  font-size: 14px;
+}
+```
+--- solution-append
+.meta {
+  color: #676580;
+  font-size: 14px;
+}
+--- check
+t.expect(/\.meta\s*\{/.test(t.clean) || !/\bmeta\s*\{/.test(t.clean), "A class selector starts with a dot: `.meta`, not `meta`.");
+const meta = t.$(".meta"), p = t.$$("article p").find((x) => !x.classList.contains("meta"));
+t.expect(t.px(meta, "font-size") < t.px(p, "font-size"), "The facts line should be smaller than the other text. Add `font-size: 14px;` to `.meta` (don't forget `px`).");
+t.expect(!t.same(t.css(meta, "color"), t.css("body", "color")), "Give the facts line a grey `color`, different from the normal text.");
+t.expect(t.same(t.css(p, "color"), t.css("body", "color")), "Only the facts line should turn grey. Use the class selector `.meta`, not `p`.");
+--- learned
+A **class selector** (`.meta`) styles only the elements with that label. This is how you'll style almost everything from now on: give it a class in HTML, style the class in CSS.
+--- summary
+`.name` selects elements with `class="name"`. Sizes need units like `px`.
+--- mistakes
+- No dot: `meta { }` looks for a `<meta>` element.
+- A number without a unit: `font-size: 14;` is ignored.
+- A dot in the HTML: `class=".meta"`.
+
+
+=== step card
+title: The box model: make a card
+minutes: 20
+slot: css
+--- explain
+To the browser, every element is a **box**. Each box has four layers, from inside to outside:
+
+```
+┌──────────────── margin ────────────────┐
+│  ┌──────────── border ──────────────┐  │
+│  │  ┌───────── padding ──────────┐  │  │
+│  │  │         content            │  │  │
+│  │  └────────────────────────────┘  │  │
+│  └──────────────────────────────────┘  │
+└────────────────────────────────────────┘
+```
+
+- **content**: the text or picture
+- **padding**: space *inside* the border, around the content
+- **border**: a line around the box
+- **margin**: space *outside* the border, between this box and its neighbours
+
+```css
+.box {
+  background-color: white;
+  padding: 20px;
+  border: 2px solid black;
+  border-radius: 10px;
+}
+```
+
+`border` takes three values: thickness, style (`solid`, `dashed`, `dotted`) and colour. `border-radius` rounds the corners.
+--- task
+The whole show is inside `<article class="show">`. Turn it into a white card:
+
+- `background-color: #ffffff;`
+- `padding` of `24px`
+- a thin `border`, like `1px solid #e3e0f0`
+- rounded corners with `border-radius: 12px;`
+--- hint
+The selector is `.show`. Put the four declarations inside it.
+--- hint
+```css
+.show {
+  background-color: #ffffff;
+  padding: 24px;
+  border: 1px solid #e3e0f0;
+  border-radius: 12px;
+}
+```
+--- solution-append
+.show {
+  background-color: #ffffff;
+  padding: 24px;
+  border: 1px solid #e3e0f0;
+  border-radius: 12px;
+}
+--- check
+const s = t.$(".show");
+t.expect(/\.show\s*\{/.test(t.clean), "Start a rule with the selector `.show` (with a dot).");
+t.expect(!t.isTransparent(t.css(s, "background-color")), "Give the card a `background-color`, for example `#ffffff`.");
+t.expect(t.px(s, "padding-top") >= 8 && t.px(s, "padding-left") >= 8, "Add some `padding` inside the card, like `padding: 24px;`.");
+t.expect(t.css(s, "border-top-style") !== "none" && t.px(s, "border-top-width") >= 1, "Add a `border`: thickness, style and colour, like `border: 1px solid #e3e0f0;`.");
+t.expect(t.px(s, "border-top-left-radius") >= 4, "Round the corners with `border-radius`, like `border-radius: 12px;`.");
+--- learned
+You used three layers of the **box model**: padding inside, the border around it, and the background under both. Open the preview's **Bigger** view to see the card at full size.
+--- summary
+Box model: content, padding (inside), border, margin (outside).
+--- mistakes
+- `border: 1px #e3e0f0;` without a style (`solid`): no border appears.
+- Mixing up padding and margin.
+
+
+=== step centre
+title: Width and centring
+minutes: 15
+slot: css
+--- explain
+On a wide screen, very long lines of text are tiring to read. `max-width` stops a box from getting wider than a size you choose:
+
+```css
+.box {
+  max-width: 600px;
+}
+```
+
+On a phone the box is still allowed to be narrower. That's why it's `max-width` and not `width`.
+
+To **centre** a box, give it the same margin on the left and on the right. The value `auto` asks the browser to share the free space equally:
+
+```css
+.box {
+  margin: 40px auto;
+}
+```
+
+With two values, the first one is for top and bottom, the second for left and right.
+
+> The preview is narrow. Press **Bigger** above it to see the centring on a big screen.
+--- task
+In your `.show` rule, add a `max-width` of `640px` and a `margin` of `32px auto`.
+--- hint
+Add two lines inside your existing `.show { }` rule: `max-width: 640px;` and `margin: 32px auto;`.
+--- hint
+```css
+.show {
+  max-width: 640px;
+  margin: 32px auto;
+  background-color: #ffffff;
+  padding: 24px;
+  border: 1px solid #e3e0f0;
+  border-radius: 12px;
+}
+```
+--- solution-replace
+.show {
+  background-color: #ffffff;
+=>
+.show {
+  max-width: 640px;
+  margin: 32px auto;
+  background-color: #ffffff;
+--- check
+const s = t.$(".show");
+const mw = t.css(s, "max-width");
+t.expect(mw !== "none", "Add `max-width: 640px;` to the `.show` rule.");
+t.expect(parseFloat(mw) >= 300 && parseFloat(mw) <= 1000, `A max-width of ${mw} is unusual. Try \`640px\`.`);
+const rules = t.rules((sel) => /\.show\b/.test(sel));
+t.expect(rules.some((r) => r.style.marginLeft === "auto" && r.style.marginRight === "auto"), "To centre the card, the left and right margins must be `auto`: `margin: 32px auto;`.");
+t.expect(t.px(s, "margin-top") >= 8, "Give the card some space above and below: the first margin value, like `32px`.");
+--- learned
+`max-width` keeps text readable on big screens, and `margin: ... auto` centres a box. You'll use this pair on almost every website.
+--- summary
+`max-width` limits the width; `margin: 0 auto` centres a box.
+--- mistakes
+- `width: 640px` instead of `max-width`: the card is too wide for phones.
+- `margin: auto 32px` (values swapped): no space above, and it isn't centred.
+
+
+=== step poster
+title: Size the poster
+minutes: 10
+slot: css
+--- explain
+Images can be sized with CSS too. If you set only the `width`, the browser works out the height so the picture keeps its shape.
+
+```css
+.photo {
+  width: 150px;
+  border-radius: 50%;
+}
+```
+
+(`50%` rounding on a square picture makes a circle.)
+--- task
+Style the poster (`class="poster"`): a `width` of `200px` and slightly rounded corners, `border-radius: 8px`.
+--- hint
+The selector is `.poster`.
+--- hint
+```css
+.poster {
+  width: 200px;
+  border-radius: 8px;
+}
+```
+--- solution-append
+.poster {
+  width: 200px;
+  border-radius: 8px;
+}
+--- check
+const img = t.$(".poster");
+const w = img.getBoundingClientRect().width;
+t.expect(w >= 100 && w <= 320, `The poster is ${Math.round(w)}px wide. Set \`width: 200px;\` in a \`.poster\` rule.`);
+t.expect(t.px(img, "border-top-left-radius") >= 3, "Round the poster's corners a little: `border-radius: 8px;`.");
+--- learned
+Set one side of an image and the browser keeps its shape. Classes let you style this one picture without touching any others.
+--- summary
+Size images with `width`; the height follows.
+
+
+=== step header
+title: Header and footer
+minutes: 20
+slot: css
+--- explain
+Now style the top bar and the footer. Look at the whole page tab: the header has `class="site-header"`, the logo link has `class="logo"`, and the footer has `class="site-footer"`.
+
+Useful new properties:
+
+- `border-bottom`: a line only at the bottom (there's also `border-top`, `border-left`, `border-right`)
+- `font-weight: bold;` makes text bold
+- `text-decoration: none;` removes the underline from a link
+- `text-align: center;` centres text inside its box
+--- task
+1. `.site-header`: a white `background-color`, `padding: 16px 24px;` and a `border-bottom` like `1px solid #e3e0f0`
+2. `.logo`: `font-weight: bold;`, a bigger `font-size` (like `22px`) and `text-decoration: none;`
+3. `.site-footer`: `text-align: center;` and a grey `color`
+--- hint
+Three rules, one per class: `.site-header { }`, `.logo { }` and `.site-footer { }`.
+--- hint
+```css
+.site-header {
+  background-color: #ffffff;
+  padding: 16px 24px;
+  border-bottom: 1px solid #e3e0f0;
+}
+
+.logo {
+  font-weight: bold;
+  font-size: 22px;
+  text-decoration: none;
+}
+
+.site-footer {
+  text-align: center;
+  color: #676580;
+}
+```
+--- solution-append
+.site-header {
+  background-color: #ffffff;
+  padding: 16px 24px;
+  border-bottom: 1px solid #e3e0f0;
+}
+
+.logo {
+  font-weight: bold;
+  font-size: 22px;
+  text-decoration: none;
+}
+
+.site-footer {
+  text-align: center;
+  color: #676580;
+}
+--- check
+const h = t.$(".site-header");
+t.expect(!t.isTransparent(t.css(h, "background-color")), "Give `.site-header` a `background-color`.");
+t.expect(t.px(h, "padding-top") >= 8, "Add `padding` to `.site-header`, like `padding: 16px 24px;`.");
+t.expect(t.css(h, "border-bottom-style") !== "none", "Add a `border-bottom` to `.site-header`, like `1px solid #e3e0f0`.");
+const logo = t.$(".logo");
+t.expect(parseInt(t.css(logo, "font-weight")) >= 600, "Make the logo bold: `font-weight: bold;` in a `.logo` rule.");
+t.expect(!/underline/.test(t.css(logo, "text-decoration-line")), "Remove the logo's underline: `text-decoration: none;`.");
+t.expect(t.px(logo, "font-size") > t.px("body", "font-size"), "Make the logo text bigger with `font-size`, like `22px`.");
+t.expect(t.css(".site-footer", "text-align") === "center", "Centre the footer text: `.site-footer { text-align: center; }`.");
+--- learned
+`border-bottom`, `font-weight`, `text-decoration` and `text-align` are small properties with a big effect. The page now looks like a real website.
+--- summary
+Style parts of the page by their class: header, logo, footer.
+
+
+=== step links
+title: Links and hover
+minutes: 15
+slot: css
+--- explain
+Links are blue and underlined by default. You can change that, and also say how a link looks **while the mouse is over it**, with `:hover` after the selector:
+
+```css
+a {
+  color: darkgreen;
+}
+
+a:hover {
+  color: black;
+}
+```
+
+`:hover` is called a **pseudo-class**: a state the element can be in. Move your mouse over the links in the preview to try it.
+--- task
+1. Give all links (`a`) your accent colour, the same as your headings.
+2. Add an `a:hover` rule that changes the colour to a darker shade, like `#3d2a99`.
+--- hint
+Two rules: `a { color: ...; }` and `a:hover { color: ...; }`. There's no space between `a` and `:hover`.
+--- hint
+```css
+a {
+  color: #5b3fd6;
+}
+
+a:hover {
+  color: #3d2a99;
+}
+```
+--- solution-append
+a {
+  color: #5b3fd6;
+}
+
+a:hover {
+  color: #3d2a99;
+}
+--- check
+const a = t.$("article a");
+t.expect(!t.same(t.css(a, "color"), "rgb(0, 0, 238)"), "The links are still the default blue. Add a rule for `a` with your accent `color`.");
+const hov = t.rules((sel) => /(^|[\s,])a:hover/.test(sel));
+t.expect(hov.length, "Add a second rule with the selector `a:hover` (no space before the colon).");
+t.expect(hov.some((r) => r.style.color || r.style.textDecoration || r.style.backgroundColor), "Inside `a:hover { }`, change the `color`.");
+--- learned
+`:hover` styles an element while the mouse is over it. It's the first bit of interaction on your page, and it needed no programming.
+--- summary
+`a:hover` styles a link while the mouse is over it.
+--- mistakes
+- A space: `a :hover` means something different and doesn't work.
+
+
+=== step table
+title: A tidy table
+minutes: 15
+slot: css
+--- explain
+Tables look cramped by default. Two tricks make them clean:
+
+- `border-collapse: collapse;` on the `table` merges the double lines between cells into one.
+- `padding` on the cells (`th, td`) gives the numbers room to breathe.
+
+```css
+table {
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 6px 16px;
+  border-bottom: 1px solid #dddddd;
+  text-align: left;
+}
+```
+--- task
+Style the seasons table: `border-collapse: collapse;` on `table`, and on `th, td` some `padding`, a `border-bottom` and `text-align: left;`.
+--- hint
+Two rules: `table { }` and `th, td { }`.
+--- hint
+```css
+table {
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 6px 16px;
+  border-bottom: 1px solid #e3e0f0;
+  text-align: left;
+}
+```
+--- solution-append
+table {
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 6px 16px;
+  border-bottom: 1px solid #e3e0f0;
+  text-align: left;
+}
+--- check
+t.expect(t.css("table", "border-collapse") === "collapse", "Add `border-collapse: collapse;` to a `table` rule.");
+const td = t.$("td");
+t.expect(t.px(td, "padding-left") >= 6, "Give the cells some `padding` in a `th, td` rule, like `padding: 6px 16px;`.");
+t.expect(t.css(td, "border-bottom-style") !== "none", "Add a `border-bottom` to the cells, like `1px solid #e3e0f0`.");
+t.expect(t.css("th", "text-align") === "left" || t.css("th", "text-align") === "start", "Line the headings up on the left: `text-align: left;` in the `th, td` rule.");
+--- learned
+Collapsed borders and padding turn a cramped grid into a readable table.
+--- summary
+`border-collapse: collapse` and cell padding make tables readable.
+
+
+=== step theme
+title: Your own colours with variables
+minutes: 25
+slot: css
+provides: theme
+--- explain
+Your accent colour now appears in several rules: headings and links. To change it, you'd have to find and edit every copy. CSS **variables** fix that: define a colour once, give it a name, and use the name everywhere.
+
+```css
+:root {
+  --color-accent: #0a7d5a;
+}
+
+h1 {
+  color: var(--color-accent);
+}
+```
+
+- `:root` means "the whole document". Variables defined there work everywhere.
+- A variable name starts with two dashes: `--color-accent`.
+- `var(--color-accent)` uses it.
+
+Now changing one line changes the colour everywhere.
+
+> **This is your ShowShelf colour scheme.** From tomorrow on, the Lab uses your `--color-accent` and `--color-bg` in every page you build. Pick colours you like.
+--- task
+1. At the top of your CSS, add a `:root` rule with two variables: `--color-accent` (your favourite strong colour) and `--color-bg` (a light background colour).
+2. Use `var(--color-accent)` for the headings (`h1, h2`) and the links (`a`).
+3. Use `var(--color-bg)` for the body's background.
+
+Then change `--color-accent` to a different colour and watch the headings and links change together.
+--- hint
+The `:root { }` rule holds the two variables. Then, in your existing rules, replace the colour codes with `var(--color-accent)` or `var(--color-bg)`.
+--- hint
+```css
+:root {
+  --color-accent: #5b3fd6;
+  --color-bg: #f6f5fb;
+}
+
+body {
+  background-color: var(--color-bg);
+  ...
+}
+
+h1, h2 {
+  color: var(--color-accent);
+}
+```
+And in the `a` rule: `color: var(--color-accent);`
+--- solution-replace
+body {
+  background-color: #f6f5fb;
+=>
+:root {
+  --color-accent: #5b3fd6;
+  --color-bg: #f6f5fb;
+}
+
+body {
+  background-color: var(--color-bg);
+--- solution-replace
+h1, h2 {
+  color: #5b3fd6;
+}
+=>
+h1, h2 {
+  color: var(--color-accent);
+}
+--- solution-replace
+a {
+  color: #5b3fd6;
+}
+=>
+a {
+  color: var(--color-accent);
+}
+--- check
+const accent = t.cssVar("--color-accent"), bgv = t.cssVar("--color-bg");
+t.expect(/:root\s*\{/.test(t.clean), "Start with a `:root { }` rule at the top, with a colon before `root`.");
+t.expect(accent, "Define `--color-accent` inside `:root`, with two dashes: `--color-accent: #5b3fd6;`.");
+t.expect(bgv, "Define `--color-bg` inside `:root` too.");
+const probe = t.doc.createElement("i");
+t.doc.body.appendChild(probe);
+probe.style.color = "var(--color-accent)";
+const accentRgb = t.win.getComputedStyle(probe).color;
+probe.style.color = "var(--color-bg)";
+const bgRgb = t.win.getComputedStyle(probe).color;
+probe.remove();
+t.expect(/var\(\s*--color-accent\s*\)/.test(t.clean), "Use the variable in your rules: `color: var(--color-accent);`.");
+t.expect(t.same(t.css("h1", "color"), accentRgb), "The `h1, h2` rule should use `color: var(--color-accent);`.");
+t.expect(t.same(t.css("article a", "color"), accentRgb), "The `a` rule should use `color: var(--color-accent);` too.");
+t.expect(t.same(t.css("body", "background-color"), bgRgb), "The body's `background-color` should be `var(--color-bg)`.");
+t.expect(t.light(bgRgb) > 0.55, "Keep `--color-bg` light, so the text stays easy to read.");
+--- learned
+Variables let you define a value once and reuse it everywhere. Your `--color-accent` and `--color-bg` are now **your** ShowShelf colours: you'll see them again tomorrow.
+--- summary
+CSS variables: define `--name: value;` in `:root`, use it with `var(--name)`.
+--- mistakes
+- One dash instead of two: `-color-accent`.
+- `var(color-accent)` without the dashes.
+- `root { }` without the colon.
+--- teacher
+The student's `:root` block is carried to Days 3 onwards automatically. If a student picks a dark `--color-bg`, later pages will be hard to read: suggest a light one.
+
+
+=== step dark
+title: Dark mode
+minutes: 20
+slot: css
+bonus: yes
+--- explain
+Many people set their computer to **dark mode**. Websites can follow that setting with a **media query**: CSS that only applies when a condition is true.
+
+```css
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #12111a;
+  }
+}
+```
+
+Because your colours are variables, you only need to give them new values inside the media query. That's the real power of variables.
+
+To see it, switch your computer to dark mode (on Windows: Settings, Personalisation, Colours; on a Mac: System Settings, Appearance).
+--- task
+Add a `@media (prefers-color-scheme: dark)` block that sets new, dark values for `--color-bg`, plus a light text colour. Tip: add a `--color-text` variable and use it in `body` for this.
+--- hint
+Inside the media query goes a `:root { }` rule with the dark values. Two pairs of curly brackets: one for `@media`, one for `:root`.
+--- hint
+```css
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #12111a;
+    --color-text: #f1f0f7;
+    --color-accent: #a18bff;
+  }
+}
+```
+And in `body`: `color: var(--color-text);` (define `--color-text: #1c1b29;` in your normal `:root`).
+--- solution-replace
+  --color-bg: #f6f5fb;
+}
+=>
+  --color-bg: #f6f5fb;
+  --color-text: #1c1b29;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #12111a;
+    --color-text: #f1f0f7;
+    --color-accent: #a18bff;
+  }
+}
+--- solution-replace
+  color: #1c1b29;
+=>
+  color: var(--color-text);
+--- check
+t.expect(/@media\s*\(\s*prefers-color-scheme\s*:\s*dark\s*\)\s*\{/.test(t.clean), "Start a block with `@media (prefers-color-scheme: dark) {`.");
+const m = t.clean.match(/@media\s*\(\s*prefers-color-scheme\s*:\s*dark\s*\)\s*\{([\s\S]*)/);
+t.expect(/:root\s*\{[^}]*--color-bg\s*:/.test(m[1]), "Inside the media query, put a `:root { }` rule that sets `--color-bg` to a dark colour.");
+let ok = false;
+for (const sh of t.doc.styleSheets) for (const r of sh.cssRules) if (r.media && /dark/.test(r.media.mediaText)) ok = true;
+t.expect(ok, "The browser couldn't read your media query. Check that every `{` has its `}`.");
+--- learned
+A **media query** applies CSS only when a condition is true. With variables, a whole dark theme is just a few new values.
+--- summary
+`@media (prefers-color-scheme: dark)` for a dark theme.
+
+
+=== step hover-poster
+title: A poster that moves
+minutes: 15
+slot: css
+bonus: yes
+--- explain
+`transform` can move, rotate or resize an element without changing the layout around it. `transition` makes the change smooth instead of instant:
+
+```css
+.photo {
+  transition: transform 0.2s;
+}
+
+.photo:hover {
+  transform: scale(1.05) rotate(-2deg);
+}
+```
+
+`scale(1.05)` means 5% bigger. `0.2s` is two tenths of a second.
+--- task
+Make the poster grow a little and tilt when the mouse is over it, smoothly.
+--- hint
+Add `transition: transform 0.2s;` to `.poster`, and a new `.poster:hover` rule with a `transform`.
+--- hint
+```css
+.poster:hover {
+  transform: scale(1.05) rotate(-2deg);
+}
+```
+--- solution-replace
+.poster {
+  width: 200px;
+  border-radius: 8px;
+}
+=>
+.poster {
+  width: 200px;
+  border-radius: 8px;
+  transition: transform 0.2s;
+}
+
+.poster:hover {
+  transform: scale(1.05) rotate(-2deg);
+}
+--- check
+const hov = t.rules((sel) => /\.poster:hover/.test(sel));
+t.expect(hov.length && hov.some((r) => r.style.transform), "Add a `.poster:hover` rule with a `transform`, like `transform: scale(1.05);`.");
+t.expect(/transition/.test(t.css(".poster", "transition-property")) || t.css(".poster", "transition-duration") !== "0s", "Add a `transition` to `.poster` so the change is smooth: `transition: transform 0.2s;`.");
+--- learned
+`transform` plus `transition` gives smooth little animations, all in CSS.
+--- summary
+`transform` and `transition` for small animations.
+
+
+=== step caps
+title: Small, spaced headings
+minutes: 10
+slot: css
+bonus: yes
+--- explain
+Two more text properties designers love:
+
+- `text-transform: uppercase;` shows the text in capitals, without changing the HTML.
+- `letter-spacing: 1px;` adds space between the letters.
+
+Together they make neat, quiet subheadings.
+--- task
+Make the `h2` headings uppercase, a bit smaller (`16px`) and spaced out (`letter-spacing: 1px`). Keep the `h1` as it is.
+--- hint
+Add a new rule for `h2` alone, under the `h1, h2` rule.
+--- hint
+```css
+h2 {
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+```
+--- solution-append
+h2 {
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+--- check
+t.expect(t.css("h2", "text-transform") === "uppercase", "Add `text-transform: uppercase;` to an `h2` rule.");
+t.expect(t.px("h2", "letter-spacing") > 0, "Add some `letter-spacing` to the `h2`, like `1px`.");
+t.expect(t.css("h1", "text-transform") !== "uppercase", "Only the `h2` should be uppercase: put it in a rule for `h2` alone.");
+--- learned
+When two rules style the same element, both apply. For the same property, the later rule wins.
+--- summary
+`text-transform` and `letter-spacing` style headings.

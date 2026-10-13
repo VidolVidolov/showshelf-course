@@ -1,0 +1,2098 @@
+=== day
+n: 9
+title: The show page
+subtitle: Views, details and My List
+hours: 3 hours
+page: index.html
+slot: js | js | app.js
+file: app.js = js
+refs: @page, helpers.js
+
+--- intro
+Today ShowShelf gets a page for every show, with its cast and seasons, and a page for My List.
+
+Instead of separate HTML files, the page now has three **views**: three `<section>` elements, of which only one shows at a time. Open the **index.html (whole page)** tab to see them: `#home-view`, `#show-view` and `#mylist-view`. Switching views is one more thing in the state.
+
+Your code box starts with the finished app from Day 8, tidied into sections. The element lookups for the new parts of the page are already at the top (look for **Day 9**), so you can focus on what they do. Today's new code goes at the very bottom, under the line that says *new on Day 9*.
+
+**This is your finished app.** On Day 11 it becomes your own website, online. Take your time, and read the code you add as well as writing it.
+
+--- template
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ShowShelf</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo" id="logo">ShowShelf</a>
+      <nav class="nav">
+        <a href="index.html" id="nav-home">Home</a>
+        <a href="index.html" id="nav-mylist">My List <span class="list-count" id="list-count">0</span></a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- View 1: home, with the search and the grid of shows -->
+    <section id="home-view">
+      <div class="hero">
+        <h1>What are we watching tonight?</h1>
+        <p>Search real shows from TVmaze and keep your watchlist.</p>
+        <form class="search" id="search-form">
+          <input type="search" id="search" placeholder="Search shows, e.g. office" aria-label="Search shows">
+          <button type="submit">Search</button>
+        </form>
+      </div>
+      <div class="toolbar">
+        <div class="genres" id="genres"></div>
+      </div>
+      <p class="status" id="status" hidden></p>
+      <p class="status" id="empty-message" hidden>No shows match your search.</p>
+      <div class="grid" id="grid"></div>
+    </section>
+
+    <!-- View 2: one show -->
+    <section id="show-view" hidden>
+      <p class="back-link"><button type="button" class="button-secondary" id="back-button">← Back to shows</button></p>
+      <p class="status" id="show-status" hidden></p>
+      <article class="show" id="show-details">
+        <div class="show-header">
+          <img class="poster" id="show-poster" src="poster.svg" alt="">
+          <div>
+            <h1 id="show-name"></h1>
+            <p class="meta" id="show-meta"></p>
+            <p class="rating" id="show-rating"></p>
+            <p id="show-genres"></p>
+            <p class="intro" id="show-summary"></p>
+            <p class="show-links"><button type="button" id="show-list-button">+ Add to My List</button></p>
+          </div>
+        </div>
+        <section>
+          <h2>Cast</h2>
+          <ul id="show-cast"></ul>
+        </section>
+        <section>
+          <h2>Seasons</h2>
+          <table class="seasons">
+            <thead>
+              <tr><th>Season</th><th>Episodes</th><th>Year</th></tr>
+            </thead>
+            <tbody id="show-seasons"></tbody>
+          </table>
+        </section>
+      </article>
+    </section>
+
+    <!-- View 3: My List -->
+    <section id="mylist-view" hidden>
+      <div class="hero">
+        <h1>My List</h1>
+        <p>The shows you saved. They stay here after a reload.</p>
+      </div>
+      <p class="status" id="mylist-empty">Your list is empty. Press + on a show to add it.</p>
+      <div class="grid" id="mylist-grid"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>ShowShelf · Web Dev in 11 Days</p>
+  </footer>
+
+  <script src="helpers.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
+
+--- template extras
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ShowShelf</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo" id="logo">ShowShelf</a>
+      <nav class="nav">
+        <a href="index.html" id="nav-home">Home</a>
+        <a href="index.html" id="nav-mylist">My List <span class="list-count" id="list-count">0</span></a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- View 1: home, with the search and the grid of shows -->
+    <section id="home-view">
+      <div class="hero">
+        <h1>What are we watching tonight?</h1>
+        <p>Search real shows from TVmaze and keep your watchlist.</p>
+        <form class="search" id="search-form">
+          <input type="search" id="search" placeholder="Search shows, e.g. office" aria-label="Search shows">
+          <button type="submit">Search</button>
+        </form>
+      </div>
+      <div class="toolbar">
+        <div class="genres" id="genres"></div>
+      </div>
+      <p class="status" id="status" hidden></p>
+      <p class="status" id="empty-message" hidden>No shows match your search.</p>
+      <div class="grid" id="grid"></div>
+    </section>
+
+    <!-- View 2: one show -->
+    <section id="show-view" hidden>
+      <p class="back-link"><button type="button" class="button-secondary" id="back-button">← Back to shows</button></p>
+      <p class="status" id="show-status" hidden></p>
+      <article class="show" id="show-details">
+        <div class="show-header">
+          <img class="poster" id="show-poster" src="poster.svg" alt="">
+          <div>
+            <h1 id="show-name"></h1>
+            <p class="meta" id="show-meta"></p>
+            <p class="rating" id="show-rating"></p>
+            <p id="show-genres"></p>
+            <p class="intro" id="show-summary"></p>
+            <p class="show-links"><button type="button" id="show-list-button">+ Add to My List</button></p>
+          </div>
+        </div>
+        <section>
+          <h2>Cast</h2>
+          <ul id="show-cast"></ul>
+        </section>
+        <section>
+          <h2>Seasons</h2>
+          <table class="seasons">
+            <thead>
+              <tr><th>Season</th><th>Episodes</th><th>Year</th></tr>
+            </thead>
+            <tbody id="show-seasons"></tbody>
+          </table>
+        </section>
+      </article>
+    </section>
+
+    <!-- View 3: My List -->
+    <section id="mylist-view" hidden>
+      <div class="hero">
+        <h1>My List</h1>
+        <p>The shows you saved. They stay here after a reload.</p>
+        <!-- New for the extra challenge -->
+        <p class="rating" id="mylist-average"></p>
+      </div>
+      <p class="status" id="mylist-empty">Your list is empty. Press + on a show to add it.</p>
+      <div class="grid" id="mylist-grid"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>ShowShelf · Web Dev in 11 Days</p>
+  </footer>
+
+  <script src="helpers.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
+
+--- file style.css
+{{asset:appCss}}
+
+--- file helpers.js
+// helpers.js: small helper functions (read only)
+
+// ratingLabel(9.2) -> "Must watch", ratingLabel(7.5) -> "Worth a try", ratingLabel(5) -> "Skip it"
+function ratingLabel(rating) {
+  if (rating >= 8.5) {
+    return "Must watch";
+  } else if (rating >= 7) {
+    return "Worth a try";
+  } else {
+    return "Skip it";
+  }
+}
+
+// yearsLabel(1994, 2004) -> "1994–2004", yearsLabel(2019, 2019) -> "2019",
+// yearsLabel(2019, null) -> "2019–now" (still running), yearsLabel(null, null) -> ""
+function yearsLabel(premiered, ended) {
+  if (!premiered) {
+    return "";
+  }
+  if (!ended) {
+    return premiered + "–now";
+  }
+  if (premiered === ended) {
+    return String(premiered);
+  }
+  return premiered + "–" + ended;
+}
+
+// getByGenre(shows, "Comedy") -> only the shows that have this genre
+function getByGenre(list, genre) {
+  return list.filter((show) => show.genres.includes(genre));
+}
+
+// allGenres(shows) -> ["Action", "Adventure", "Comedy", ...]: every genre once, from A to Z
+function allGenres(list) {
+  const result = [];
+  for (const show of list) {
+    for (const genre of show.genres) {
+      if (!result.includes(genre)) {
+        result.push(genre);
+      }
+    }
+  }
+  return result.sort();
+}
+
+// ---------- Helpers for TVmaze's data ----------
+
+// stripTags("<p><b>Dark</b> is a mystery.</p>") -> "Dark is a mystery."
+// TVmaze writes its summaries in HTML. We keep only the text.
+function stripTags(html) {
+  if (!html) {
+    return "";
+  }
+  return html.replace(/<[^>]*>/g, "").replace(/&amp;/g, "&").trim();
+}
+
+// yearOf("2019-06-21") -> 2019, yearOf(null) -> null
+function yearOf(date) {
+  if (!date) {
+    return null;
+  }
+  return Number(date.slice(0, 4));
+}
+
+// toShow(apiShow): one show in TVmaze's shape -> one show in OUR shape.
+// Some of TVmaze's fields can be null, so each one gets a safe value.
+function toShow(apiShow) {
+  let network = "";
+  if (apiShow.network) {
+    network = apiShow.network.name;
+  } else if (apiShow.webChannel) {
+    network = apiShow.webChannel.name;   // streaming shows have a web channel instead
+  }
+
+  let image = null;
+  if (apiShow.image) {
+    image = apiShow.image.medium;        // the medium-sized poster
+  }
+
+  let rating = null;
+  if (apiShow.rating) {
+    rating = apiShow.rating.average ?? null;
+  }
+
+  return {
+    id: apiShow.id,
+    name: apiShow.name,
+    genres: apiShow.genres ?? [],
+    rating: rating,
+    premiered: yearOf(apiShow.premiered),
+    ended: yearOf(apiShow.ended),
+    runtime: apiShow.averageRuntime ?? apiShow.runtime ?? null,
+    network: network,
+    image: image,
+    summary: stripTags(apiShow.summary),
+  };
+}
+
+--- default js
+// app.js: ShowShelf (Day 9)
+// This is the finished app from Day 8, tidied into sections.
+// Today's page has three views: home, show and My List. Open the whole-page tab to see them.
+// New lines for today say "Day 9" in their comments.
+// Loaded before this file (open the read-only tab to see it):
+//   helpers.js -> ratingLabel, yearsLabel, getByGenre, allGenres, yearOf, toShow, stripTags
+
+// ---------- Elements: the parts of the page we change ----------
+const grid = document.querySelector("#grid");
+const searchInput = document.querySelector("#search");
+const searchForm = document.querySelector("#search-form");
+const emptyMessage = document.querySelector("#empty-message");
+const genresBox = document.querySelector("#genres");
+const listCount = document.querySelector("#list-count");
+const statusMessage = document.querySelector("#status");
+
+// Day 9: the three views, and the header links that switch between them
+const homeView = document.querySelector("#home-view");
+const showView = document.querySelector("#show-view");
+const myListView = document.querySelector("#mylist-view");
+const logoLink = document.querySelector("#logo");
+const homeLink = document.querySelector("#nav-home");
+const myListLink = document.querySelector("#nav-mylist");
+
+// Day 9: the parts of the show view
+const backButton = document.querySelector("#back-button");
+const showStatus = document.querySelector("#show-status");
+const showDetails = document.querySelector("#show-details");
+const showPoster = document.querySelector("#show-poster");
+const showName = document.querySelector("#show-name");
+const showMeta = document.querySelector("#show-meta");
+const showRating = document.querySelector("#show-rating");
+const showGenres = document.querySelector("#show-genres");
+const showSummary = document.querySelector("#show-summary");
+const showListButton = document.querySelector("#show-list-button");
+const castList = document.querySelector("#show-cast");
+const seasonsBody = document.querySelector("#show-seasons");
+
+// Day 9: the parts of the My List view
+const myListGrid = document.querySelector("#mylist-grid");
+const myListEmpty = document.querySelector("#mylist-empty");
+
+// ---------- State: everything on the page that can change ----------
+const state = {
+  shows: [],      // the shows on the home page, from TVmaze (in our shape)
+  genre: "",      // the chosen genre ("" means all genres)
+  myList: JSON.parse(localStorage.getItem("myListIds")) ?? [],   // saved TVmaze ids, or an empty list
+};
+
+// ---------- TVmaze: asking for data ----------
+
+// The address of the TVmaze API. Every request starts with it.
+const API = "https://api.tvmaze.com";
+
+// The search address: searchUrl("the office") -> ".../search/shows?q=the%20office"
+function searchUrl(term) {
+  return `${API}/search/shows?q=${encodeURIComponent(term)}`;
+}
+
+// Search TVmaze. Gives back a list of shows in OUR shape, ready for createCard.
+async function searchShows(term) {
+  const response = await fetch(searchUrl(term));
+  if (!response.ok) {
+    throw new Error("TVmaze answered " + response.status);   // stop here: we have no shows
+  }
+  const results = await response.json();
+  return results.map((result) => toShow(result.show));
+}
+
+// Page 0 of TVmaze's list of shows: the first 250
+async function getShowsPage() {
+  const response = await fetch(`${API}/shows?page=0`);
+  if (!response.ok) {
+    throw new Error("TVmaze answered " + response.status);
+  }
+  const apiShows = await response.json();
+  return apiShows.map(toShow);
+}
+
+// Load the shows for the home page (page 0 when the search is empty),
+// with a loading message, an error message, and a message when nothing is found
+async function loadShows(term) {
+  statusMessage.textContent = "Loading shows…";
+  statusMessage.classList.remove("error");
+  statusMessage.hidden = false;
+  emptyMessage.hidden = true;   // an old "nothing found" doesn't belong to the new search
+  try {
+    if (term === "") {
+      state.shows = await getShowsPage();   // empty search box: the first page of shows
+    } else {
+      state.shows = await searchShows(term);
+    }
+    statusMessage.hidden = true;
+    state.genre = "";   // the new shows may not have the chosen genre
+    emptyMessage.textContent = `No shows found for "${term}". Try another word.`;
+    render();
+  } catch (error) {
+    // No internet, or TVmaze answered with an error: tell the person, in red
+    statusMessage.textContent = "Sorry, the shows could not be loaded (" + error.message + "). Check your internet connection and try again.";
+    statusMessage.classList.add("error");
+  }
+}
+
+// ---------- One card for one show ----------
+// createCard(show) builds a card and gives it back. It doesn't put it on the page.
+function createCard(show) {
+  const card = document.createElement("article");
+  card.className = "card";
+
+  const poster = document.createElement("img");
+  poster.className = "poster";
+  poster.src = show.image ?? "poster.svg";   // no picture (null)? use poster.svg
+  poster.alt = "";                           // the name is under the poster, so no alt text
+  poster.loading = "lazy";                   // load the picture only when it scrolls into view
+
+  const body = document.createElement("div");
+  body.className = "card-body";
+
+  // Real shows can have no genres at all, so only add a badge when there is one
+  if (show.genres.length > 0) {
+    const badge = document.createElement("span");
+    badge.className = "badge";
+    badge.textContent = show.genres[0];
+    body.append(badge);
+  }
+
+  const title = document.createElement("h3");
+  title.textContent = show.name;
+
+  // Real shows can have no rating yet (null)
+  const rating = document.createElement("p");
+  rating.className = "rating";
+  if (show.rating === null) {
+    rating.textContent = "No rating yet";
+  } else {
+    rating.textContent = "★ " + show.rating + " · " + ratingLabel(show.rating);
+  }
+
+  const meta = document.createElement("p");
+  meta.className = "meta";
+  meta.textContent = yearsLabel(show.premiered, show.ended);
+
+  body.append(title, rating, meta);
+  card.append(poster, body);
+  card.append(createListButton(show));
+  return card;
+}
+
+// The round button on a card: "+" adds the show, "✓" means it's in My List
+function createListButton(show) {
+  const button = document.createElement("button");
+  button.className = "list-btn";
+  if (isInMyList(show.id)) {
+    button.textContent = "✓";
+  } else {
+    button.textContent = "+";
+  }
+  button.setAttribute("aria-pressed", isInMyList(show.id));   // "pressed" look, and for screen readers
+  button.setAttribute("aria-label", "My List: " + show.name);
+  button.addEventListener("click", () => {
+    toggleMyList(show);
+  });
+  return button;
+}
+
+// ---------- Draw the page from the state ----------
+
+// Draw a list of shows in the grid
+function renderGrid(list) {
+  grid.replaceChildren();   // remove the old cards first
+  for (const show of list) {
+    grid.append(createCard(show));
+  }
+  emptyMessage.hidden = list.length > 0;   // show the message only when there are no shows
+}
+
+function render() {
+  let list = state.shows;
+  if (state.genre !== "") {
+    list = getByGenre(list, state.genre);
+  }
+
+  renderGrid(list);
+  renderGenres();
+  listCount.textContent = state.myList.length;
+}
+
+// One button (a "chip") per genre. The chosen one gets the class "active".
+function renderGenres() {
+  genresBox.replaceChildren();
+  for (const genre of allGenres(state.shows)) {
+    const chip = document.createElement("button");
+    chip.className = "chip";
+    chip.textContent = genre;
+    if (genre === state.genre) {
+      chip.classList.add("active");
+    }
+    chip.addEventListener("click", () => {
+      if (state.genre === genre) {
+        state.genre = "";      // clicked the chosen genre again: all genres
+      } else {
+        state.genre = genre;
+      }
+      render();
+    });
+    genresBox.append(chip);
+  }
+}
+
+// ---------- My List ----------
+
+// Is this show in My List? Gives true or false.
+function isInMyList(id) {
+  return state.myList.includes(id);
+}
+
+// Add the show to My List, or take it out if it's already there
+function toggleMyList(show) {
+  if (isInMyList(show.id)) {
+    state.myList = state.myList.filter((id) => id !== show.id);
+  } else {
+    state.myList.push(show.id);
+  }
+  saveMyList();
+  render();
+}
+
+// Save My List in the browser (localStorage keeps text only, so we turn it into JSON text)
+function saveMyList() {
+  localStorage.setItem("myListIds", JSON.stringify(state.myList));
+}
+
+// ---------- Events: what happens when someone uses the page ----------
+
+// Pressing Enter or Search asks TVmaze
+searchForm.addEventListener("submit", (event) => {
+  event.preventDefault();   // don't reload the page
+  loadShows(searchInput.value.trim());
+});
+
+// ---------- Credit: TVmaze's data is free to use if we say where it comes from ----------
+const credit = document.createElement("a");
+credit.href = "https://www.tvmaze.com";
+credit.textContent = "Data from TVmaze";
+document.querySelector(".site-footer p").append(" · ", credit);
+
+// ---------- Start: load the first shows from TVmaze ----------
+loadShows("");
+
+// ========== The show view and My List (new on Day 9) ==========
+
+
+=== step open-show
+title: Three views, one page
+minutes: 20
+slot: js
+--- explain
+A **view** is one screen of an app. ShowShelf now has three, and they're all in the same page: three `<section>` elements, of which only one is visible at a time.
+
+Which view is showing is part of the state: `state.view` is `"home"`, `"show"` or `"mylist"`. And like everything else, `render()` draws it. One line per view:
+
+```js
+cartPanel.hidden = state.panel !== "cart";   // hidden unless the panel is "cart"
+```
+
+To open a show, a click on a card changes `state.view` and calls `render()`.
+
+One trap: the round + button is **inside** the card. A click on it also counts as a click on the card, because events **bubble** up from an element to everything around it. So the + button would open the show too. `event.stopPropagation()` stops the click from going any further up:
+
+```js
+likeButton.addEventListener("click", (event) => {
+  event.stopPropagation();   // don't also count as a click on the post around it
+  like(post);
+});
+```
+--- task
+1. In `state`, add `view: "home",`.
+2. At the top of `render()`, add three lines that hide every view except the one in `state.view` (`homeView`, `showView` and `myListView`).
+3. Fill in the TODO in `openShow`.
+4. In `createCard`, before `return card;`, add a click listener to the card that calls `openShow(show.id)`.
+5. In `createListButton`, give the listener an `event` parameter and call `event.stopPropagation();` first.
+
+Click a card: the home view disappears. (The show view is empty for now.) Press **Run again** to go back.
+--- starter-append
+// ---------- The show view ----------
+
+// Open the show view for one show (a click on a card calls this)
+function openShow(id) {
+  // TODO: switch to the show view: set state.view to "show", then call render()
+  window.scrollTo(0, 0);   // start at the top of the page
+}
+--- hint
+Each of the three lines in `render()` compares `state.view` with the name of one view: `homeView.hidden = state.view !== "home";`. The other two work the same way.
+--- hint
+```js
+function render() {
+  homeView.hidden = state.view !== "home";
+  showView.hidden = state.view !== "show";
+  myListView.hidden = state.view !== "mylist";
+  ...
+```
+```js
+function openShow(id) {
+  state.view = "show";
+  render();
+  window.scrollTo(0, 0);
+}
+```
+In `createCard`: `card.addEventListener("click", () => { openShow(show.id); });`
+--- solution-replace
+const state = {
+  shows: [],      // the shows on the home page, from TVmaze (in our shape)
+=>
+const state = {
+  view: "home",   // which view is showing: "home", "show" or "mylist"
+  shows: [],      // the shows on the home page, from TVmaze (in our shape)
+--- solution-replace
+function render() {
+  let list = state.shows;
+=>
+function render() {
+  // Show the view that matches state.view, and hide the other two
+  homeView.hidden = state.view !== "home";
+  showView.hidden = state.view !== "show";
+  myListView.hidden = state.view !== "mylist";
+
+  let list = state.shows;
+--- solution-replace
+  card.append(createListButton(show));
+  return card;
+=>
+  card.append(createListButton(show));
+  card.addEventListener("click", () => {
+    openShow(show.id);
+  });
+  return card;
+--- solution-replace
+  button.addEventListener("click", () => {
+    toggleMyList(show);
+  });
+=>
+  button.addEventListener("click", (event) => {
+    event.stopPropagation();   // a click on the button is not a click on the card
+    toggleMyList(show);
+  });
+--- solution-append
+// ---------- The show view ----------
+
+// Open the show view for one show (a click on a card calls this)
+function openShow(id) {
+  state.view = "show";
+  render();
+  window.scrollTo(0, 0);   // start at the top of the page
+}
+--- check
+await t.sleep(450);
+await t.rerun();   // start from a fresh run of the page
+const home = t.$("#home-view"), showV = t.$("#show-view"), mine = t.$("#mylist-view");
+const st = () => t.get("state");
+t.expect(st().view === "home", "Add `view: \"home\",` to the `state` object: the page starts on the home view.");
+t.expect(await t.waitFor(() => t.$$("#grid .card").length === 12, 3000), "The home view should load 12 shows. Look in the Console for an error.");
+t.expect(!home.hidden && showV.hidden && mine.hidden, "At the start only the home view should show. At the top of `render()`, set `homeView.hidden`, `showView.hidden` and `myListView.hidden` from `state.view`.");
+await t.click(t.$$("#grid .card h3")[1]);
+t.expect(st().view === "show", "Clicking a card didn't change `state.view`. In `createCard`, add a click listener to `card` that calls `openShow(show.id)`, and in `openShow` set `state.view = \"show\";` (the TODO).");
+t.expect(!showV.hidden && home.hidden, "`state.view` is \"show\", but the page didn't switch views. Call `render();` in `openShow`, and check the three `hidden` lines at the top of `render()`.");
+st().view = "mylist";
+t.get("render")();
+t.expect(!mine.hidden && home.hidden && showV.hidden, "When `state.view` is \"mylist\", only the My List view should show. Check the line `myListView.hidden = state.view !== \"mylist\";`.");
+st().view = "home";
+t.get("render")();
+t.expect(!home.hidden && showV.hidden && mine.hidden, "When `state.view` is \"home\", the home view should come back and the others should hide.");
+await t.click(t.$$("#grid .card .list-btn")[0]);
+const viewAfterPlus = st().view;
+await t.click(t.$$("#grid .card .list-btn")[0]);
+st().view = "home";
+t.get("render")();
+t.expect(viewAfterPlus === "home", "Clicking the + button also opened the show. In `createListButton`, give the listener an `event` parameter and call `event.stopPropagation();` first.");
+--- learned
+Views are state too. `render()` shows one `<section>` and hides the others, and `stopPropagation()` keeps a click on the + button from also counting as a click on the card.
+--- summary
+Views in one page: `state.view` plus `hidden` in `render()`. `event.stopPropagation()` stops bubbling.
+--- mistakes
+- `homeView.hidden = state.view === "home";`: the wrong way round, so the home view hides exactly when it should show.
+- `card.addEventListener("click", openShow(show.id))`: this calls `openShow` straight away for every card.
+- Forgetting `event` in `(event) => { ... }`, so `event.stopPropagation()` fails.
+
+
+=== step get-show
+title: One show, with cast and seasons
+minutes: 15
+slot: js
+--- explain
+To fill the show view, we need one show by its id. TVmaze has an address for that: `/shows/431` gives Friends.
+
+We also want the cast and the seasons. We could ask three times, but TVmaze can **embed** them in the same answer when you ask for it in the query string:
+
+`https://api.tvmaze.com/shows/431?embed[]=cast&embed[]=seasons`
+
+[Open it in a new tab](https://api.tvmaze.com/shows/431?embed[]=cast&embed[]=seasons) and scroll to the end: the extras are in a property called `_embedded`.
+
+```json
+{
+  "id": 431,
+  "name": "Friends",
+  ...
+  "_embedded": {
+    "cast": [ { "person": { "name": "Jennifer Aniston" }, "character": { "name": "Rachel Green" } }, ... ],
+    "seasons": [ { "number": 1, "episodeOrder": 24, "premiereDate": "…" }, ... ]
+  }
+}
+```
+
+A function can give back several things at once by returning an **object**: `return { show: ..., cast: ..., seasons: ... };`
+--- task
+1. Fill in the TODO in `getShowById`: return an object with three properties, `show`, `cast` and `seasons`.
+2. Make `openShow` an `async function`, and at its end add `const data = await getShowById(id);` and `console.log(data.show.name);`.
+
+Click a card and look at the Console.
+--- starter-append
+// Ask TVmaze for one show, with its cast and seasons in the same answer
+// getShowById(431) -> { show: {...our shape...}, cast: [...], seasons: [...] }
+async function getShowById(id) {
+  const response = await fetch(`${API}/shows/${id}?embed[]=cast&embed[]=seasons`);
+  if (!response.ok) {
+    throw new Error("TVmaze answered " + response.status);
+  }
+  const data = await response.json();
+  // TODO: give back an object with three properties:
+  //   show:    the show in our shape, toShow(data)
+  //   cast:    data._embedded.cast
+  //   seasons: data._embedded.seasons
+}
+--- hint
+The `return` is an object literal with three `name: value` pairs, separated by commas.
+--- hint
+```js
+  return {
+    show: toShow(data),
+    cast: data._embedded.cast,
+    seasons: data._embedded.seasons,
+  };
+```
+```js
+async function openShow(id) {
+  state.view = "show";
+  render();
+  window.scrollTo(0, 0);
+  const data = await getShowById(id);
+  console.log(data.show.name);
+}
+```
+--- solution-replace
+function openShow(id) {
+  state.view = "show";
+  render();
+  window.scrollTo(0, 0);   // start at the top of the page
+}
+=>
+async function openShow(id) {
+  state.view = "show";
+  render();
+  window.scrollTo(0, 0);   // start at the top of the page
+  const data = await getShowById(id);
+  console.log(data.show.name);
+}
+--- solution-append
+// Ask TVmaze for one show, with its cast and seasons in the same answer
+// getShowById(431) -> { show: {...our shape...}, cast: [...], seasons: [...] }
+async function getShowById(id) {
+  const response = await fetch(`${API}/shows/${id}?embed[]=cast&embed[]=seasons`);
+  if (!response.ok) {
+    throw new Error("TVmaze answered " + response.status);
+  }
+  const data = await response.json();
+  return {
+    show: toShow(data),
+    cast: data._embedded.cast,
+    seasons: data._embedded.seasons,
+  };
+}
+--- check
+await t.sleep(450);
+await t.rerun();   // start from a fresh run of the page
+const getShowById = t.get("getShowById");
+t.expect(typeof getShowById === "function", "I can't find `getShowById`. Press **Start again** to get the new code back.");
+let data;
+try { data = await getShowById(169); } catch (e) { t.fail("`getShowById(169)` crashed: " + e.message + (/reading '(cast|seasons)'/.test(e.message) ? ". Check the spelling: `data._embedded`, with an underscore at the start." : "")); }
+t.expect(data && typeof data === "object", "`getShowById` should give back an object. Fill in the TODO: `return { show: ..., cast: ..., seasons: ... };`.");
+t.expect(data.show && data.show.name === "Breaking Bad", "`getShowById(169).show` should be Breaking Bad: `show: toShow(data)`.");
+t.expect(typeof data.show.rating === "number", "`show` should be in our shape, with `rating` as a plain number. Use `toShow(data)`.");
+t.expect(Array.isArray(data.cast) && data.cast.length === 4, "`cast` should be the array `data._embedded.cast`.");
+t.expect(Array.isArray(data.seasons) && data.seasons.length === 5, "`seasons` should be the array `data._embedded.seasons`.");
+t.expect(await t.waitFor(() => t.$$("#grid .card").length === 12, 3000), "The home view should load 12 shows. Look in the Console for an error.");
+await t.click(t.$$("#grid .card h3")[0]);
+t.expect(await t.waitFor(() => t.logs.some((l) => l.text.trim() === "Friends"), 3000), "Clicking Friends should log its name. Make `openShow` `async`, and at its end add `const data = await getShowById(id);` and `console.log(data.show.name);`.");
+--- learned
+One request, three kinds of data, thanks to `embed`. And `getShowById` hands them back together in one object, with the show already in our shape.
+--- summary
+`/shows/ID?embed[]=cast&embed[]=seasons` gets a show with its cast and seasons; a function can return an object.
+--- mistakes
+- `data.embedded.cast`: the property starts with an underscore, `_embedded`.
+- Forgetting `async` on `openShow`, so `await` gives an error.
+- `toShow(data._embedded)` instead of `toShow(data)`.
+
+
+=== step show-info
+title: Fill in the show
+minutes: 20
+slot: js
+--- explain
+Now put the show on the page. The show view already has empty elements for each part, and their constants are at the top of your code: `showName`, `showMeta`, `showSummary` and so on.
+
+For text, always use `textContent`. There's also a property called `innerHTML`, which treats the text as HTML. That's dangerous with text from the internet: if a summary contained `<img src=x onerror="stealPasswords()">`, `innerHTML` would run that code on your page. `textContent` shows it as harmless text.
+
+> The rule: text that comes from anywhere else goes in with `textContent`, never `innerHTML`.
+
+For the genres, you make one badge per genre, like the chips on the home page:
+
+```js
+for (const tag of photo.tags) {
+  const label = document.createElement("span");
+  label.textContent = tag;
+  tagsBox.append(label);
+}
+```
+
+We've added `renderShow(show)` below your code. The poster and the rating are done; four TODOs are for you.
+--- task
+1. Fill in the four TODOs in `renderShow`.
+2. In `openShow`, replace `console.log(data.show.name);` with `renderShow(data.show);`.
+
+Click a few cards: each opens with its own name, years, summary and genres. Press **Run again** to go back (the back button comes later).
+--- starter-append
+// Fill the show view with one show (in our shape)
+function renderShow(show) {
+  showPoster.src = show.image ?? "poster.svg";
+  showPoster.alt = "Poster for " + show.name;
+  // TODO 1: the name, in showName
+
+  // TODO 2: the years, in showMeta (yearsLabel with show.premiered and show.ended)
+  if (show.network !== "") {
+    showMeta.textContent += " · " + show.network;   // += adds to the end of the text
+  }
+
+  if (show.rating === null) {
+    showRating.textContent = "No rating yet";
+  } else {
+    showRating.textContent = "★ " + show.rating + " · " + ratingLabel(show.rating);
+  }
+
+  // TODO 3: the summary, in showSummary. Use textContent, never innerHTML!
+  if (show.summary === "") {
+    showSummary.textContent = "No summary yet.";
+  }
+
+  // One badge per genre
+  showGenres.replaceChildren();
+  for (const genre of show.genres) {
+    // TODO 4: create a <span> with the class "badge" and the genre as its text,
+    //         then add it to showGenres
+    showGenres.append(" ");   // a space between the badges
+  }
+}
+--- hint
+TODOs 1 to 3 are one line each, like `showName.textContent = show.name;`. TODO 4 is three lines (create, class, text) plus an `append`, like building the chips on Day 7.
+--- hint
+```js
+  showName.textContent = show.name;
+```
+```js
+  showMeta.textContent = yearsLabel(show.premiered, show.ended);
+```
+```js
+  showSummary.textContent = show.summary;
+```
+```js
+    const badge = document.createElement("span");
+    badge.className = "badge";
+    badge.textContent = genre;
+    showGenres.append(badge);
+```
+--- solution-replace
+  const data = await getShowById(id);
+  console.log(data.show.name);
+=>
+  const data = await getShowById(id);
+  renderShow(data.show);
+--- solution-append
+// Fill the show view with one show (in our shape)
+function renderShow(show) {
+  showPoster.src = show.image ?? "poster.svg";
+  showPoster.alt = "Poster for " + show.name;
+  showName.textContent = show.name;
+
+  showMeta.textContent = yearsLabel(show.premiered, show.ended);
+  if (show.network !== "") {
+    showMeta.textContent += " · " + show.network;   // += adds to the end of the text
+  }
+
+  if (show.rating === null) {
+    showRating.textContent = "No rating yet";
+  } else {
+    showRating.textContent = "★ " + show.rating + " · " + ratingLabel(show.rating);
+  }
+
+  // textContent, never innerHTML: the summary is text from the internet
+  showSummary.textContent = show.summary;
+  if (show.summary === "") {
+    showSummary.textContent = "No summary yet.";
+  }
+
+  // One badge per genre
+  showGenres.replaceChildren();
+  for (const genre of show.genres) {
+    const badge = document.createElement("span");
+    badge.className = "badge";
+    badge.textContent = genre;
+    showGenres.append(badge);
+    showGenres.append(" ");   // a space between the badges
+  }
+}
+--- check
+await t.sleep(450);
+await t.rerun();   // start from a fresh run of the page
+const openShow = t.get("openShow");
+t.expect(typeof openShow === "function", "I can't find `openShow`. Look in the Console for an error.");
+t.expect(!/showSummary\.innerHTML/.test(t.clean), "Use `textContent` for the summary, not `innerHTML`. Text from the internet must never be treated as HTML.");
+openShow(431);
+t.expect(await t.waitFor(() => t.text("#show-name") === "Friends", 3000), "After opening Friends, the show view should show its name. In `openShow`, replace the `console.log` with `renderShow(data.show);`, and fill in TODO 1: `showName.textContent = show.name;`.");
+const meta = t.text("#show-meta");
+t.expect(/1994/.test(meta), `The line under the name says "${meta}". TODO 2: \`showMeta.textContent = yearsLabel(show.premiered, show.ended);\`, above the network lines.`);
+const sum = t.text("#show-summary");
+t.expect(/six friends/i.test(sum), `The summary says "${sum}". TODO 3: \`showSummary.textContent = show.summary;\`, above the "No summary yet" lines.`);
+const badges = () => t.$$("#show-genres .badge").map((b) => t.text(b));
+t.expect(badges().length === 2 && badges()[0] === "Comedy" && badges()[1] === "Romance", `TODO 4: the genres show ${badges().length} badges (${badges().join(", ")}). There should be one \`<span class="badge">\` per genre: Comedy and Romance.`);
+openShow(169);
+t.expect(await t.waitFor(() => t.text("#show-name") === "Breaking Bad", 3000), "Opening a second show should replace the name.");
+const meta2 = t.text("#show-meta");
+t.expect(/2008/.test(meta2) && (meta2.match(/AMC/g) || []).length === 1 && !/NBC/.test(meta2), `After opening Breaking Bad the line under the name says "${meta2}". TODO 2 must set the text with \`=\`, above the network lines, so each show starts fresh.`);
+t.expect(badges().length === 3 && badges()[0] === "Drama", "After opening Breaking Bad there should be its 3 genre badges, not the old ones as well.");
+--- learned
+The show view is filled from one object, with `textContent` everywhere. Remember the rule: text from anywhere else goes in with `textContent`, never `innerHTML`.
+--- summary
+Fill a view from an object with `textContent`; never use `innerHTML` for text from outside.
+--- mistakes
+- `showSummary.innerHTML = show.summary`: works, but opens the door to code hidden in the text.
+- Writing TODO 2 below the network lines, so `=` wipes the network out again.
+- Appending the badges without `replaceChildren()` first (it's given), so they pile up from show to show.
+
+
+=== step cast
+title: The cast
+minutes: 15
+slot: js
+--- explain
+The cast is an array of objects, and each one has two objects inside: the **person** (the actor) and the **character** they play.
+
+```js
+{
+  person: { name: "Bryan Cranston", image: ... },
+  character: { name: "Walter White" }
+}
+```
+
+To reach a name, go one level at a time: `member.person.name`, `member.character.name`.
+
+A list is built like the grid: empty it, then one new element per item.
+
+```js
+stopsList.replaceChildren();
+for (const stop of route.stops) {
+  const item = document.createElement("li");
+  item.textContent = stop.name + " at " + stop.time;
+  stopsList.append(item);
+}
+```
+--- task
+1. Fill in the TODO in `renderCast`, so each cast member becomes an `<li>` like "Bryan Cranston as Walter White".
+2. In `openShow`, under `renderShow(data.show);`, add `renderCast(data.cast);`.
+--- starter-append
+// The cast as a list: "Jennifer Aniston as Rachel Green"
+function renderCast(cast) {
+  castList.replaceChildren();
+  for (const member of cast) {
+    // TODO: create an <li> with the text  member.person.name + " as " + member.character.name,
+    //       and add it to castList
+  }
+  if (cast.length === 0) {
+    const empty = document.createElement("li");
+    empty.textContent = "No cast information yet.";
+    castList.append(empty);
+  }
+}
+--- hint
+Three lines inside the loop: create an `li`, set its `textContent`, and `castList.append(...)` it.
+--- hint
+```js
+  for (const member of cast) {
+    const item = document.createElement("li");
+    item.textContent = member.person.name + " as " + member.character.name;
+    castList.append(item);
+  }
+```
+--- solution-replace
+  renderShow(data.show);
+=>
+  renderShow(data.show);
+  renderCast(data.cast);
+--- solution-append
+// The cast as a list: "Jennifer Aniston as Rachel Green"
+function renderCast(cast) {
+  castList.replaceChildren();
+  for (const member of cast) {
+    const item = document.createElement("li");
+    item.textContent = member.person.name + " as " + member.character.name;
+    castList.append(item);
+  }
+  if (cast.length === 0) {
+    const empty = document.createElement("li");
+    empty.textContent = "No cast information yet.";
+    castList.append(empty);
+  }
+}
+--- check
+await t.sleep(450);
+await t.rerun();   // start from a fresh run of the page
+t.get("openShow")(169);
+t.expect(await t.waitFor(() => t.text("#show-name") === "Breaking Bad", 3000), "Opening a show should still fill the show view. Keep `renderShow(data.show);` in `openShow`.");
+const items = () => t.$$("#show-cast li").map((li) => t.text(li));
+t.expect(await t.waitFor(() => items().length > 0, 1000), "The cast list is empty. In `openShow`, call `renderCast(data.cast);`, and fill in the TODO in `renderCast`.");
+t.expect(items().length === 4, `The cast list has ${items().length} items. Breaking Bad has 4 cast members in the sample data: one \`<li>\` each.`);
+t.expect(items()[0] === "Bryan Cranston as Walter White", `The first item says "${items()[0]}". It should say "Bryan Cranston as Walter White": \`member.person.name + " as " + member.character.name\`.`);
+t.get("openShow")(431);
+t.expect(await t.waitFor(() => t.text("#show-name") === "Friends", 3000), "Opening Friends should fill the show view.");
+t.expect(await t.waitFor(() => items().length === 6, 1000), `After opening Friends the list has ${items().length} items. It should have Friends' 6 cast members, not the old ones as well.`);
+--- learned
+Nested data, one level at a time: `member.person.name`. And lists are built the same way as the grid: empty, then one element per item.
+--- summary
+Reach nested data step by step (`member.person.name`) and build a list with a loop.
+--- mistakes
+- `member.name`: the name is inside `person`.
+- Creating the `li` outside the loop, so only the last person shows.
+
+
+=== step seasons
+title: The seasons table
+minutes: 15
+slot: js
+--- explain
+Each season becomes a row of the table: a `<tr>` with three `<td>` cells. Creating a cell takes three lines, and there are three cells per row. That's a sign you need a small function:
+
+```js
+function createCell(text) {
+  const cell = document.createElement("td");
+  cell.textContent = text;
+  return cell;
+}
+```
+
+`createCell` is ready below your code, and `row.append` can take several cells at once:
+
+```js
+row.append(createCell("Mon"), createCell("Rain"), createCell("12°"));
+```
+
+For the year, the season has `premiereDate`, a date like "2019-06-21". `yearOf(date)` in helpers.js keeps only the year.
+
+> Real TVmaze data can have `null` for a season that hasn't been planned yet. `textContent = null` shows an empty cell, so nothing breaks.
+--- task
+1. Fill in the TODO in `renderSeasons`: add three cells to the row, for the season number, the number of episodes (`episodeOrder`) and the year.
+2. In `openShow`, under `renderCast(data.cast);`, add `renderSeasons(data.seasons);`.
+--- starter-append
+// One table cell (<td>) with some text
+function createCell(text) {
+  const cell = document.createElement("td");
+  cell.textContent = text;
+  return cell;
+}
+
+// The seasons as table rows: season number, episodes, year
+function renderSeasons(seasons) {
+  seasonsBody.replaceChildren();
+  for (const season of seasons) {
+    const row = document.createElement("tr");
+    // TODO: add three cells to the row: season.number, season.episodeOrder,
+    //       and the year, yearOf(season.premiereDate)
+    seasonsBody.append(row);
+  }
+}
+--- hint
+One line: `row.append(...)` with three `createCell(...)` calls inside, separated by commas.
+--- hint
+```js
+    row.append(
+      createCell(season.number),
+      createCell(season.episodeOrder),
+      createCell(yearOf(season.premiereDate))
+    );
+```
+--- solution-replace
+  renderCast(data.cast);
+=>
+  renderCast(data.cast);
+  renderSeasons(data.seasons);
+--- solution-append
+// One table cell (<td>) with some text
+function createCell(text) {
+  const cell = document.createElement("td");
+  cell.textContent = text;
+  return cell;
+}
+
+// The seasons as table rows: season number, episodes, year
+function renderSeasons(seasons) {
+  seasonsBody.replaceChildren();
+  for (const season of seasons) {
+    const row = document.createElement("tr");
+    row.append(
+      createCell(season.number),
+      createCell(season.episodeOrder),
+      createCell(yearOf(season.premiereDate))
+    );
+    seasonsBody.append(row);
+  }
+}
+--- check
+await t.sleep(450);
+await t.rerun();   // start from a fresh run of the page
+t.get("openShow")(431);
+t.expect(await t.waitFor(() => t.text("#show-name") === "Friends", 3000), "Opening a show should still fill the show view. Keep `renderShow` and `renderCast` in `openShow`.");
+const rows = () => t.$$("#show-seasons tr");
+t.expect(await t.waitFor(() => rows().length > 0, 1000), "The seasons table is empty. In `openShow`, call `renderSeasons(data.seasons);`.");
+t.expect(rows().length === 10, `The seasons table has ${rows().length} rows. Friends has 10 seasons: one row each.`);
+const cells = [...rows()[0].querySelectorAll("td")].map((c) => t.text(c));
+t.expect(cells.length === 3, `The first row has ${cells.length} cells. Add three to each row: \`row.append(createCell(...), createCell(...), createCell(...));\``);
+t.expect(cells[0] === "1" && cells[1] === "24", `The first row says ${cells.join(" | ")}. It should start with season 1 and 24 episodes: \`season.number\` and \`season.episodeOrder\`.`);
+t.expect(cells[2] === "1994", `The year cell says "${cells[2]}". Show only the year: \`yearOf(season.premiereDate)\`.`);
+--- learned
+When the same three lines keep coming back, a small function like `createCell` makes the code shorter and easier to read. The show view is now complete.
+--- summary
+A small helper function (`createCell`) removes repetition.
+--- mistakes
+- `createCell(season.premiereDate)`: the whole date instead of the year.
+- Appending the row to `castList` or to the `table` instead of `seasonsBody`.
+
+
+=== step back
+title: The back button
+minutes: 10
+slot: js
+--- explain
+The show view has a button at the top: **← Back to shows**. It's a plain button, so it does nothing until you listen for its clicks.
+
+Going back is only a change of state: the home view, drawn again. The home page's shows are still in `state.shows`, so nothing needs to load.
+
+```js
+closeButton.addEventListener("click", () => {
+  state.panel = "none";
+  render();
+});
+```
+--- task
+At the bottom, add a click listener to `backButton` that sets `state.view` to `"home"` and calls `render()`.
+
+Open a show, then go back: the same shows are still there, with the same genre chosen.
+--- hint
+The same two lines as in `openShow`, but with `"home"`.
+--- hint
+```js
+backButton.addEventListener("click", () => {
+  state.view = "home";
+  render();
+});
+```
+--- solution-append
+// ---------- Switching views ----------
+
+// The back button in the show view goes home
+backButton.addEventListener("click", () => {
+  state.view = "home";
+  render();
+});
+--- check
+await t.sleep(450);
+await t.rerun();   // start from a fresh run of the page
+t.expect(await t.waitFor(() => t.$$("#grid .card").length === 12, 3000), "The home view should load 12 shows. Look in the Console for an error.");
+await t.click(t.$$("#grid .card h3")[0]);
+t.expect(await t.waitFor(() => !t.$("#show-view").hidden, 1000), "Clicking a card should still open the show view.");
+await t.click("#back-button");
+t.expect(!t.$("#home-view").hidden && t.$("#show-view").hidden, "The back button should bring the home view back. Add a click listener to `backButton` that sets `state.view = \"home\";` and calls `render();`.");
+t.expect(t.$$("#grid .card").length === 12, "After going back, the home view should still show its 12 shows.");
+--- learned
+Going back is only a change of state: `state.view = "home"` and `render()`. Nothing is loaded again, because the shows were in the state all along.
+--- summary
+A back button changes `state.view` and calls `render()`.
+--- mistakes
+- Calling `loadShows("")` in the back button: it works, but asks TVmaze again for nothing.
+
+
+=== step loading
+title: Loading and errors
+minutes: 15
+slot: js
+--- explain
+Opening a show takes a moment, and for that moment the show view shows the **previous** show, or nothing at all. And if the connection drops, nothing tells the person.
+
+You solved both on the home page yesterday, in `loadShows`. The show view gets the same treatment, with its own elements: `showStatus` for the message and `showDetails` for the show itself.
+
+```js
+try {
+  const data = await getWeather(city);
+  renderWeather(data);
+} catch (error) {
+  weatherStatus.textContent = "Sorry, no weather right now.";
+}
+```
+
+Scroll up to `loadShows` in your code if you need a reminder: the pattern is the same.
+--- task
+In `openShow`, after `window.scrollTo(0, 0);`:
+
+1. Hide the details, `showDetails.hidden = true;`, and show `showStatus` with the text "Loading show…". Also remove its `error` class.
+2. Put the `await` line and the three `render...` lines inside `try { }`. At the end of `try`, hide the status and show the details again.
+3. In `catch (error) { }`, give `showStatus` a friendly error message and the class `error`.
+--- hint
+It's the same shape as `loadShows`: the message before `try`, the `await` in `try`, the error in `catch`.
+--- hint
+```js
+async function openShow(id) {
+  state.view = "show";
+  render();
+  window.scrollTo(0, 0);
+
+  showDetails.hidden = true;
+  showStatus.textContent = "Loading show…";
+  showStatus.classList.remove("error");
+  showStatus.hidden = false;
+
+  try {
+    const data = await getShowById(id);
+    renderShow(data.show);
+    renderCast(data.cast);
+    renderSeasons(data.seasons);
+    showStatus.hidden = true;
+    showDetails.hidden = false;
+  } catch (error) {
+    showStatus.textContent = "Sorry, this show could not be loaded. Check your internet connection and try again.";
+    showStatus.classList.add("error");
+  }
+}
+```
+--- solution-replace
+  window.scrollTo(0, 0);   // start at the top of the page
+  const data = await getShowById(id);
+  renderShow(data.show);
+  renderCast(data.cast);
+  renderSeasons(data.seasons);
+}
+=>
+  window.scrollTo(0, 0);   // start at the top of the page
+
+  // While loading: hide the old show and say what's happening
+  showDetails.hidden = true;
+  showStatus.textContent = "Loading show…";
+  showStatus.classList.remove("error");
+  showStatus.hidden = false;
+
+  try {
+    const data = await getShowById(id);
+    renderShow(data.show);
+    renderCast(data.cast);
+    renderSeasons(data.seasons);
+    showStatus.hidden = true;
+    showDetails.hidden = false;
+  } catch (error) {
+    // No internet, or TVmaze answered with an error
+    showStatus.textContent = "Sorry, this show could not be loaded (" + error.message + "). Check your internet connection and try again.";
+    showStatus.classList.add("error");
+  }
+}
+--- check
+await t.sleep(450);
+await t.rerun();   // start from a fresh run of the page
+const status = t.$("#show-status"), details = t.$("#show-details");
+t.get("openShow")(431);
+await t.sleep(60);
+t.expect(!status.hidden && /loading/i.test(t.text(status)), "While the show is loading, show a message. In `openShow`, after `window.scrollTo(0, 0);`, set `showStatus.textContent = \"Loading show…\";` and `showStatus.hidden = false;`.");
+t.expect(details.hidden, "While loading, hide the old show: `showDetails.hidden = true;`.");
+t.expect(await t.waitFor(() => t.text("#show-name") === "Friends" && !details.hidden, 3000), "When the show has loaded, show the details again: `showDetails.hidden = false;` at the end of `try`.");
+t.expect(status.hidden, "When the show has loaded, hide the loading message: `showStatus.hidden = true;`.");
+const realFetch = t.win.fetch;
+try {
+  t.win.fetch = () => new t.win.Promise((resolve, reject) => t.win.setTimeout(() => reject(new t.win.TypeError("Failed to fetch")), 200));
+  t.get("openShow")(169);
+  t.expect(await t.waitFor(() => status.classList.contains("error") && !/loading/i.test(t.text(status)), 2000), "With no internet connection, the show view should say so in red. Put the `await` line in `try { }`, and in `catch (error) { }` set a message and `showStatus.classList.add(\"error\");`.");
+  t.expect(details.hidden, "After an error, keep the details hidden.");
+} finally {
+  t.win.fetch = realFetch;
+}
+t.get("openShow")(431);
+await t.sleep(60);
+t.expect(!status.classList.contains("error"), "After an error, the next \"Loading show…\" is still red. Remove the class at the start: `showStatus.classList.remove(\"error\");`.");
+t.expect(await t.waitFor(() => !details.hidden && status.hidden, 3000), "When the connection works again, opening a show should work normally.");
+--- learned
+Every view that loads data needs its loading and error states. You wrote the pattern once in `loadShows`; now you can use it anywhere.
+--- summary
+Loading and error states for the show view: a message before `await`, `try / catch` around it.
+--- mistakes
+- Showing the details before the `await`, so the old show flashes.
+- Leaving `renderShow` outside `try`, so an error still breaks the page.
+
+
+=== step not-found
+title: Show not found
+minutes: 10
+slot: js
+--- explain
+What if the id doesn't exist? TVmaze answers with status **404**, "not found". Right now `getShowById` throws, and the page says "could not be loaded, check your internet connection". That's wrong: the connection is fine, the show doesn't exist.
+
+A 404 is a normal answer, not a broken connection, so let's treat it as one: `getShowById` gives back `null`, which means "no such show", and `openShow` shows its own message.
+
+`return` can end a function early:
+
+```js
+if (basket.length === 0) {
+  message.textContent = "Your basket is empty.";
+  return;   // nothing more to do
+}
+```
+--- task
+1. In `getShowById`, before the `response.ok` check: if `response.status` is `404`, `return null;`.
+2. In `openShow`, straight after the `await` line: if `data` is `null`, set `showStatus` to "Show not found." and `return`.
+--- hint
+Both are small `if` blocks. The one in `getShowById` must come **before** `if (!response.ok)`, because a 404 is also "not ok".
+--- hint
+```js
+  if (response.status === 404) {
+    return null;
+  }
+```
+```js
+    const data = await getShowById(id);
+    if (data === null) {
+      showStatus.textContent = "Show not found. Go back and pick another one.";
+      return;
+    }
+```
+--- solution-replace
+  const response = await fetch(`${API}/shows/${id}?embed[]=cast&embed[]=seasons`);
+  if (!response.ok) {
+=>
+  const response = await fetch(`${API}/shows/${id}?embed[]=cast&embed[]=seasons`);
+  if (response.status === 404) {
+    return null;   // TVmaze has no show with this id
+  }
+  if (!response.ok) {
+--- solution-replace
+// getShowById(431) -> { show: {...our shape...}, cast: [...], seasons: [...] }
+=>
+// getShowById(431) -> { show: {...our shape...}, cast: [...], seasons: [...] }, or null if there's no such show
+--- solution-replace
+    const data = await getShowById(id);
+    renderShow(data.show);
+=>
+    const data = await getShowById(id);
+    if (data === null) {
+      showStatus.textContent = "Show not found. Go back and pick another one.";
+      return;
+    }
+    renderShow(data.show);
+--- check
+await t.sleep(450);
+await t.rerun();   // start from a fresh run of the page
+let r;
+try { r = await t.get("getShowById")(999999); } catch (e) { r = "threw"; }
+t.expect(r === null, "When TVmaze answers 404, `getShowById` should give back `null` instead of throwing. Before the `response.ok` check, add `if (response.status === 404) { return null; }`.");
+const status = t.$("#show-status");
+t.get("openShow")(999999);
+t.expect(await t.waitFor(() => /not found/i.test(t.text(status)), 3000), `Opening a show that doesn't exist shows "${t.text(status)}". In \`openShow\`, after the \`await\` line, if \`data === null\`, set the message "Show not found." and \`return;\`.`);
+t.expect(t.$("#show-details").hidden, "For a show that doesn't exist, keep the details hidden.");
+t.get("openShow")(169);
+t.expect(await t.waitFor(() => t.text("#show-name") === "Breaking Bad" && !t.$("#show-details").hidden, 3000), "Shows that do exist should still open normally.");
+--- learned
+Not every failure is an error. A 404 is a clear answer, "no such thing", and deserves its own honest message. `return` inside an `if` ends the function early.
+--- summary
+Treat 404 as "not found" (`return null`), and use an early `return` for special cases.
+--- mistakes
+- Putting the 404 check after `if (!response.ok)`: the function throws first and never gets there.
+- Forgetting `return;` after the message, so `renderShow(null.show)` crashes.
+
+
+=== step mylist-objects
+title: My List remembers more
+minutes: 20
+slot: js
+--- explain
+Soon My List gets its own view. But My List holds only ids, like `[431, 169]`, and a card needs a name, a poster, a rating. We could ask TVmaze for every show in the list, but that's many requests, and it wouldn't work offline.
+
+Instead, My List will keep a small **object** for each show, with only what a card needs:
+
+```js
+{ id: 431, name: "Friends", image: null, genres: ["Comedy", "Romance"], rating: 8.8 }
+```
+
+The saved text gets a bit longer, but the My List view can draw straight from it. It goes back to the key `"myList"`. We've added `loadMyList()` below: it also throws away the plain ids that Day 7 saved under that key.
+
+Checking for an id in a list of objects needs a new array method: `some` gives `true` if **at least one** item passes the test.
+
+```js
+[{ day: "Mon" }, { day: "Fri" }].some((item) => item.day === "Fri");   // true
+```
+--- task
+1. In `state`, load the list with the new function: `myList: loadMyList(),`
+2. In `saveMyList`, use the key `"myList"` again.
+3. In `isInMyList`: `return state.myList.some((item) => item.id === id);`
+4. In `toggleMyList`, remove with `state.myList.filter((item) => item.id !== show.id)`, and push an object with the five properties `id`, `name`, `image`, `genres` and `rating`, taken from `show`.
+--- starter-append
+// ---------- My List, saved as small objects ----------
+// Each show in My List is saved with what a card needs, so the My List view
+// can draw it without asking TVmaze:
+//   { id: 431, name: "Friends", image: null, genres: ["Comedy", "Romance"], rating: 8.8 }
+
+// Read My List from localStorage (the key is "myList")
+function loadMyList() {
+  const saved = JSON.parse(localStorage.getItem("myList")) ?? [];
+  // On Day 7 this key held plain ids, like [2, 5]. Keep only the objects.
+  return saved.filter((item) => typeof item === "object");
+}
+--- hint
+In `toggleMyList`, the `push` gets an object literal: `state.myList.push({ id: show.id, name: show.name, ... });`.
+--- hint
+```js
+function isInMyList(id) {
+  return state.myList.some((item) => item.id === id);
+}
+
+function toggleMyList(show) {
+  if (isInMyList(show.id)) {
+    state.myList = state.myList.filter((item) => item.id !== show.id);
+  } else {
+    state.myList.push({
+      id: show.id,
+      name: show.name,
+      image: show.image,
+      genres: show.genres,
+      rating: show.rating,
+    });
+  }
+  saveMyList();
+  render();
+}
+```
+--- solution-replace
+  myList: JSON.parse(localStorage.getItem("myListIds")) ?? [],   // saved TVmaze ids, or an empty list
+=>
+  myList: loadMyList(),   // small objects for the shows in My List (see loadMyList below)
+--- solution-replace
+// Is this show in My List? Gives true or false.
+function isInMyList(id) {
+  return state.myList.includes(id);
+}
+=>
+// Is this show in My List? Gives true or false.
+function isInMyList(id) {
+  return state.myList.some((item) => item.id === id);
+}
+--- solution-replace
+  if (isInMyList(show.id)) {
+    state.myList = state.myList.filter((id) => id !== show.id);
+  } else {
+    state.myList.push(show.id);
+  }
+=>
+  if (isInMyList(show.id)) {
+    state.myList = state.myList.filter((item) => item.id !== show.id);
+  } else {
+    // Save what a card needs, so My List can be drawn without asking TVmaze
+    state.myList.push({
+      id: show.id,
+      name: show.name,
+      image: show.image,
+      genres: show.genres,
+      rating: show.rating,
+    });
+  }
+--- solution-replace
+  localStorage.setItem("myListIds", JSON.stringify(state.myList));
+=>
+  localStorage.setItem("myList", JSON.stringify(state.myList));
+--- solution-append
+// ---------- My List, saved as small objects ----------
+// Each show in My List is saved with what a card needs, so the My List view
+// can draw it without asking TVmaze:
+//   { id: 431, name: "Friends", image: null, genres: ["Comedy", "Romance"], rating: 8.8 }
+
+// Read My List from localStorage (the key is "myList")
+function loadMyList() {
+  const saved = JSON.parse(localStorage.getItem("myList")) ?? [];
+  // On Day 7 this key held plain ids, like [2, 5]. Keep only the objects.
+  return saved.filter((item) => typeof item === "object");
+}
+--- check
+await t.sleep(450);
+t.win.localStorage.removeItem("myList");
+t.win.localStorage.removeItem("myListIds");
+await t.rerun();
+const buttons = () => t.$$("#grid .card .list-btn");
+t.expect(await t.waitFor(() => buttons().length === 12, 3000), "The home view should load 12 shows with their + buttons. Look in the Console for an error.");
+await t.click(buttons()[0]);
+const raw = t.win.localStorage.getItem("myList");
+t.expect(raw !== null, "Nothing was saved under the key `\"myList\"`. In `saveMyList`, change the key from `\"myListIds\"` to `\"myList\"`.");
+const saved = JSON.parse(raw);
+t.expect(Array.isArray(saved) && saved.length === 1, `After adding Friends, "myList" holds ${raw}. It should hold one item.`);
+const item = saved[0];
+t.expect(item && typeof item === "object", `My List saved ${JSON.stringify(item)} for Friends. It should save a small object: in \`toggleMyList\`, push \`{ id: show.id, name: show.name, image: show.image, genres: show.genres, rating: show.rating }\`.`);
+t.expect(item.id === 431 && item.name === "Friends" && Array.isArray(item.genres) && item.rating === 8.8 && "image" in item, `The saved object is ${JSON.stringify(item)}. It needs five properties: id, name, image, genres and rating.`);
+t.expect(t.text("#list-count") === "1", "After adding one show, the counter should say 1.");
+t.expect(buttons()[0].getAttribute("aria-pressed") === "true", "Friends is in My List, but its button doesn't show a tick. Update `isInMyList`: `return state.myList.some((item) => item.id === id);`.");
+await t.click(buttons()[0]);
+t.expect(JSON.parse(t.win.localStorage.getItem("myList")).length === 0, "Clicking the tick again should take Friends out of My List. In `toggleMyList`, remove with `state.myList.filter((item) => item.id !== show.id)`.");
+await t.click(buttons()[1]);
+await t.rerun();
+t.expect(await t.waitFor(() => buttons().length === 12, 3000), "After a reload the home view should load its shows again.");
+t.expect(t.text("#list-count") === "1", "After a reload My List should still hold 1 show. In `state`, use `myList: loadMyList(),`.");
+t.win.localStorage.setItem("myList", "[2,5]");
+await t.rerun();
+t.expect(t.text("#list-count") === "0", "Old Day 7 ids in \"myList\" should be ignored. In `state`, use `myList: loadMyList(),`, which keeps only the objects.");
+t.win.localStorage.removeItem("myList");
+--- learned
+My List now stores exactly what a card needs. Saving a little extra data is a common trade: more text in localStorage, no extra requests later.
+--- summary
+Store small objects in localStorage; `some` checks whether any item matches.
+--- mistakes
+- Changing `push` but not `filter` (or `isInMyList`), so taking a show out stops working.
+- `includes(id)` on a list of objects: always `false`, because it compares whole objects with a number.
+- Forgetting a comma between the properties of the object.
+
+
+=== step mylist-view
+title: The My List view
+minutes: 20
+slot: js
+--- explain
+Now My List gets its view. It's drawn with the same `createCard` as the home page, so its cards have posters, ticks, and open the show on click. That's the payoff of writing one good function.
+
+The header links need care: they're real links to `index.html`. On your finished website, following them would reload the page. `event.preventDefault()` stops that, like the form's submit on Day 7, and we switch views ourselves.
+
+We've added `renderMyList()` and the listener for the logo, as an example. Read the logo's listener, then write the two others the same way.
+--- task
+1. **TODO 1** in `renderMyList`: a `for...of` loop over `state.myList` that appends `createCard(show)` to `myListGrid`.
+2. At the end of `render()`, call `renderMyList();`, so My List is drawn every time the state changes.
+3. **TODO 2**: click listeners for `homeLink` (to the `"home"` view) and `myListLink` (to the `"mylist"` view), like the logo's.
+
+Add a few shows, open **My List** in the header, and take one out again.
+--- starter-append
+// ---------- The My List view ----------
+
+// Draw the saved shows, with the same createCard as the home page
+function renderMyList() {
+  myListGrid.replaceChildren();
+  // TODO 1: one card for each show in state.myList (a for...of loop, like renderGrid)
+
+  myListEmpty.hidden = state.myList.length > 0;
+}
+
+// The logo goes home
+logoLink.addEventListener("click", (event) => {
+  event.preventDefault();   // don't follow the link: we switch views ourselves
+  state.view = "home";
+  render();
+});
+
+// TODO 2: the same for homeLink (to "home") and for myListLink (to "mylist")
+--- hint
+TODO 1 is a loop like the one in `renderGrid`, with `state.myList` and `myListGrid`. For TODO 2, copy the logo's listener twice and change the names.
+--- hint
+```js
+  for (const show of state.myList) {
+    myListGrid.append(createCard(show));
+  }
+```
+```js
+homeLink.addEventListener("click", (event) => {
+  event.preventDefault();
+  state.view = "home";
+  render();
+});
+
+myListLink.addEventListener("click", (event) => {
+  event.preventDefault();
+  state.view = "mylist";
+  render();
+});
+```
+And in `render()`: `renderMyList();`
+--- solution-replace
+  renderGenres();
+  listCount.textContent = state.myList.length;
+}
+=>
+  renderGenres();
+  listCount.textContent = state.myList.length;
+  renderMyList();
+}
+--- solution-append
+// ---------- The My List view ----------
+
+// Draw the saved shows, with the same createCard as the home page
+function renderMyList() {
+  myListGrid.replaceChildren();
+  for (const show of state.myList) {
+    myListGrid.append(createCard(show));
+  }
+  myListEmpty.hidden = state.myList.length > 0;
+}
+
+// The logo goes home
+logoLink.addEventListener("click", (event) => {
+  event.preventDefault();   // don't follow the link: we switch views ourselves
+  state.view = "home";
+  render();
+});
+
+// The Home link goes home too
+homeLink.addEventListener("click", (event) => {
+  event.preventDefault();
+  state.view = "home";
+  render();
+});
+
+// The My List link opens the My List view
+myListLink.addEventListener("click", (event) => {
+  event.preventDefault();
+  state.view = "mylist";
+  render();
+});
+--- check
+await t.sleep(450);
+t.win.localStorage.removeItem("myList");
+await t.rerun();
+const buttons = () => t.$$("#grid .card .list-btn");
+t.expect(await t.waitFor(() => buttons().length === 12, 3000), "The home view should load 12 shows. Look in the Console for an error.");
+await t.click(buttons()[0]);
+await t.click(buttons()[1]);
+const nav = t.$(".nav");
+let prevented = null;
+const spy = (e) => { prevented = e.defaultPrevented; };
+nav.addEventListener("click", spy);
+await t.click("#nav-mylist");
+nav.removeEventListener("click", spy);
+t.expect(!t.$("#mylist-view").hidden && t.$("#home-view").hidden, "Clicking **My List** in the header should switch to the My List view. TODO 2: add a click listener to `myListLink` that sets `state.view = \"mylist\";` and calls `render();`.");
+t.expect(prevented, "The My List link switched views, but also tried to open index.html. Start its listener with `event.preventDefault();`, like the logo's.");
+const names = () => t.$$("#mylist-grid .card h3").map((h) => t.text(h));
+t.expect(names().length === 2, `The My List view shows ${names().length} cards. TODO 1: in \`renderMyList\`, loop over \`state.myList\` and append \`createCard(show)\` to \`myListGrid\`. And call \`renderMyList();\` at the end of \`render()\`.`);
+t.expect(names().includes("Friends") && names().includes("Breaking Bad"), `The My List view shows ${names().join(", ")}. It should show the shows you added: Friends and Breaking Bad.`);
+t.expect(t.$("#mylist-empty").hidden, "With shows in My List, the \"Your list is empty\" message should be hidden. Call `renderMyList();` in `render()`.");
+await t.click(t.$$("#mylist-grid .card .list-btn")[0]);
+t.expect(names().length === 1, "Taking a show out in the My List view should remove its card straight away. Call `renderMyList();` at the end of `render()`.");
+await t.click(t.$$("#mylist-grid .card .list-btn")[0]);
+t.expect(!t.$("#mylist-empty").hidden, "With My List empty, the \"Your list is empty\" message should show.");
+await t.click("#nav-home");
+t.expect(!t.$("#home-view").hidden && t.$("#mylist-view").hidden, "Clicking **Home** in the header should bring the home view back. TODO 2: a click listener on `homeLink`, like the logo's.");
+t.win.localStorage.removeItem("myList");
+--- learned
+A whole new view from one loop and `createCard`. Because My List saves what a card needs, it appears instantly, even offline.
+--- summary
+Reuse `createCard` for a second view; `preventDefault()` on links you handle yourself.
+--- mistakes
+- Forgetting `renderMyList()` in `render()`: the view only updates on a reload.
+- Leaving out `event.preventDefault()`: in the Lab a notice appears; on the real website the page would reload.
+- Looping over `state.shows` instead of `state.myList`.
+
+
+=== step show-list-button
+title: My List from the show view
+minutes: 15
+slot: js
+--- explain
+The show view has a button, **+ Add to My List**, that does nothing yet. It needs to know **which** show is open. That's state too: `state.currentShow`, the open show, or `null` when none is.
+
+Once the button changes My List through `toggleMyList`, `render()` runs, and `render()` can draw the button's text from the state, like every other part of the page. We've added `renderShowListButton()` for that.
+
+The pattern, one last time today:
+
+1. The event changes the state (`toggleMyList(state.currentShow)`).
+2. `render()` draws everything from the state, the button included.
+--- task
+1. In `state`, add `currentShow: null,`.
+2. In `openShow`, right before `renderShow(data.show);`, remember the show: `state.currentShow = data.show;`. Right after `renderSeasons(...)`, call `renderShowListButton();`.
+3. At the end of `render()`, call `renderShowListButton();`.
+4. At the bottom, add a click listener to `showListButton` that calls `toggleMyList(state.currentShow);`.
+
+Open a show, add it, then look at its card on the home page and in My List: all three agree.
+--- starter-append
+// The My List button in the show view. Its text follows the state.
+function renderShowListButton() {
+  if (!state.currentShow) {
+    return;   // no show is open yet
+  }
+  if (isInMyList(state.currentShow.id)) {
+    showListButton.textContent = "✓ In My List";
+  } else {
+    showListButton.textContent = "+ Add to My List";
+  }
+  showListButton.setAttribute("aria-pressed", isInMyList(state.currentShow.id));
+}
+--- hint
+The listener has one line inside it. You don't need to call `render()` yourself: `toggleMyList` already does.
+--- hint
+```js
+showListButton.addEventListener("click", () => {
+  toggleMyList(state.currentShow);
+});
+```
+In `openShow`:
+```js
+    state.currentShow = data.show;
+    renderShow(data.show);
+    renderCast(data.cast);
+    renderSeasons(data.seasons);
+    renderShowListButton();
+```
+--- solution-replace
+  myList: loadMyList(),   // small objects for the shows in My List (see loadMyList below)
+=>
+  myList: loadMyList(),   // small objects for the shows in My List (see loadMyList below)
+  currentShow: null,      // the show open in the show view (null when none is)
+--- solution-replace
+    renderShow(data.show);
+    renderCast(data.cast);
+    renderSeasons(data.seasons);
+=>
+    state.currentShow = data.show;
+    renderShow(data.show);
+    renderCast(data.cast);
+    renderSeasons(data.seasons);
+    renderShowListButton();
+--- solution-replace
+  renderMyList();
+}
+=>
+  renderMyList();
+  renderShowListButton();
+}
+--- solution-append
+// The My List button in the show view. Its text follows the state.
+function renderShowListButton() {
+  if (!state.currentShow) {
+    return;   // no show is open yet
+  }
+  if (isInMyList(state.currentShow.id)) {
+    showListButton.textContent = "✓ In My List";
+  } else {
+    showListButton.textContent = "+ Add to My List";
+  }
+  showListButton.setAttribute("aria-pressed", isInMyList(state.currentShow.id));
+}
+
+// Add the open show to My List, or take it out
+showListButton.addEventListener("click", () => {
+  toggleMyList(state.currentShow);
+});
+--- check
+await t.sleep(450);
+t.win.localStorage.removeItem("myList");
+await t.rerun();
+t.expect(await t.waitFor(() => t.$$("#grid .card").length === 12, 3000), "The home view should load 12 shows. Look in the Console for an error.");
+t.get("openShow")(169);
+t.expect(await t.waitFor(() => t.text("#show-name") === "Breaking Bad" && !t.$("#show-details").hidden, 3000), "Opening Breaking Bad should fill the show view. Look in the Console for an error.");
+t.expect(t.get("state").currentShow && t.get("state").currentShow.id === 169, "`state.currentShow` should be the open show. In `openShow`, add `state.currentShow = data.show;` before `renderShow(data.show);`.");
+const btn = t.$("#show-list-button");
+await t.click(btn);
+const saved = () => JSON.parse(t.win.localStorage.getItem("myList") || "[]");
+t.expect(saved().some((i) => i.id === 169), "Clicking **+ Add to My List** should add Breaking Bad. Add a click listener to `showListButton` that calls `toggleMyList(state.currentShow);`.");
+t.expect(t.text("#list-count") === "1", "After adding from the show view, the counter at the top should say 1.");
+t.expect(/in my list/i.test(t.text(btn)), `After adding, the button says "${t.text(btn)}". It should say "✓ In My List": call \`renderShowListButton();\` at the end of \`render()\`.`);
+await t.click(btn);
+t.expect(!saved().some((i) => i.id === 169) && /add/i.test(t.text(btn)), "Clicking again should take Breaking Bad out, and the button should say \"+ Add to My List\" again.");
+await t.click(t.$$("#grid .card .list-btn")[0]);
+t.get("openShow")(431);
+t.expect(await t.waitFor(() => t.text("#show-name") === "Friends" && !t.$("#show-details").hidden, 3000), "Opening Friends should fill the show view.");
+t.expect(/in my list/i.test(t.text(btn)), "Friends was added from its card, so its show view should say \"✓ In My List\" straight away. In `openShow`, call `renderShowListButton();` after the show is drawn.");
+t.win.localStorage.removeItem("myList");
+--- learned
+Your ShowShelf is complete: search, genres, a page for every show, and a My List that remembers. Every part is drawn from one `state`, so the card, the show view and My List always agree. On Day 11 this becomes your website.
+--- summary
+`state.currentShow` remembers the open show; one `render()` keeps every view in agreement.
+--- mistakes
+- Setting the button's text inside the click listener instead of in `render()`: it goes wrong when the show is added from its card.
+- Adding the listener inside `openShow`: every opened show adds one more listener, and one click toggles several times.
+--- teacher
+This is the last core step of the app students take home on Day 11. If time allows, ask them to try it online (the preview asks the real TVmaze when there's internet): real posters, and some shows with "No rating yet".
+
+
+=== step address
+title: A link for every show
+minutes: 20
+slot: js
+bonus: yes
+--- explain
+Open a show and look at the address: it doesn't change. So you can't share a link to a show, and the browser's back button doesn't go back to the home view.
+
+The part of an address after `#` is called the **hash**. Changing it doesn't reload the page, and the browser fires a `"hashchange"` event every time it changes, including when someone presses the back button.
+
+```js
+location.hash = "step/3";   // the address now ends with #step/3
+location.hash;              // "#step/3"
+"#step/3".slice(6);         // "3": the text from position 6 on
+```
+
+So the plan: a card click only changes the hash to `#show/431`, and one listener opens whatever show the hash names. We've added that listener's function, `showFromAddress()`.
+
+> `startsWith` checks the beginning of a text: `"#show/431".startsWith("#show/")` is `true`.
+--- task
+1. **TODO**: call `showFromAddress` on every `"hashchange"` of `window`.
+2. In `createCard`'s click listener, replace `openShow(show.id);` with `location.hash = "show/" + show.id;`.
+3. In the back button's listener, replace its two lines with `location.hash = "";`.
+4. In the logo, Home and My List listeners, add `location.hash = "";` after `event.preventDefault();`, so the address forgets the show.
+--- starter-append
+// ---------- Extra: an address for every show, like index.html#show/431 ----------
+
+// Show the view that the address asks for
+function showFromAddress() {
+  if (location.hash.startsWith("#show/")) {
+    const id = Number(location.hash.slice(6));   // "#show/431" -> 431
+    openShow(id);
+  } else if (state.view === "show") {
+    state.view = "home";                          // the address has no show any more
+    render();
+  }
+}
+
+// TODO: call showFromAddress every time the address changes ("hashchange" on window)
+
+// Someone opened a link to a show, like index.html#show/431: open it straight away
+if (location.hash.startsWith("#show/")) {
+  showFromAddress();
+}
+--- hint
+`window.addEventListener("hashchange", showFromAddress);`: give the function's name, without brackets, so the browser calls it later.
+--- hint
+```js
+window.addEventListener("hashchange", showFromAddress);
+```
+In `createCard`:
+```js
+  card.addEventListener("click", () => {
+    location.hash = "show/" + show.id;
+  });
+```
+The back button:
+```js
+backButton.addEventListener("click", () => {
+  location.hash = "";
+});
+```
+--- solution-replace
+  card.addEventListener("click", () => {
+    openShow(show.id);
+  });
+=>
+  card.addEventListener("click", () => {
+    location.hash = "show/" + show.id;   // the hashchange listener opens the show
+  });
+--- solution-replace
+backButton.addEventListener("click", () => {
+  state.view = "home";
+  render();
+});
+=>
+backButton.addEventListener("click", () => {
+  location.hash = "";   // the hashchange listener goes home
+});
+--- solution-replace
+logoLink.addEventListener("click", (event) => {
+  event.preventDefault();   // don't follow the link: we switch views ourselves
+=>
+logoLink.addEventListener("click", (event) => {
+  event.preventDefault();   // don't follow the link: we switch views ourselves
+  location.hash = "";
+--- solution-replace
+homeLink.addEventListener("click", (event) => {
+  event.preventDefault();
+=>
+homeLink.addEventListener("click", (event) => {
+  event.preventDefault();
+  location.hash = "";
+--- solution-replace
+myListLink.addEventListener("click", (event) => {
+  event.preventDefault();
+=>
+myListLink.addEventListener("click", (event) => {
+  event.preventDefault();
+  location.hash = "";
+--- solution-append
+// ---------- Extra: an address for every show, like index.html#show/431 ----------
+
+// Show the view that the address asks for
+function showFromAddress() {
+  if (location.hash.startsWith("#show/")) {
+    const id = Number(location.hash.slice(6));   // "#show/431" -> 431
+    openShow(id);
+  } else if (state.view === "show") {
+    state.view = "home";                          // the address has no show any more
+    render();
+  }
+}
+
+window.addEventListener("hashchange", showFromAddress);
+
+// Someone opened a link to a show, like index.html#show/431: open it straight away
+if (location.hash.startsWith("#show/")) {
+  showFromAddress();
+}
+--- check
+await t.sleep(450);
+await t.rerun();   // start from a fresh run of the page
+t.expect(await t.waitFor(() => t.$$("#grid .card").length === 12, 3000), "The home view should load 12 shows. Look in the Console for an error.");
+await t.click(t.$$("#grid .card h3")[1]);
+t.expect(await t.waitFor(() => t.win.location.hash === "#show/169", 1000), "Clicking a card should put the show in the address. In `createCard`'s click listener: `location.hash = \"show/\" + show.id;`.");
+t.expect(await t.waitFor(() => t.text("#show-name") === "Breaking Bad" && !t.$("#show-view").hidden, 3000), "The address changed to #show/169, but the show didn't open. TODO: `window.addEventListener(\"hashchange\", showFromAddress);`.");
+await t.click("#back-button");
+t.expect(await t.waitFor(() => t.win.location.hash === "", 1000), "The back button should clear the address: `location.hash = \"\";`.");
+t.expect(await t.waitFor(() => !t.$("#home-view").hidden, 1000), "When the address has no show any more, the home view should come back.");
+t.win.location.hash = "#show/431";
+t.expect(await t.waitFor(() => t.text("#show-name") === "Friends" && !t.$("#show-view").hidden, 3000), "Changing the address to #show/431 should open Friends.");
+await t.click("#nav-mylist");
+t.expect(!t.$("#mylist-view").hidden, "The My List link should still open the My List view.");
+t.expect(await t.waitFor(() => t.win.location.hash === "", 1000), "The My List link should clear the address too (`location.hash = \"\";`), or clicking the same show again won't change the address.");
+t.win.location.hash = "";
+--- learned
+The hash makes views linkable, and `"hashchange"` makes the back button work. Big apps use the same idea, often with a library called a router.
+--- summary
+`location.hash` and the `"hashchange"` event give each view its own address.
+--- teacher
+Inside the Lab, the preview's own address changes (you can't see it). On the real website from Day 11, the address bar shows `#show/431` and the browser's back button works.
+
+
+=== step cast-photos
+title: Cast photos
+minutes: 15
+slot: js
+bonus: yes
+--- explain
+On TVmaze, most cast members have a photo: `member.person.image` is an object with a `medium` address, or `null` when there's no photo. (The Lab's offline sample data has no photos, so the check tests your code with made-up data.)
+
+An `<li>` can hold more than text. Build it in parts with `append`: a picture first, then the text.
+
+```js
+const item = document.createElement("li");
+item.append(icon);                     // an element
+item.append("Milk, 2 bottles");        // then plain text
+```
+
+Careful: setting `textContent` after appending the picture would wipe the picture out, because `textContent` replaces everything inside.
+--- task
+In `renderCast`'s loop, when `member.person.image` is not `null`, create an `<img>` with `src` set to `member.person.image.medium`, an empty `alt`, and `width` 60, and append it to the `li` **before** the text. Then append the text with `append` instead of `textContent`.
+--- hint
+Inside the loop: create the `li`, then an `if` block for the photo, then `item.append(member.person.name + " as " + member.character.name);`.
+--- hint
+```js
+  for (const member of cast) {
+    const item = document.createElement("li");
+    if (member.person.image !== null) {
+      const photo = document.createElement("img");
+      photo.src = member.person.image.medium;
+      photo.alt = "";
+      photo.width = 60;
+      item.append(photo);
+    }
+    item.append(member.person.name + " as " + member.character.name);
+    castList.append(item);
+  }
+```
+--- solution-replace
+    const item = document.createElement("li");
+    item.textContent = member.person.name + " as " + member.character.name;
+    castList.append(item);
+=>
+    const item = document.createElement("li");
+    if (member.person.image !== null) {
+      const photo = document.createElement("img");
+      photo.src = member.person.image.medium;
+      photo.alt = "";
+      photo.width = 60;
+      item.append(photo);
+    }
+    item.append(member.person.name + " as " + member.character.name);
+    castList.append(item);
+--- check
+await t.sleep(450);
+await t.rerun();   // start from a fresh run of the page
+const renderCast = t.get("renderCast");
+t.expect(typeof renderCast === "function", "I can't find `renderCast`. Look in the Console for an error.");
+const fake = [
+  { person: { name: "Ann Example", image: { medium: "https://static.tvmaze.com/example.jpg" } }, character: { name: "Herself" } },
+  { person: { name: "Bob Example", image: null }, character: { name: "Himself" } },
+];
+try { renderCast(fake); } catch (e) { t.fail("Your `renderCast` crashed: " + e.message + ". Check for `null` before using `member.person.image.medium`."); }
+const lis = t.$$("#show-cast li");
+t.expect(lis.length === 2, `With two cast members, the list has ${lis.length} items. Keep one \`li\` per member.`);
+t.expect(lis[0].querySelector("img"), "The first member has a photo, but the list item has no `<img>`. Create one when `member.person.image !== null`, and `append` it to the `li`.");
+t.expect(/Ann Example as Herself/.test(t.text(lis[0])), `The first item says "${t.text(lis[0])}". Add the text after the photo with \`item.append(...)\`, not \`textContent\`, which would remove the photo.`);
+t.expect(!lis[1].querySelector("img"), "The second member has no photo (`null`), so their item shouldn't have an `<img>`.");
+t.expect(/Bob Example as Himself/.test(t.text(lis[1])), "Members without a photo should still have their text.");
+--- learned
+`append` builds an element from parts, and an `if` on `null` keeps missing photos from breaking the list. Online, the cast now has faces.
+--- summary
+`append` mixes elements and text; check for `null` before using an optional object.
+
+
+=== step average
+title: The average rating of My List
+minutes: 15
+slot: js
+bonus: yes
+template: extras
+--- explain
+The My List view now has an empty line under its heading, `<p id="mylist-average">`. Fill it with the average rating of the shows in My List, like "Average rating: 8.9".
+
+An average is the total divided by how many there are. Some shows have no rating (`null`), so leave them out: filter first, then add up with a loop.
+
+```js
+let total = 0;
+for (const price of prices) {
+  total = total + price;
+}
+const average = total / prices.length;
+```
+
+`toFixed(1)` shows a number with one decimal: `(26.7 / 3).toFixed(1)` is `"8.9"`.
+--- task
+1. At the top: `const myListAverage = document.querySelector("#mylist-average");`
+2. At the end of `renderMyList`: keep the shows whose rating isn't `null`. If there are none, empty the line. Otherwise add up their ratings and show "Average rating: " with the average, to one decimal.
+--- hint
+`const rated = state.myList.filter((show) => show.rating !== null);` gives the shows to count. Divide by `rated.length`, not `state.myList.length`.
+--- hint
+```js
+  const rated = state.myList.filter((show) => show.rating !== null);
+  if (rated.length === 0) {
+    myListAverage.textContent = "";
+  } else {
+    let total = 0;
+    for (const show of rated) {
+      total = total + show.rating;
+    }
+    myListAverage.textContent = "Average rating: " + (total / rated.length).toFixed(1);
+  }
+```
+--- solution-replace
+const myListEmpty = document.querySelector("#mylist-empty");
+=>
+const myListEmpty = document.querySelector("#mylist-empty");
+const myListAverage = document.querySelector("#mylist-average");
+--- solution-replace
+  myListEmpty.hidden = state.myList.length > 0;
+}
+=>
+  myListEmpty.hidden = state.myList.length > 0;
+
+  // The average rating of the shows that have one
+  const rated = state.myList.filter((show) => show.rating !== null);
+  if (rated.length === 0) {
+    myListAverage.textContent = "";
+  } else {
+    let total = 0;
+    for (const show of rated) {
+      total = total + show.rating;
+    }
+    myListAverage.textContent = "Average rating: " + (total / rated.length).toFixed(1);
+  }
+}
+--- check
+await t.sleep(450);
+t.win.localStorage.setItem("myList", JSON.stringify([
+  { id: 1001, name: "Sample A", image: null, genres: ["Drama"], rating: 8 },
+  { id: 1002, name: "Sample B", image: null, genres: ["Comedy"], rating: 9 },
+  { id: 1003, name: "Sample C", image: null, genres: [], rating: null },
+]));
+await t.rerun();
+await t.click("#nav-mylist");
+const text = t.text("#mylist-average");
+t.win.localStorage.removeItem("myList");
+t.expect(!t.$("#mylist-view").hidden, "The My List link should open the My List view. Look in the Console for an error.");
+t.expect(text !== "", "The average line is empty. At the end of `renderMyList`, set `myListAverage.textContent`.");
+t.expect(!/NaN/.test(text), `The average line says "${text}". Leave out the shows whose rating is \`null\` before adding up.`);
+t.expect(/8\.5/.test(text), `With ratings 8, 9 and one without a rating, the line says "${text}". It should show 8.5: divide by the number of rated shows, and use \`toFixed(1)\`.`);
+--- learned
+Filter, loop, divide: a small calculation drawn in `render()`, so it's always up to date.
+--- summary
+Average: filter out `null`, add up in a loop, divide, `toFixed(1)`.

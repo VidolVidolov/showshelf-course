@@ -1,0 +1,1564 @@
+=== day
+n: 7
+title: Make the page react
+subtitle: The DOM and events
+hours: 3 hours
+page: index.html
+slot: js | js | app.js
+file: app.js = js
+refs: @page, helpers.js, data.js
+
+--- intro
+Until now your JavaScript ran once and printed to the Console. Today the page **reacts**. You build the show cards with JavaScript, filter them while someone types, and add a watchlist called **My List** that is still there after a reload.
+
+You work in one file, **app.js**. The page itself, the styles and two small files are ready. Open the read-only tabs above the code box to look at them:
+
+- **data.js** holds `shows`, the 12 shows you know.
+- **helpers.js** has functions you already know, like `ratingLabel`, `yearsLabel` and `searchByName`.
+
+Your code grows from step to step: each step starts with your code from the step before.
+
+--- template
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ShowShelf</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo">ShowShelf</a>
+      <nav class="nav">
+        <a href="index.html">Home</a>
+        <span class="list-count">My List <span id="list-count">0</span></span>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <h1>What are we watching tonight?</h1>
+      <p>Find TV shows and keep your watchlist.</p>
+      <form class="search" id="search-form">
+        <input type="search" id="search" placeholder="Search shows, e.g. office" aria-label="Search shows">
+        <button type="submit">Search</button>
+      </form>
+    </section>
+
+    <div class="toolbar">
+      <div class="genres" id="genres"></div>
+    </div>
+
+    <p class="status" id="empty-message" hidden>No shows match your search.</p>
+
+    <div class="grid" id="grid"></div>
+  </main>
+
+  <footer class="site-footer">
+    <p>ShowShelf · Web Dev in 11 Days</p>
+  </footer>
+
+  <script src="data.js"></script>
+  <script src="helpers.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
+
+--- template extras
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ShowShelf</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo">ShowShelf</a>
+      <nav class="nav">
+        <a href="index.html">Home</a>
+        <span class="list-count">My List <span id="list-count">0</span></span>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <h1>What are we watching tonight?</h1>
+      <p>Find TV shows and keep your watchlist.</p>
+      <form class="search" id="search-form">
+        <input type="search" id="search" placeholder="Search shows, e.g. office" aria-label="Search shows">
+        <button type="submit">Search</button>
+      </form>
+    </section>
+
+    <div class="toolbar">
+      <div class="genres" id="genres"></div>
+      <!-- New for the extra challenges -->
+      <label class="only-list">
+        <input type="checkbox" id="only-list">
+        Only My List
+      </label>
+      <select id="sort" aria-label="Order">
+        <option value="">Normal order</option>
+        <option value="rating">Best rated first</option>
+      </select>
+    </div>
+
+    <p class="status" id="empty-message" hidden>No shows match your search.</p>
+
+    <div class="grid" id="grid"></div>
+  </main>
+
+  <!-- New for the extra challenges: a box that opens on top of the page -->
+  <dialog id="details" class="details">
+    <button class="close-btn" id="close-details" aria-label="Close">✕</button>
+    <div class="details-inner">
+      <img class="poster" id="details-poster" src="poster.svg" alt="">
+      <div>
+        <h2 id="details-title"></h2>
+        <p class="meta" id="details-meta"></p>
+        <p id="details-summary"></p>
+      </div>
+    </div>
+  </dialog>
+
+  <footer class="site-footer">
+    <p>ShowShelf · Web Dev in 11 Days</p>
+  </footer>
+
+  <script src="data.js"></script>
+  <script src="helpers.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
+
+--- file style.css
+{{asset:appCss}}
+
+--- file data.js
+// data.js: the 12 shows (read only)
+const shows = {{data:shows}};
+
+--- file helpers.js
+// helpers.js: small functions you already know (read only)
+
+// ratingLabel(9.2) -> "Must watch", ratingLabel(7.5) -> "Worth a try", ratingLabel(5) -> "Skip it"
+function ratingLabel(rating) {
+  if (rating >= 8.5) {
+    return "Must watch";
+  } else if (rating >= 7) {
+    return "Worth a try";
+  } else {
+    return "Skip it";
+  }
+}
+
+// yearsLabel(1994, 2004) -> "1994–2004", yearsLabel(2019, 2019) -> "2019",
+// yearsLabel(2019, null) -> "2019–now" (still running), yearsLabel(null, null) -> ""
+function yearsLabel(premiered, ended) {
+  if (!premiered) {
+    return "";
+  }
+  if (!ended) {
+    return premiered + "–now";
+  }
+  if (premiered === ended) {
+    return String(premiered);
+  }
+  return premiered + "–" + ended;
+}
+
+// searchByName(shows, "office") -> the shows whose name contains "office" (any letter case)
+function searchByName(list, term) {
+  const needle = term.trim().toLowerCase();
+  return list.filter((show) => show.name.toLowerCase().includes(needle));
+}
+
+// getByGenre(shows, "Comedy") -> only the shows that have this genre
+function getByGenre(list, genre) {
+  return list.filter((show) => show.genres.includes(genre));
+}
+
+// allGenres(shows) -> ["Action", "Adventure", "Comedy", ...]: every genre once, from A to Z
+function allGenres(list) {
+  const result = [];
+  for (const show of list) {
+    for (const genre of show.genres) {
+      if (!result.includes(genre)) {
+        result.push(genre);
+      }
+    }
+  }
+  return result.sort();
+}
+
+--- default js
+// app.js: makes the ShowShelf page react (Day 7)
+// Loaded before this file (open the read-only tabs to see them):
+//   data.js    -> shows: the 12 shows
+//   helpers.js -> ratingLabel, yearsLabel, searchByName, getByGenre, allGenres
+
+// ---------- Elements: the parts of the page we change ----------
+
+
+=== step find
+title: Find an element
+minutes: 10
+slot: js
+--- explain
+The browser turns your HTML into a tree of objects that JavaScript can read and change. This tree is called the **DOM** (Document Object Model). Every tag becomes an **element** object.
+
+To get hold of one element, ask the `document` with a CSS selector, like the selectors you wrote on Day 2:
+
+```js
+const logo = document.querySelector(".logo");
+logo.textContent = "TV Time";
+```
+
+- `document.querySelector(...)` gives back the **first** element that matches the selector, or `null` if nothing matches.
+- `#` selects by id and `.` by class, as in CSS.
+- `textContent` is the text inside the element. Change it, and the page changes straight away.
+
+Keeping the element in a `const` means you can use it again and again without searching the page each time.
+
+> Open the **index.html (whole page)** tab. Near the bottom is an empty `<div class="grid" id="grid">`. That's where the show cards will go.
+--- task
+Under the comment `Elements`:
+
+1. Find the grid and keep it in a constant: `const grid = document.querySelector("#grid");`
+2. As a test, put some text in it, for example "The shows will appear here."
+3. Log the element with `console.log(grid);` and look at the Console under the preview.
+--- hint
+Three lines: the `const` with `querySelector`, then `grid.textContent = "...";`, then `console.log(grid);`. The id needs a `#` in front of it.
+--- hint
+```js
+const grid = document.querySelector("#grid");
+grid.textContent = "The shows will appear here.";
+console.log(grid);
+```
+--- solution
+// app.js: makes the ShowShelf page react (Day 7)
+// Loaded before this file (open the read-only tabs to see them):
+//   data.js    -> shows: the 12 shows
+//   helpers.js -> ratingLabel, yearsLabel, searchByName, getByGenre, allGenres
+
+// ---------- Elements: the parts of the page we change ----------
+const grid = document.querySelector("#grid");
+grid.textContent = "The shows will appear here.";
+console.log(grid);
+--- check
+t.expect(/\b(const|let|var)\s+grid\s*=/.test(t.clean), "I can't find `const grid = ...` yet. Under the Elements comment, write `const grid = document.querySelector(\"#grid\");`.");
+const grid = t.get("grid");
+if (!grid || grid.id !== "grid") {
+  t.expect(!/querySelector\(\s*["']grid["']\s*\)/.test(t.clean), "Your selector is `\"grid\"`, which looks for a `<grid>` tag. An id needs a `#` in front: `document.querySelector(\"#grid\")`.");
+  t.fail("`grid` doesn't hold the grid element yet. Write `document.querySelector(\"#grid\")`, with the `#` and a capital S in `querySelector`.");
+}
+t.expect(t.text("#grid").length > 0, "The grid is still empty. Give it some text: `grid.textContent = \"The shows will appear here.\";`");
+t.expect(t.logs.some((l) => /div#grid/.test(l.text)), "Now log the element: `console.log(grid);`. It appears in the Console under the preview.");
+--- learned
+`querySelector` finds an element in the page, and changing its `textContent` changes what people see. Everything today starts with finding an element.
+--- summary
+`document.querySelector("#id")` finds an element; `textContent` changes its text.
+--- mistakes
+- Forgetting the `#`: `querySelector("grid")` looks for a `<grid>` tag and gives `null`.
+- `queryselector` or `QuerySelector`: capital letters matter.
+- Writing `grid.textContent` before the `const grid` line.
+
+
+=== step create
+title: Build an element
+minutes: 15
+slot: js
+--- explain
+JavaScript can also make **new** elements. It takes three moves: create it, fill it, put it on the page.
+
+```js
+const note = document.createElement("p");      // 1. create a <p> (not on the page yet)
+note.className = "meta";                        // 2. give it a class...
+note.textContent = "Updated today";             //    ...and some text
+document.querySelector("footer").append(note);  // 3. put it inside the footer
+```
+
+- `document.createElement("p")` makes a new element. It exists only in JavaScript until you add it to the page.
+- `className` sets the `class` attribute, so the CSS for that class applies to it.
+- `parent.append(child)` puts `child` inside `parent`, after anything already there.
+
+You can put elements inside elements you created, too: build the small parts first, then put them together.
+--- task
+1. Delete the `grid.textContent = ...` line from step 1. The `console.log` can go too.
+2. Under `const grid`, create an `article` element with the class `card`.
+3. Create an `h3` whose text is the first show's name: `shows[0].name`.
+4. Put the `h3` inside the article, and the article inside the grid.
+
+A small white card with "Friends" appears in the preview.
+--- hint
+Two `document.createElement(...)` calls: one for `"article"`, one for `"h3"`. Then two `append` calls: first `card.append(title)`, then `grid.append(card)`.
+--- hint
+```js
+const card = document.createElement("article");
+card.className = "card";
+
+const title = document.createElement("h3");
+title.textContent = shows[0].name;
+
+card.append(title);
+grid.append(card);
+```
+--- solution
+// app.js: makes the ShowShelf page react (Day 7)
+// Loaded before this file (open the read-only tabs to see them):
+//   data.js    -> shows: the 12 shows
+//   helpers.js -> ratingLabel, yearsLabel, searchByName, getByGenre, allGenres
+
+// ---------- Elements: the parts of the page we change ----------
+const grid = document.querySelector("#grid");
+
+// ---------- A first card ----------
+const card = document.createElement("article");
+card.className = "card";
+
+const title = document.createElement("h3");
+title.textContent = shows[0].name;
+
+card.append(title);
+grid.append(card);
+--- check
+const card = t.$("#grid article");
+if (!card) {
+  t.expect(!t.$("#grid h3"), "Your `h3` is in the grid, but not inside an `article`. Append the `h3` to the card, and then the card to the grid.");
+  t.fail("I can't find an `<article>` in the grid yet. Create it with `document.createElement(\"article\")` and add it with `grid.append(card);`.");
+}
+t.expect(card.classList.contains("card"), "Give the article the class `card`: `card.className = \"card\";`.");
+const h3 = card.querySelector("h3");
+t.expect(h3, "Put an `h3` inside the card: create it with `document.createElement(\"h3\")`, then `card.append(title);`.");
+const names = t.get("shows").map((s) => s.name);
+t.expect(names.includes(t.text(h3)), `The heading in the card says "${t.text(h3)}". Use the first show's name: \`title.textContent = shows[0].name;\``);
+const leftover = [...t.$("#grid").childNodes].some((n) => n.nodeType === 3 && n.textContent.trim());
+t.expect(!leftover, "The test text from step 1 is still in the grid. Delete the line `grid.textContent = ...`.");
+--- learned
+You built part of the page with JavaScript: `createElement`, fill it, `append`. The CSS for `.card` applied straight away, because you gave it the class.
+--- summary
+`document.createElement("tag")` makes an element; `parent.append(child)` puts it on the page.
+--- mistakes
+- `card.class = "card"`: the property is called `className`.
+- Appending the card to the grid before putting the title in it (it works, but it's easier to read in the other order).
+- Forgetting `grid.append(card)`, so the card never appears.
+
+
+=== step create-card
+title: A function that builds a card
+minutes: 20
+slot: js
+--- explain
+You'll need a card for every show, so the card code belongs in a **function**. We've moved your code from step 2 into a function called `createCard(show)` and added the other parts of a card: a poster, a genre badge, the rating and the years.
+
+Read it from top to bottom:
+
+- it gets one show object as its parameter, `show`
+- it creates elements and fills them from `show`
+- `append` can take several elements at once: `body.append(badge, title, rating, meta)` adds all four, in that order
+- at the end, `return card;` gives the finished card back. The function doesn't put it on the page: the last line does that.
+
+Three lines are still missing. They are marked `// TODO`.
+
+To join pieces of text, use `+`:
+
+```js
+label.textContent = "Season " + season.number + " of " + total;
+```
+
+> `show.image ?? "poster.svg"` means "the show's picture, or `poster.svg` if it has none (`null`)". Real pictures arrive tomorrow.
+--- task
+Fill in the three TODO lines inside `createCard`, using the helpers from **helpers.js**:
+
+1. The badge shows the first genre: `show.genres[0]`.
+2. The rating line reads like `★ 8.8 · Must watch`: the rating, then the label from `ratingLabel(show.rating)`. Copy the `★` and `·` from the comment, or use `*` and `-`.
+3. The meta line shows the years: `yearsLabel(show.premiered, show.ended)`.
+--- starter
+// app.js: makes the ShowShelf page react (Day 7)
+// Loaded before this file (open the read-only tabs to see them):
+//   data.js    -> shows: the 12 shows
+//   helpers.js -> ratingLabel, yearsLabel, searchByName, getByGenre, allGenres
+
+// ---------- Elements: the parts of the page we change ----------
+const grid = document.querySelector("#grid");
+
+// ---------- One card for one show ----------
+// createCard(show) builds a card and gives it back. It doesn't put it on the page.
+function createCard(show) {
+  const card = document.createElement("article");
+  card.className = "card";
+
+  const poster = document.createElement("img");
+  poster.className = "poster";
+  poster.src = show.image ?? "poster.svg";   // no picture (null)? use poster.svg
+  poster.alt = "";                           // the name is under the poster, so no alt text
+
+  const body = document.createElement("div");
+  body.className = "card-body";
+
+  const badge = document.createElement("span");
+  badge.className = "badge";
+  // TODO 1: the badge shows the first genre (show.genres[0])
+
+  const title = document.createElement("h3");
+  title.textContent = show.name;
+
+  const rating = document.createElement("p");
+  rating.className = "rating";
+  // TODO 2: the rating, like "★ 8.8 · Must watch" (show.rating and ratingLabel)
+
+  const meta = document.createElement("p");
+  meta.className = "meta";
+  // TODO 3: the years, like "1994–2004" (yearsLabel with show.premiered and show.ended)
+
+  body.append(badge, title, rating, meta);
+  card.append(poster, body);
+  return card;
+}
+
+// Try it with the first show
+grid.append(createCard(shows[0]));
+--- hint
+Each TODO is one line that sets `textContent`, like the title line above it: `title.textContent = show.name;`. For the rating, join the pieces with `+`.
+--- hint
+```js
+badge.textContent = show.genres[0];
+```
+```js
+rating.textContent = "★ " + show.rating + " · " + ratingLabel(show.rating);
+```
+```js
+meta.textContent = yearsLabel(show.premiered, show.ended);
+```
+--- solution
+// app.js: makes the ShowShelf page react (Day 7)
+// Loaded before this file (open the read-only tabs to see them):
+//   data.js    -> shows: the 12 shows
+//   helpers.js -> ratingLabel, yearsLabel, searchByName, getByGenre, allGenres
+
+// ---------- Elements: the parts of the page we change ----------
+const grid = document.querySelector("#grid");
+
+// ---------- One card for one show ----------
+// createCard(show) builds a card and gives it back. It doesn't put it on the page.
+function createCard(show) {
+  const card = document.createElement("article");
+  card.className = "card";
+
+  const poster = document.createElement("img");
+  poster.className = "poster";
+  poster.src = show.image ?? "poster.svg";   // no picture (null)? use poster.svg
+  poster.alt = "";                           // the name is under the poster, so no alt text
+
+  const body = document.createElement("div");
+  body.className = "card-body";
+
+  const badge = document.createElement("span");
+  badge.className = "badge";
+  badge.textContent = show.genres[0];
+
+  const title = document.createElement("h3");
+  title.textContent = show.name;
+
+  const rating = document.createElement("p");
+  rating.className = "rating";
+  rating.textContent = "★ " + show.rating + " · " + ratingLabel(show.rating);
+
+  const meta = document.createElement("p");
+  meta.className = "meta";
+  meta.textContent = yearsLabel(show.premiered, show.ended);
+
+  body.append(badge, title, rating, meta);
+  card.append(poster, body);
+  return card;
+}
+
+// Try it with the first show
+grid.append(createCard(shows[0]));
+--- check
+const createCard = t.get("createCard");
+t.expect(typeof createCard === "function", "I can't find the function `createCard`. Press **Start again** to get the code back.");
+const shows = t.get("shows");
+let card;
+try { card = createCard(shows[1]); } catch (e) { t.fail("Your `createCard` crashed: " + e.message); }
+t.expect(card && card.nodeType === 1, "`createCard` should give the card back. Keep `return card;` as its last line.");
+const badge = card.querySelector(".badge");
+const bt = badge ? badge.textContent.trim() : "";
+t.expect(bt !== "", "TODO 1: the badge is empty. Set its text to the first genre: `badge.textContent = show.genres[0];`");
+t.expect(bt === "Drama", `TODO 1: for Breaking Bad the badge says "${bt}". It should show only the first genre, "Drama": use \`show.genres[0]\`.`);
+const rt = t.text(card.querySelector(".rating"));
+t.expect(rt !== "", "TODO 2: the rating line is empty. Set `rating.textContent` to the rating and its label.");
+t.expect(rt.includes("9.2"), `TODO 2: for Breaking Bad the rating line says "${rt}". It should contain the number 9.2, which is \`show.rating\`.`);
+t.expect(/must watch/i.test(rt), `TODO 2: the rating line says "${rt}". Add the label from \`ratingLabel(show.rating)\`, which gives "Must watch" for 9.2.`);
+const mt = t.text(card.querySelector(".meta"));
+t.expect(mt.includes("2008") && mt.includes("2013"), `TODO 3: for Breaking Bad the meta line says "${mt}". It should show the years 2008–2013: use \`yearsLabel(show.premiered, show.ended)\`.`);
+t.expect(t.$$("#grid .card").length >= 1, "Keep the last line, `grid.append(createCard(shows[0]));`, so a card appears on the page.");
+--- learned
+`createCard` turns one show object into one card element. A function that **returns** an element is a small factory: give it any show, and it builds that show's card.
+--- summary
+A function can build an element from an object and `return` it.
+--- mistakes
+- `badge.textContent = show.genres;` shows every genre with commas. Use `[0]` for the first one.
+- Missing `+` between the pieces of the rating text, which gives a syntax error.
+- Deleting `return card;`, so `createCard` gives back `undefined`.
+--- teacher
+The code box starts fresh in this step: their step 2 lines were moved into the function. If a student asks where their code went, show them the `card` and `title` lines at the top of `createCard`.
+
+
+=== step loop
+title: A card for every show
+minutes: 10
+slot: js
+--- explain
+You know `for...of` from earlier days: it runs the same code once for every item in an array.
+
+```js
+for (const name of ["Dark", "Fleabag"]) {
+  console.log("Now watching " + name);
+}
+```
+
+Now put your function inside a loop: for each show, create a card and append it to the grid.
+
+This is the heart of building pages with JavaScript: **data in, elements out**. One function describes what a single card looks like; the loop makes as many cards as there are shows. Add a thirteenth show to the data, and a thirteenth card appears, with no new HTML.
+--- task
+Replace the last line, `grid.append(createCard(shows[0]));`, with a `for...of` loop that adds a card for **every** show in `shows`.
+--- hint
+Loop over `shows` with a variable called `show`. Inside the loop, the same line as before, but with `show` instead of `shows[0]`.
+--- hint
+```js
+for (const show of shows) {
+  grid.append(createCard(show));
+}
+```
+--- solution-replace
+// Try it with the first show
+grid.append(createCard(shows[0]));
+=>
+// One card for every show
+for (const show of shows) {
+  grid.append(createCard(show));
+}
+--- check
+const cards = t.$$("#grid .card");
+t.expect(cards.length > 1, "There's only one card. Replace the last line with a `for...of` loop over `shows` that appends `createCard(show)` for each one.");
+t.expect(cards.length !== 13, "There are 13 cards: Friends is there twice. Delete the old line `grid.append(createCard(shows[0]));`.");
+t.expect(cards.length === 12, `There are ${cards.length} cards. There should be 12, one per show.`);
+const names = cards.map((c) => t.text(c.querySelector("h3")));
+t.expect(new Set(names).size === 12, "The same show appears on every card. Inside the loop, use the loop variable: `createCard(show)`, not `createCard(shows[0])`.");
+--- learned
+Twelve cards from three lines of code. If the data changes, the page follows, with no new HTML.
+--- summary
+A loop plus a function: one element for every item in an array.
+--- mistakes
+- Keeping the old line, so Friends appears twice.
+- `createCard(shows)` (the whole array) instead of `createCard(show)`.
+
+
+=== step render-grid
+title: Draw any list of shows
+minutes: 15
+slot: js
+--- explain
+Soon the grid will change while you use the page: fewer cards while you search, all of them again afterwards. So the drawing code has to run again and again, with different lists. That's a job for a function with a parameter:
+
+```js
+function renderGrid(list) { ... }
+
+renderGrid(shows);                        // all 12
+renderGrid(searchByName(shows, "the"));   // only the matching shows
+```
+
+One thing to watch: `append` adds to what is already there. Draw twice and you'd have 24 cards. So the function must first empty the grid:
+
+```js
+grid.replaceChildren();   // removes everything inside the grid
+```
+
+Then it loops over `list`, its parameter, and not over `shows`. That way it draws whatever list it's given.
+
+> "Render" is the word developers use for "draw on the screen".
+--- task
+1. Put your loop inside a new function `renderGrid(list)`. Make `grid.replaceChildren();` its first line, and loop over `list`.
+2. Under the function, call it with all the shows: `renderGrid(shows);`
+--- hint
+The function has two parts: first `grid.replaceChildren();`, then your loop with `list` where it said `shows`.
+--- hint
+```js
+function renderGrid(list) {
+  grid.replaceChildren();
+  for (const show of list) {
+    grid.append(createCard(show));
+  }
+}
+
+renderGrid(shows);
+```
+--- solution-replace
+// One card for every show
+for (const show of shows) {
+  grid.append(createCard(show));
+}
+=>
+// ---------- Draw a list of shows in the grid ----------
+function renderGrid(list) {
+  grid.replaceChildren();   // remove the old cards first
+  for (const show of list) {
+    grid.append(createCard(show));
+  }
+}
+
+renderGrid(shows);
+--- check
+const renderGrid = t.get("renderGrid");
+t.expect(typeof renderGrid === "function", "I can't find a function called `renderGrid`. Wrap your loop in `function renderGrid(list) { ... }`.");
+t.expect(t.$$("#grid .card").length === 12, "The page should start with all 12 cards. Under the function, call it: `renderGrid(shows);`.");
+const shows = t.get("shows");
+try { renderGrid([shows[2], shows[5]]); } catch (e) { t.fail("Your `renderGrid` crashed: " + e.message); }
+const n = t.$$("#grid .card").length;
+t.expect(n !== 14, "`renderGrid` added the new cards after the old ones (14 cards). Empty the grid first: `grid.replaceChildren();` as the first line of the function.");
+t.expect(n !== 12 && n !== 24, "When I gave `renderGrid` a list of two shows, it still drew all 12. Loop over the parameter `list`, not over `shows`.");
+t.expect(n === 2, `When I gave \`renderGrid\` a list of two shows, it drew ${n} cards. It should draw exactly the shows in \`list\`.`);
+const names = t.$$("#grid .card h3").map((h) => t.text(h));
+t.expect(names[0] === "The Office" && names[1] === "Dark", "The cards should follow the order of the list you give to `renderGrid`.");
+renderGrid(shows);
+--- learned
+`renderGrid(list)` draws any list you give it, and starts from an empty grid every time. Next, you'll call it while someone types.
+--- summary
+`renderGrid(list)` empties the grid with `replaceChildren()` and draws a card for each show.
+--- mistakes
+- Forgetting `grid.replaceChildren()`, so cards pile up.
+- Looping over `shows` inside the function, so the parameter is ignored.
+
+
+=== step search-input
+title: React to typing
+minutes: 15
+slot: js
+--- explain
+An **event** is something that happens on the page: a click, a key press, the text in a box changing. You can ask an element to run a function whenever an event happens:
+
+```js
+const logo = document.querySelector(".logo");
+logo.addEventListener("click", () => {
+  console.log("Someone clicked the logo");
+});
+```
+
+- `"click"` is the name of the event.
+- The arrow function is the **event listener**. The browser calls it every time the event happens, not now.
+
+For a text box, the `"input"` event happens on every change: each letter typed or deleted. Inside the listener, `searchInput.value` is the text that is in the box right now.
+
+You also have `searchByName(list, text)` in helpers.js. It gives back only the shows whose name contains the text, whatever the letter case.
+--- task
+1. At the top, under `const grid`, find the search box: `const searchInput = document.querySelector("#search");`
+2. At the bottom, add an `"input"` listener to `searchInput`. Inside it, draw only the matching shows: `renderGrid(searchByName(shows, searchInput.value));`
+
+Then type **office** in the search box in the preview, and delete it again.
+--- hint
+The listener is `searchInput.addEventListener("input", () => { ... });`. Inside the curly brackets goes one line: the `renderGrid(...)` call.
+--- hint
+```js
+searchInput.addEventListener("input", () => {
+  renderGrid(searchByName(shows, searchInput.value));
+});
+```
+--- solution-replace
+const grid = document.querySelector("#grid");
+=>
+const grid = document.querySelector("#grid");
+const searchInput = document.querySelector("#search");
+--- solution-append
+// ---------- Events: what happens when someone uses the page ----------
+// Every time the text in the search box changes, show only the shows that match
+searchInput.addEventListener("input", () => {
+  renderGrid(searchByName(shows, searchInput.value));
+});
+--- check
+await t.sleep(450);
+await t.rerun();   // start from a fresh run of the page
+const input = t.$("#search");
+const typeIn = async (v) => { input.value = v; input.dispatchEvent(new t.win.Event("input", { bubbles: true })); await t.sleep(80); };
+const names = () => t.$$("#grid .card h3").map((h) => t.text(h));
+t.expect(names().length === 12, "The page should start with all 12 cards. Keep `renderGrid(shows);` under the function, and look in the Console for an error.");
+await typeIn("office");
+if (names().length === 12) {
+  t.expect(!/addEventListener\(\s*["']change["']/.test(t.clean), "Use the `\"input\"` event. `\"change\"` only happens when you leave the box, not while you type.");
+  t.expect(/\b(const|let)\s+searchInput\s*=/.test(t.clean), "At the top, find the search box: `const searchInput = document.querySelector(\"#search\");`.");
+  t.fail("Typing **office** in the search box didn't change the grid. Add an `\"input\"` listener to `searchInput` that calls `renderGrid(searchByName(shows, searchInput.value));`.");
+}
+t.expect(names().length === 1 && names()[0] === "The Office", `After typing "office" the grid shows: ${names().join(", ") || "nothing"}. It should show only The Office. Use \`searchInput.value\`, the text in the box.`);
+await typeIn("");
+t.expect(names().length === 12, "After emptying the search box, all 12 shows should come back.");
+await typeIn("BAD");
+t.expect(names().length === 1 && names()[0] === "Breaking Bad", "Searching BAD in capitals should find Breaking Bad. Use `searchByName`, which ignores letter case.");
+await typeIn("");
+--- learned
+`addEventListener` runs your code **later**, whenever the event happens. The page now reacts to the person using it, which is what makes it an app.
+--- summary
+`element.addEventListener("input", () => { ... })` runs code on every change; `.value` is the text in a box.
+--- mistakes
+- `searchInput.value` read once outside the listener: it's empty at that moment and never updates.
+- Using the `"change"` event, which waits until you leave the box.
+- Calling the function instead of giving it: `addEventListener("input", renderGrid(...))`.
+
+
+=== step submit
+title: Stop the page reloading
+minutes: 10
+slot: js
+--- explain
+Try it: click in the search box in the preview and press **Enter**. The Lab shows a notice: the form tried to reload the page.
+
+That's what a `<form>` does when it is **submitted** (with Enter, or its Search button): it sends the text to a server and loads a new page. We don't have a server, and we want to stay on this page.
+
+Every listener receives an **event object** with details about what happened. Its method `preventDefault()` cancels what the browser would normally do:
+
+```js
+link.addEventListener("click", (event) => {
+  event.preventDefault();   // don't follow the link
+});
+```
+
+The event for a form is `"submit"`. It happens on the `<form>` itself, not on the button or the text box.
+--- task
+1. At the top, find the form: `const searchForm = document.querySelector("#search-form");`
+2. At the bottom, add a `"submit"` listener to `searchForm` that calls `event.preventDefault();`.
+
+Press Enter in the search box again: no notice this time.
+--- hint
+The arrow function needs a parameter this time, `(event) => { ... }`, so you can use `event.preventDefault();` inside it.
+--- hint
+```js
+searchForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+});
+```
+--- solution-replace
+const searchInput = document.querySelector("#search");
+=>
+const searchInput = document.querySelector("#search");
+const searchForm = document.querySelector("#search-form");
+--- solution-append
+// Pressing Enter sends ("submits") the form. Stop the browser from reloading the page.
+searchForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+});
+--- check
+await t.sleep(450);
+await t.rerun();   // start from a fresh run of the page
+const form = t.$("#search-form");
+let prevented = null;
+const spy = (e) => { prevented = e.defaultPrevented; };
+t.doc.addEventListener("submit", spy);
+form.dispatchEvent(new t.win.Event("submit", { bubbles: true, cancelable: true }));
+t.doc.removeEventListener("submit", spy);
+if (!prevented) {
+  t.expect(!/\.preventDefault\s*;/.test(t.clean), "`preventDefault` is a method: call it with brackets, `event.preventDefault();`.");
+  t.expect(!/searchInput\.addEventListener\(\s*["']submit/.test(t.clean), "The `\"submit\"` event happens on the form, not on the text box. Use `searchForm.addEventListener(\"submit\", ...)`.");
+  t.fail("The form still tries to reload the page. Add a `\"submit\"` listener to `searchForm` that calls `event.preventDefault();`.");
+}
+t.expect(t.$$("#grid .card").length === 12, "The grid should still show all 12 shows. Look in the Console for an error.");
+--- learned
+Listeners get an **event object**. `event.preventDefault()` stops the browser's normal behaviour, here the page reload. You'll use it for every form.
+--- summary
+`event.preventDefault()` stops the browser's default action, like a form reloading the page.
+--- mistakes
+- Adding the listener to the button with `"click"`: Enter in the box still submits the form.
+- `event.preventDefault` without brackets: nothing happens.
+- Forgetting the `event` parameter: `event is not defined`.
+
+
+=== step empty
+title: When nothing matches
+minutes: 10
+slot: js
+--- explain
+Search for something that doesn't exist, like **zzz**. The grid goes empty, and the page looks broken. It's better to say what happened.
+
+The page already has a message for this, hidden: `<p class="status" id="empty-message" hidden>`. Every element has a `hidden` property: `true` hides it, `false` shows it.
+
+```js
+banner.hidden = true;    // hide it
+banner.hidden = false;   // show it
+```
+
+A comparison like `list.length > 0` is already `true` or `false`, so you can use it directly, without an `if`:
+
+```js
+saleBanner.hidden = itemsOnSale.length === 0;   // hide the banner when nothing is on sale
+```
+--- task
+1. At the top, find the message: `const emptyMessage = document.querySelector("#empty-message");`
+2. At the end of `renderGrid`, add one line that hides the message when the list has shows, and shows it when the list is empty.
+
+Search for zzz, then for dark.
+--- hint
+Inside `renderGrid`, after the loop: `emptyMessage.hidden = ...;`. The message should be hidden when there **are** shows, so when `list.length > 0`.
+--- hint
+```js
+function renderGrid(list) {
+  grid.replaceChildren();
+  for (const show of list) {
+    grid.append(createCard(show));
+  }
+  emptyMessage.hidden = list.length > 0;
+}
+```
+--- solution-replace
+const searchForm = document.querySelector("#search-form");
+=>
+const searchForm = document.querySelector("#search-form");
+const emptyMessage = document.querySelector("#empty-message");
+--- solution-replace
+    grid.append(createCard(show));
+  }
+}
+=>
+    grid.append(createCard(show));
+  }
+  emptyMessage.hidden = list.length > 0;   // show the message only when there are no shows
+}
+--- check
+await t.sleep(450);
+await t.rerun();   // start from a fresh run of the page
+const msg = t.$("#empty-message");
+const input = t.$("#search");
+const typeIn = async (v) => { input.value = v; input.dispatchEvent(new t.win.Event("input", { bubbles: true })); await t.sleep(80); };
+t.expect(t.$$("#grid .card").length === 12, "The page should start with all 12 cards. Look in the Console: if it says \"Cannot access 'emptyMessage' before initialization\", move `const emptyMessage = ...` to the top, under `const grid`.");
+t.expect(msg.hidden, "With all 12 shows on the page, the message should be hidden. It should be hidden when there are shows: `emptyMessage.hidden = list.length > 0;`.");
+await typeIn("zzz");
+t.expect(t.$$("#grid .card").length === 0, "Searching for zzz should leave the grid empty. Keep your search listener from step 6.");
+t.expect(!msg.hidden, "When I search for zzz, the grid is empty but the message stays hidden. At the end of `renderGrid`, add `emptyMessage.hidden = list.length > 0;`.");
+await typeIn("dark");
+t.expect(msg.hidden, "When I search for dark, there's a result, but the message is still showing. It should be hidden when `list.length > 0`.");
+await typeIn("");
+--- learned
+`element.hidden = true/false` shows and hides things. Setting it from a comparison keeps the message and the grid in agreement every time the grid is drawn.
+--- summary
+`element.hidden = condition;` shows or hides an element.
+--- mistakes
+- The condition the wrong way round: `list.length === 0` hides the message exactly when it's needed.
+- Putting the line outside `renderGrid`, so it only runs once.
+- `const emptyMessage` at the bottom of the file: "Cannot access before initialization".
+
+
+=== step genres
+title: Genre buttons and one render()
+minutes: 30
+slot: js
+--- explain
+Now we add a button per genre (called a **chip**). But careful: the grid now depends on two things, the search text **and** the genre. If the search box and the chips each drew the grid their own way, they would undo each other's work.
+
+The fix is a pattern you'll use in every app from now on:
+
+1. Keep everything that can change in one object, the **state**.
+2. Write one function, `render()`, that draws the page from the state.
+3. Events only change the state, and then call `render()`.
+
+```js
+state.genre = "Comedy";   // something happened: change the state
+render();                 // draw the page again from the state
+```
+
+We've added the `state` object, `render()` and `renderGenres()` below your code. `renderGenres()` makes one chip per genre with `allGenres(shows)`, and gives the chosen one the class `active`.
+
+> `""` (an empty text) in `state.genre` means "no genre chosen: show all genres".
+--- task
+1. **TODO 1** in `render()`: if `state.genre` is not `""`, keep only that genre, with `getByGenre(list, state.genre)`.
+2. **TODO 2** in the chip's click listener: if `state.genre` is already this `genre`, set it to `""`; otherwise set it to `genre`. Then call `render()`.
+3. In your search listener, replace the `renderGrid(...)` line with two lines: `state.search = searchInput.value;` and `render();`.
+4. Delete the old line `renderGrid(shows);` under the `renderGrid` function. The `render();` at the bottom draws the page now.
+
+Try it: click **Drama**, then type **the**. Click Drama again to see all genres.
+--- starter-append
+// ---------- State: everything on the page that can change ----------
+const state = {
+  search: "",   // the text in the search box
+  genre: "",    // the chosen genre ("" means all genres)
+};
+
+// ---------- Draw the page from the state ----------
+function render() {
+  let list = searchByName(shows, state.search);
+  // TODO 1: if state.genre is not "", keep only the shows of that genre (getByGenre)
+
+  renderGrid(list);
+  renderGenres();
+}
+
+// One button (a "chip") per genre, in the box with the id "genres". The chosen one gets the class "active".
+const genresBox = document.querySelector("#genres");
+function renderGenres() {
+  genresBox.replaceChildren();
+  for (const genre of allGenres(shows)) {
+    const chip = document.createElement("button");
+    chip.className = "chip";
+    chip.textContent = genre;
+    if (genre === state.genre) {
+      chip.classList.add("active");
+    }
+    chip.addEventListener("click", () => {
+      // TODO 2: if state.genre is already this genre, set it to "" (all genres again),
+      //         otherwise set it to this genre. Then draw the page again: render()
+    });
+    genresBox.append(chip);
+  }
+}
+
+// ---------- Start: draw the page for the first time ----------
+render();
+--- hint
+TODO 1 is an `if` that changes `list`: `list = getByGenre(list, state.genre);`. TODO 2 is an `if` / `else` that sets `state.genre`, followed by `render();`.
+--- hint
+TODO 1:
+```js
+  if (state.genre !== "") {
+    list = getByGenre(list, state.genre);
+  }
+```
+TODO 2:
+```js
+      if (state.genre === genre) {
+        state.genre = "";
+      } else {
+        state.genre = genre;
+      }
+      render();
+```
+And the search listener:
+```js
+searchInput.addEventListener("input", () => {
+  state.search = searchInput.value;
+  render();
+});
+```
+--- solution-replace
+}
+
+renderGrid(shows);
+=>
+}
+--- solution-replace
+// Every time the text in the search box changes, show only the shows that match
+searchInput.addEventListener("input", () => {
+  renderGrid(searchByName(shows, searchInput.value));
+});
+=>
+// Every time the text in the search box changes: change the state, then draw again
+searchInput.addEventListener("input", () => {
+  state.search = searchInput.value;
+  render();
+});
+--- solution-append
+// ---------- State: everything on the page that can change ----------
+const state = {
+  search: "",   // the text in the search box
+  genre: "",    // the chosen genre ("" means all genres)
+};
+
+// ---------- Draw the page from the state ----------
+function render() {
+  let list = searchByName(shows, state.search);
+  if (state.genre !== "") {
+    list = getByGenre(list, state.genre);
+  }
+
+  renderGrid(list);
+  renderGenres();
+}
+
+// One button (a "chip") per genre, in the box with the id "genres". The chosen one gets the class "active".
+const genresBox = document.querySelector("#genres");
+function renderGenres() {
+  genresBox.replaceChildren();
+  for (const genre of allGenres(shows)) {
+    const chip = document.createElement("button");
+    chip.className = "chip";
+    chip.textContent = genre;
+    if (genre === state.genre) {
+      chip.classList.add("active");
+    }
+    chip.addEventListener("click", () => {
+      if (state.genre === genre) {
+        state.genre = "";      // clicked the chosen genre again: all genres
+      } else {
+        state.genre = genre;
+      }
+      render();
+    });
+    genresBox.append(chip);
+  }
+}
+
+// ---------- Start: draw the page for the first time ----------
+render();
+--- check
+await t.sleep(450);
+await t.rerun();   // start from a fresh run of the page
+const chipsNow = () => t.$$("#genres button");
+t.expect(chipsNow().length > 0, "There are no genre buttons yet. Keep `render();` at the bottom, and look in the Console for an error.");
+t.expect(t.$$("#grid .card").length === 12, "The page should start with all 12 shows. Look in the Console for an error.");
+t.expect(!/^\s*renderGrid\(\s*shows\s*\)\s*;?\s*$/m.test(t.clean), "Delete the old line `renderGrid(shows);`. Now `render();` at the bottom draws the page.");
+const chip = (name) => chipsNow().find((b) => t.text(b) === name);
+const names = () => t.$$("#grid .card h3").map((h) => t.text(h));
+const input = t.$("#search");
+const typeIn = async (v) => { input.value = v; input.dispatchEvent(new t.win.Event("input", { bubbles: true })); await t.sleep(80); };
+await t.click(chip("Drama"));
+const st = t.get("state");
+t.expect(st && st.genre === "Drama", "When I click **Drama**, `state.genre` doesn't change. TODO 2: in the chip's click listener, set `state.genre = genre;` and call `render();`.");
+t.expect(names().length === 8, `After clicking Drama the grid shows ${names().length} shows. It should show the 8 dramas. TODO 1: in \`render()\`, use \`getByGenre(list, state.genre)\` when \`state.genre\` is not "".`);
+t.expect(chip("Drama") && chip("Drama").classList.contains("active"), "The Drama chip should look chosen. Call `render()` at the end of the click listener, so the chips are drawn again.");
+await typeIn("the");
+t.expect(names().length === 3, `With Drama chosen, typing "the" shows ${names().length} shows: ${names().join(", ")}. It should show 3 (The Crown, The Wire, Band of Brothers). In the search listener, write \`state.search = searchInput.value;\` and \`render();\` instead of \`renderGrid(...)\`.`);
+await typeIn("");
+t.expect(names().length === 8, "After emptying the search box, the 8 dramas should come back.");
+await t.click(chip("Drama"));
+t.expect(t.get("state").genre === "" && names().length === 12, "Clicking the chosen chip again should show all 12 shows. TODO 2: if `state.genre === genre`, set `state.genre = \"\";`.");
+--- learned
+This is the most important idea of the day: **state, then render**. Events never touch the grid themselves. They change `state` and call `render()`, and `render()` draws everything from the state. However many buttons you add, the page can't get out of step.
+--- summary
+Keep what can change in a `state` object; events change the state, then call `render()`.
+--- mistakes
+- Forgetting `render()` after changing `state.genre`: the state changes but the page doesn't.
+- Leaving `renderGrid(searchByName(...))` in the search listener, so typing ignores the chosen genre.
+- `if (state.genre = genre)` with one `=`: that sets the value instead of comparing.
+--- teacher
+This step is longer than the others. The key idea is item 4: the search listener stops drawing and only changes `state`. If a student is lost, draw three boxes on paper: event, state, render, with arrows in that order.
+
+
+=== step mylist
+title: My List
+minutes: 25
+slot: js
+--- explain
+Time for **My List**. Each card gets a round button in the corner: **+** adds the show, **✓** means it's already in the list.
+
+My List is part of the state: an array of show **ids**, like `[2, 5]`. Ids are better than names because they are unique and never change.
+
+You already know the array tools that do the work:
+
+```js
+favourites.push(7);                                  // add 7 at the end
+favourites = favourites.filter((id) => id !== 7);    // a new array without 7
+[2, 5].includes(5);                                  // true: 5 is in the array
+```
+
+We've added three functions below your code: `isInMyList(id)` answers true or false, `toggleMyList(show)` adds or removes a show, and `createListButton(show)` builds the round button. Look at the end of `toggleMyList`: it calls `render()`. Change the state, then draw. The button shows `+` or `✓` because it's drawn from the state every time.
+--- task
+1. In the `state` object, add `myList: []`.
+2. At the top, find the counter in the header: `const listCount = document.querySelector("#list-count");`
+3. Fill in **TODO 1** and **TODO 2** in `toggleMyList`.
+4. In `createCard`, right before `return card;`, add the button: `card.append(createListButton(show));`
+5. At the end of `render()`, show how many shows are in My List: `listCount.textContent = state.myList.length;`
+
+Click + on a few cards and watch the counter at the top.
+--- starter-append
+// ---------- My List ----------
+
+// Is this show in My List? Gives true or false.
+function isInMyList(id) {
+  return state.myList.includes(id);
+}
+
+// Add the show to My List, or take it out if it's already there
+function toggleMyList(show) {
+  if (isInMyList(show.id)) {
+    // TODO 1: take the id out: keep every id that is not show.id (filter)
+  } else {
+    // TODO 2: add the id at the end (push)
+  }
+  render();
+}
+
+// The round button on a card: "+" adds the show, "✓" means it's in My List
+function createListButton(show) {
+  const button = document.createElement("button");
+  button.className = "list-btn";
+  if (isInMyList(show.id)) {
+    button.textContent = "✓";
+  } else {
+    button.textContent = "+";
+  }
+  button.setAttribute("aria-pressed", isInMyList(show.id));   // "pressed" look, and for screen readers
+  button.setAttribute("aria-label", "My List: " + show.name);
+  button.addEventListener("click", () => {
+    toggleMyList(show);
+  });
+  return button;
+}
+--- hint
+TODO 1 gives `state.myList` a new value: `state.myList = state.myList.filter(...)`. TODO 2 is one `push`. Don't forget items 1, 2, 4 and 5 of the task: they're outside the new code.
+--- hint
+```js
+  if (isInMyList(show.id)) {
+    state.myList = state.myList.filter((id) => id !== show.id);
+  } else {
+    state.myList.push(show.id);
+  }
+```
+In `state`:
+```js
+const state = {
+  search: "",
+  genre: "",
+  myList: [],
+};
+```
+--- solution-replace
+const emptyMessage = document.querySelector("#empty-message");
+=>
+const emptyMessage = document.querySelector("#empty-message");
+const listCount = document.querySelector("#list-count");
+--- solution-replace
+  card.append(poster, body);
+  return card;
+=>
+  card.append(poster, body);
+  card.append(createListButton(show));
+  return card;
+--- solution-replace
+  genre: "",    // the chosen genre ("" means all genres)
+};
+=>
+  genre: "",    // the chosen genre ("" means all genres)
+  myList: [],   // the ids of the shows in My List, like [2, 5]
+};
+--- solution-replace
+  renderGrid(list);
+  renderGenres();
+}
+=>
+  renderGrid(list);
+  renderGenres();
+  listCount.textContent = state.myList.length;
+}
+--- solution-append
+// ---------- My List ----------
+
+// Is this show in My List? Gives true or false.
+function isInMyList(id) {
+  return state.myList.includes(id);
+}
+
+// Add the show to My List, or take it out if it's already there
+function toggleMyList(show) {
+  if (isInMyList(show.id)) {
+    state.myList = state.myList.filter((id) => id !== show.id);
+  } else {
+    state.myList.push(show.id);
+  }
+  render();
+}
+
+// The round button on a card: "+" adds the show, "✓" means it's in My List
+function createListButton(show) {
+  const button = document.createElement("button");
+  button.className = "list-btn";
+  if (isInMyList(show.id)) {
+    button.textContent = "✓";
+  } else {
+    button.textContent = "+";
+  }
+  button.setAttribute("aria-pressed", isInMyList(show.id));   // "pressed" look, and for screen readers
+  button.setAttribute("aria-label", "My List: " + show.name);
+  button.addEventListener("click", () => {
+    toggleMyList(show);
+  });
+  return button;
+}
+--- check
+await t.sleep(450);
+await t.rerun();   // start from a fresh run of the page
+const st = t.get("state");
+t.expect(st && Array.isArray(st.myList), "Add `myList: []` to the `state` object.");
+t.expect(t.$$("#grid .card").length === 12, "The page should show all 12 shows. Look in the Console for an error.");
+const buttons = () => t.$$("#grid .card .list-btn");
+t.expect(buttons().length === 12, "I can't find the round buttons on the cards. In `createCard`, right before `return card;`, add `card.append(createListButton(show));`.");
+await t.click(buttons()[0]);
+t.expect(t.get("state").myList.includes(1), "Clicking + on Friends didn't put its id (1) in `state.myList`. TODO 2 in `toggleMyList`: `state.myList.push(show.id);`.");
+t.expect(t.get("state").myList.length === 1, "One click should add the show once. Check TODO 1 and TODO 2 in `toggleMyList`.");
+t.expect(t.text("#list-count") === "1", `After adding one show, the counter at the top says "${t.text("#list-count")}". At the end of \`render()\`, add \`listCount.textContent = state.myList.length;\`.`);
+t.expect(buttons()[0].getAttribute("aria-pressed") === "true", "The Friends button should now show a tick. Keep `render();` at the end of `toggleMyList`.");
+await t.click(buttons()[0]);
+t.expect(!t.get("state").myList.includes(1), "Clicking the tick again should take Friends out of My List. TODO 1: `state.myList = state.myList.filter((id) => id !== show.id);`.");
+t.expect(t.text("#list-count") === "0", "After taking the show out again, the counter should say 0.");
+await t.click(buttons()[1]);
+await t.click(buttons()[2]);
+t.expect(t.text("#list-count") === "2", "Two shows added: the counter should say 2.");
+--- learned
+My List is state too: an array of ids. The buttons change it with `push` and `filter`, then call `render()`, so the ticks and the counter always match the state.
+--- summary
+My List is an array of ids in the state: `push` adds, `filter` removes, `includes` checks.
+--- mistakes
+- `state.myList.filter(...)` without `state.myList =` in front: `filter` makes a new array and doesn't change the old one.
+- Adding the button after `return card;`, where the code never runs.
+- `listCount.textContent` set outside `render()`, so it doesn't update on clicks.
+
+
+=== step save
+title: Remember My List
+minutes: 15
+slot: js
+--- explain
+Add a show to My List, then press **Run again** above the preview: the list is empty again. Everything in JavaScript variables disappears when the page reloads.
+
+The browser has a small store for each website that survives reloads: **localStorage**. It keeps text under a name, called a **key**:
+
+```js
+localStorage.setItem("theme", "dark");   // save
+localStorage.getItem("theme");           // "dark", or null if nothing is saved
+```
+
+It can only store text. To save an array or an object, turn it into text with `JSON.stringify`, and back again with `JSON.parse`:
+
+```js
+localStorage.setItem("scores", JSON.stringify([7, 9]));        // saved as "[7,9]"
+const scores = JSON.parse(localStorage.getItem("scores"));     // [7, 9] again
+```
+
+The very first time, nothing is saved yet: `getItem` gives `null`, and `JSON.parse(null)` is `null` too. Writing `?? []` after it means "or an empty array, if that's `null`".
+--- task
+1. Fill in the TODO in `saveMyList`, using the key `"myList"`.
+2. In `toggleMyList`, call `saveMyList();` right before `render();`.
+3. In `state`, start `myList` from the saved list: `JSON.parse(localStorage.getItem("myList")) ?? []`.
+
+Add two shows, then press **Run again**: they're still in My List.
+--- starter-append
+// Save My List in the browser (localStorage keeps text only, so we turn it into JSON text)
+function saveMyList() {
+  // TODO: localStorage.setItem with the key "myList" and the text JSON.stringify(state.myList)
+}
+--- hint
+`setItem` takes two things: the key and the text. The text is `JSON.stringify(state.myList)`.
+--- hint
+```js
+function saveMyList() {
+  localStorage.setItem("myList", JSON.stringify(state.myList));
+}
+```
+In `state`:
+```js
+  myList: JSON.parse(localStorage.getItem("myList")) ?? [],
+```
+--- solution-replace
+  myList: [],   // the ids of the shows in My List, like [2, 5]
+=>
+  myList: JSON.parse(localStorage.getItem("myList")) ?? [],   // saved ids, or an empty list
+--- solution-replace
+    state.myList.push(show.id);
+  }
+  render();
+=>
+    state.myList.push(show.id);
+  }
+  saveMyList();
+  render();
+--- solution-append
+// Save My List in the browser (localStorage keeps text only, so we turn it into JSON text)
+function saveMyList() {
+  localStorage.setItem("myList", JSON.stringify(state.myList));
+}
+--- check
+await t.sleep(450);
+t.win.localStorage.removeItem("myList");
+await t.rerun();
+const buttons = () => t.$$("#grid .card .list-btn");
+t.expect(buttons().length === 12, "The cards have lost their + buttons. Look in the Console for an error.");
+t.expect(t.text("#list-count") === "0", "With nothing saved, the counter should start at 0. In `state`, use `JSON.parse(localStorage.getItem(\"myList\")) ?? []`.");
+await t.click(buttons()[1]);
+const saved = t.win.localStorage.getItem("myList");
+t.expect(saved !== null, "Nothing was saved. Fill in the TODO in `saveMyList`, and call `saveMyList();` in `toggleMyList`, right before `render();`.");
+t.expect(saved === "[2]", `After adding Breaking Bad, localStorage has "${saved}" under "myList". It should be the list as JSON text, "[2]": use \`JSON.stringify(state.myList)\`.`);
+await t.rerun();
+const count = t.text("#list-count");
+t.expect(count !== "0", "After a reload My List is empty again. In `state`, start from the saved list: `myList: JSON.parse(localStorage.getItem(\"myList\")) ?? []`.");
+t.expect(count === "1", `After a reload the counter says "${count}" instead of 1. Turn the saved text back into an array with \`JSON.parse(...)\`.`);
+t.expect(buttons()[1].getAttribute("aria-pressed") === "true", "After a reload, Breaking Bad should still show its tick.");
+t.win.localStorage.removeItem("myList");
+--- learned
+`localStorage` plus `JSON.stringify` and `JSON.parse` make data survive a reload. Your ShowShelf now remembers what you picked, like a real app.
+--- summary
+`localStorage.setItem/getItem` with `JSON.stringify/parse` saves data across reloads.
+--- mistakes
+- Saving the array without `JSON.stringify`: it's stored as `"2,5"`, which `JSON.parse` can't read back as an array.
+- Forgetting `JSON.parse` when loading, so `myList` is a piece of text.
+- Calling `saveMyList()` after `render()` in a different function, or not at all.
+--- teacher
+If a student's page shows ticks from earlier experiments, they can click them away. The Lab keeps localStorage between reloads on purpose, like a real browser does.
+
+
+=== step only-list
+title: Only My List
+minutes: 15
+slot: js
+bonus: yes
+template: extras
+--- explain
+The toolbar now has a checkbox, **Only My List**. When it's ticked, the grid should show only the shows in My List.
+
+A checkbox has a `checked` property (`true` or `false`), and a `"change"` event that happens every time it's ticked or unticked.
+
+It's the same pattern as the genres: add a value to the state, change it in the event, and let `render()` use it.
+
+```js
+onlyDramaBox.addEventListener("change", () => {
+  state.onlyDrama = onlyDramaBox.checked;
+  render();
+});
+```
+--- task
+1. At the top: `const onlyListBox = document.querySelector("#only-list");`
+2. Add `onlyMyList: false` to `state`.
+3. Add a `"change"` listener to the checkbox that sets `state.onlyMyList` and calls `render()`.
+4. In `render()`, before `renderGrid(list)`: if `state.onlyMyList` is true, keep only the shows that are in My List (`filter` with `isInMyList(show.id)`).
+--- hint
+The filter in `render()`: `list = list.filter((show) => isInMyList(show.id));`, inside an `if`.
+--- hint
+```js
+onlyListBox.addEventListener("change", () => {
+  state.onlyMyList = onlyListBox.checked;
+  render();
+});
+```
+In `render()`:
+```js
+  if (state.onlyMyList) {
+    list = list.filter((show) => isInMyList(show.id));
+  }
+```
+--- solution-replace
+const listCount = document.querySelector("#list-count");
+=>
+const listCount = document.querySelector("#list-count");
+const onlyListBox = document.querySelector("#only-list");
+--- solution-replace
+  myList: JSON.parse(localStorage.getItem("myList")) ?? [],   // saved ids, or an empty list
+=>
+  myList: JSON.parse(localStorage.getItem("myList")) ?? [],   // saved ids, or an empty list
+  onlyMyList: false,  // is "Only My List" ticked?
+--- solution-replace
+    list = getByGenre(list, state.genre);
+  }
+=>
+    list = getByGenre(list, state.genre);
+  }
+  if (state.onlyMyList) {
+    list = list.filter((show) => isInMyList(show.id));
+  }
+--- solution-append
+// Only My List: tick the box to see only your shows
+onlyListBox.addEventListener("change", () => {
+  state.onlyMyList = onlyListBox.checked;
+  render();
+});
+--- check
+await t.sleep(450);
+t.win.localStorage.removeItem("myList");
+await t.rerun();
+const buttons = () => t.$$("#grid .card .list-btn");
+t.expect(buttons().length === 12, "The page should show all 12 shows with their buttons. Look in the Console for an error.");
+await t.click(buttons()[0]);
+await t.click(buttons()[3]);
+await t.check("#only-list", true);
+const n = t.$$("#grid .card").length;
+t.expect(n !== 12, "Ticking **Only My List** didn't change the grid. Add a `\"change\"` listener to the checkbox that sets `state.onlyMyList` and calls `render()`.");
+t.expect(n === 2, `With two shows in My List and the box ticked, the grid shows ${n} cards. It should show 2. In \`render()\`, keep only the shows where \`isInMyList(show.id)\` is true.`);
+await t.check("#only-list", false);
+t.expect(t.$$("#grid .card").length === 12, "Unticking the box should bring back all 12 shows. Use `onlyListBox.checked` to set `state.onlyMyList`.");
+t.win.localStorage.removeItem("myList");
+--- learned
+One more value in the state, one more `if` in `render()`. Adding features is easy once everything goes through the state.
+--- summary
+A checkbox's `checked` and `"change"` event can drive a filter in `render()`.
+
+
+=== step sort
+title: Best rated first
+minutes: 15
+slot: js
+bonus: yes
+template: extras
+--- explain
+The toolbar also has a drop-down list, a `<select>`. Its `value` is the `value` of the chosen `<option>`: `""` for normal order, `"rating"` for best rated first. It fires a `"change"` event when someone picks an option.
+
+To sort an array, use `sort` with a small **compare function**. It gets two items, `a` and `b`, and gives back a number: negative puts `a` first, positive puts `b` first.
+
+```js
+episodes.sort((a, b) => a.number - b.number);   // lowest number first
+```
+
+For the highest rating first, subtract the other way round: `b.rating - a.rating`.
+
+> `sort` changes the array it's called on. That's fine here, because `list` in `render()` is a new array made by `searchByName`, not the original `shows`.
+--- task
+1. At the top: `const sortSelect = document.querySelector("#sort");`
+2. Add `sort: ""` to `state`.
+3. Add a `"change"` listener to the select that sets `state.sort` to `sortSelect.value` and calls `render()`.
+4. In `render()`, before `renderGrid(list)`: if `state.sort` is `"rating"`, sort `list` with the best rating first.
+--- hint
+The sort in `render()` is one line inside an `if`: `list.sort((a, b) => b.rating - a.rating);`.
+--- hint
+```js
+sortSelect.addEventListener("change", () => {
+  state.sort = sortSelect.value;
+  render();
+});
+```
+In `render()`:
+```js
+  if (state.sort === "rating") {
+    list.sort((a, b) => b.rating - a.rating);
+  }
+```
+--- solution-replace
+const listCount = document.querySelector("#list-count");
+=>
+const listCount = document.querySelector("#list-count");
+const sortSelect = document.querySelector("#sort");
+--- solution-replace
+  myList: JSON.parse(localStorage.getItem("myList")) ?? [],   // saved ids, or an empty list
+=>
+  myList: JSON.parse(localStorage.getItem("myList")) ?? [],   // saved ids, or an empty list
+  sort: "",     // "" for normal order, "rating" for best rated first
+--- solution-replace
+    list = getByGenre(list, state.genre);
+  }
+=>
+    list = getByGenre(list, state.genre);
+  }
+  if (state.sort === "rating") {
+    list.sort((a, b) => b.rating - a.rating);   // highest rating first
+  }
+--- solution-append
+// The order drop-down
+sortSelect.addEventListener("change", () => {
+  state.sort = sortSelect.value;
+  render();
+});
+--- check
+await t.sleep(450);
+await t.rerun();   // start from a fresh run of the page
+const first = () => t.text(t.$$("#grid .card h3")[0]);
+t.expect(t.$$("#grid .card").length === 12, "The page should show all 12 shows. Look in the Console for an error.");
+t.expect(first() === "Friends", "Before choosing an order, the grid should start with Friends, like the data.");
+await t.type("#sort", "rating");
+t.expect(first() !== "Friends", "Choosing **Best rated first** didn't change the order. Add a `\"change\"` listener to `sortSelect` that sets `state.sort` and calls `render()`.");
+t.expect(first() === "Breaking Bad", `With the best rated first, the first card is "${first()}". It should be Breaking Bad (9.2). Sort with \`(a, b) => b.rating - a.rating\`.`);
+await t.type("#sort", "");
+t.expect(first() === "Friends", "Going back to **Normal order** should put Friends first again. Only sort when `state.sort === \"rating\"`.");
+--- learned
+`sort` with a compare function orders anything: by rating, by name, by year. And the state pattern made it one small `if`.
+--- summary
+`list.sort((a, b) => b.rating - a.rating)` sorts from highest to lowest.
+
+
+=== step details
+title: A details box
+minutes: 20
+slot: js
+bonus: yes
+template: extras
+--- explain
+The page now has a `<dialog>` element at the bottom: a box that can open on top of the page. Look at it in the whole-page tab.
+
+- `dialog.showModal()` opens it and darkens the page behind it.
+- `dialog.close()` closes it. (The Esc key closes it too.)
+
+When a card is clicked, fill the dialog with that show and open it.
+
+One trap: the round + button is **inside** the card. A click on it also counts as a click on the card, because events **bubble** up from an element to everything around it. To stop that, call `event.stopPropagation()` in the button's listener.
+
+```js
+likeButton.addEventListener("click", (event) => {
+  event.stopPropagation();   // don't also count as a click on the post around it
+  like(post);
+});
+```
+--- task
+1. At the top, find the dialog: `const detailsDialog = document.querySelector("#details");`
+2. Write `openDetails(show)`: set the text of `#details-title` (name), `#details-meta` (years) and `#details-summary` (`show.summary`), then call `detailsDialog.showModal()`.
+3. In `createCard`, before `return card;`, add a click listener to the card that calls `openDetails(show)`.
+4. The close button `#close-details` closes the dialog.
+5. In `createListButton`, add `event.stopPropagation();` so the + button doesn't open the dialog.
+--- hint
+Inside `openDetails`, use `document.querySelector("#details-title").textContent = show.name;` and the same for the other two.
+--- hint
+```js
+function openDetails(show) {
+  document.querySelector("#details-title").textContent = show.name;
+  document.querySelector("#details-meta").textContent = yearsLabel(show.premiered, show.ended);
+  document.querySelector("#details-summary").textContent = show.summary;
+  detailsDialog.showModal();
+}
+
+document.querySelector("#close-details").addEventListener("click", () => {
+  detailsDialog.close();
+});
+```
+In `createCard`: `card.addEventListener("click", () => openDetails(show));`
+--- solution-replace
+const listCount = document.querySelector("#list-count");
+=>
+const listCount = document.querySelector("#list-count");
+const detailsDialog = document.querySelector("#details");
+--- solution-replace
+  card.append(createListButton(show));
+  return card;
+=>
+  card.append(createListButton(show));
+  card.addEventListener("click", () => {
+    openDetails(show);
+  });
+  return card;
+--- solution-replace
+  button.addEventListener("click", () => {
+    toggleMyList(show);
+  });
+=>
+  button.addEventListener("click", (event) => {
+    event.stopPropagation();   // don't also open the details box
+    toggleMyList(show);
+  });
+--- solution-append
+// ---------- Details box ----------
+function openDetails(show) {
+  document.querySelector("#details-title").textContent = show.name;
+  document.querySelector("#details-meta").textContent = yearsLabel(show.premiered, show.ended);
+  document.querySelector("#details-summary").textContent = show.summary;
+  detailsDialog.showModal();
+}
+
+document.querySelector("#close-details").addEventListener("click", () => {
+  detailsDialog.close();
+});
+--- check
+await t.sleep(450);
+await t.rerun();   // start from a fresh run of the page
+const dlg = t.$("#details");
+t.expect(t.$$("#grid .card").length === 12, "The page should show all 12 shows. Look in the Console for an error.");
+await t.click(t.$$("#grid .card h3")[2]);
+t.expect(dlg.open, "Clicking a card didn't open the dialog. In `createCard`, add a click listener to `card` that calls `openDetails(show)`, and end `openDetails` with `detailsDialog.showModal();`.");
+t.expect(t.text("#details-title") === "The Office", `After clicking The Office, the dialog title says "${t.text("#details-title")}". Set \`#details-title\` to \`show.name\`.`);
+t.expect(/camera crew|office/i.test(t.text("#details-summary")), "Fill `#details-summary` with `show.summary`.");
+await t.click("#close-details");
+t.expect(!dlg.open, "The ✕ button should close the dialog: `detailsDialog.close();` in its click listener.");
+const before = t.win.localStorage.getItem("myList");
+await t.click(t.$$("#grid .card .list-btn")[0]);
+const opened = dlg.open;
+if (opened) dlg.close();
+await t.click(t.$$("#grid .card .list-btn")[0]);
+if (before === null) t.win.localStorage.removeItem("myList"); else t.win.localStorage.setItem("myList", before);
+t.expect(!opened, "Clicking the + button also opened the dialog. In `createListButton`, give the listener an `event` parameter and call `event.stopPropagation();`.");
+--- learned
+`<dialog>` with `showModal()` gives you a pop-up box without extra code. And you met **bubbling**: clicks travel up to the elements around them, unless you stop them.
+--- summary
+`dialog.showModal()` opens a dialog; `event.stopPropagation()` stops a click bubbling up.

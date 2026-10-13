@@ -1,0 +1,2005 @@
+=== day
+n: 11
+title: Make it yours and publish
+subtitle: Personalise, download, put online, demo
+hours: 3 hours
+page: index.html
+slot: site | js | site.js
+slot: theme | css | my-theme.css
+slot: extra | js | extra.js
+slot: url | html | my-url.txt
+slot: demo | html | demo.txt
+file: site.js = site
+file: my-theme.css = theme
+file: extra.js = extra
+refs: @page, app.js, helpers.js, style.css
+
+--- intro
+The last day. This morning's lecture went back over the whole course. This afternoon, ShowShelf becomes **your** website: your name, your colours, a feature or two of your own, and an address on the internet that you can send to anyone.
+
+The app is the one you finished on Day 9. Its files are read-only today (open the tabs above the code box to read them). You write in three new files instead:
+
+- **site.js**: your site's name, a sentence about it, and your name (steps 1 and 2)
+- **my-theme.css**: your colours, corners and font (steps 3 and 4)
+- **extra.js**: new features that use the app's own functions (steps 5 to 7)
+
+Then you download your website as one file, put it online (steps 8 and 9), and prepare a **2-minute demo** for the end of the day (step 10). Aim to finish step 9 with at least 30 minutes to spare.
+
+**What next?** Keep practising a little every week. [freeCodeCamp](https://www.freecodecamp.org) has free, step-by-step courses, and [MDN Web Docs](https://developer.mozilla.org) explains every HTML element, CSS property and JavaScript method. A great next project: build ShowShelf again from scratch with a different free API, for example one for music or for books.
+
+--- template
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A TV show finder with a watchlist, built with HTML, CSS and JavaScript.">
+  <title>ShowShelf</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="my-theme.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo" id="logo">ShowShelf</a>
+      <nav class="nav">
+        <a href="index.html" id="nav-home">Home</a>
+        <a href="index.html" id="nav-mylist">My List <span class="list-count" id="list-count">0</span></a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- View 1: home, with the search and the grid of shows -->
+    <section id="home-view">
+      <div class="hero">
+        <h1>What are we watching tonight?</h1>
+        <p id="tagline">Search real shows from TVmaze and keep your watchlist.</p>
+        <form class="search" id="search-form">
+          <input type="search" id="search" placeholder="Search shows, e.g. office" aria-label="Search shows">
+          <button type="submit">Search</button>
+        </form>
+      </div>
+      <div class="toolbar">
+        <div class="genres" id="genres"></div>
+      </div>
+      <p class="status" id="status" hidden></p>
+      <p class="status" id="empty-message" hidden>No shows match your search.</p>
+      <div class="grid" id="grid"></div>
+    </section>
+
+    <!-- View 2: one show -->
+    <section id="show-view" hidden>
+      <p class="back-link"><button type="button" class="button-secondary" id="back-button">← Back to shows</button></p>
+      <p class="status" id="show-status" hidden></p>
+      <article class="show" id="show-details">
+        <div class="show-header">
+          <img class="poster" id="show-poster" src="poster.svg" alt="">
+          <div>
+            <h1 id="show-name"></h1>
+            <p class="meta" id="show-meta"></p>
+            <p class="rating" id="show-rating"></p>
+            <p id="show-genres"></p>
+            <p class="intro" id="show-summary"></p>
+            <p class="show-links"><button type="button" id="show-list-button">+ Add to My List</button></p>
+          </div>
+        </div>
+        <section>
+          <h2>Cast</h2>
+          <ul id="show-cast"></ul>
+        </section>
+        <section>
+          <h2>Seasons</h2>
+          <table class="seasons">
+            <thead>
+              <tr><th>Season</th><th>Episodes</th><th>Year</th></tr>
+            </thead>
+            <tbody id="show-seasons"></tbody>
+          </table>
+        </section>
+      </article>
+    </section>
+
+    <!-- View 3: My List -->
+    <section id="mylist-view" hidden>
+      <div class="hero">
+        <h1>My List</h1>
+        <p>The shows you saved. They stay here after a reload.</p>
+      </div>
+      <p class="status" id="mylist-empty">Your list is empty. Press + on a show to add it.</p>
+      <div class="grid" id="mylist-grid"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <!-- "Made by ..." is filled in from site.js -->
+    <p id="made-by" hidden></p>
+    <!-- TVmaze's data is free to use if we say where it comes from -->
+    <p>Built in the Web Dev in 11 Days course · <a href="https://www.tvmaze.com">Data from TVmaze</a></p>
+  </footer>
+
+  <!-- The order matters: each file can use what the files above it made -->
+  <script src="helpers.js"></script>
+  <script src="site.js"></script>
+  <script src="app.js"></script>
+  <script src="extra.js"></script>
+</body>
+</html>
+
+--- template dark
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A TV show finder with a watchlist, built with HTML, CSS and JavaScript.">
+  <title>ShowShelf</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="my-theme.css">
+  <!-- New for the dark theme challenge: the colours to use when <body> has the class "dark" -->
+  <style>
+    body.dark {
+      --color-bg: #12111a;
+      --color-surface: #1d1b29;
+      --color-text: #f1f0f7;
+      --color-muted: #a9a6c2;
+      --color-border: #34314a;
+      --color-accent: #8b72ff;
+      --color-accent-dark: #a993ff;
+      --color-star: #e0a43a;
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo" id="logo">ShowShelf</a>
+      <nav class="nav">
+        <a href="index.html" id="nav-home">Home</a>
+        <a href="index.html" id="nav-mylist">My List <span class="list-count" id="list-count">0</span></a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- View 1: home, with the search and the grid of shows -->
+    <section id="home-view">
+      <div class="hero">
+        <h1>What are we watching tonight?</h1>
+        <p id="tagline">Search real shows from TVmaze and keep your watchlist.</p>
+        <form class="search" id="search-form">
+          <input type="search" id="search" placeholder="Search shows, e.g. office" aria-label="Search shows">
+          <button type="submit">Search</button>
+        </form>
+      </div>
+      <div class="toolbar">
+        <div class="genres" id="genres"></div>
+      </div>
+      <p class="status" id="status" hidden></p>
+      <p class="status" id="empty-message" hidden>No shows match your search.</p>
+      <div class="grid" id="grid"></div>
+    </section>
+
+    <!-- View 2: one show -->
+    <section id="show-view" hidden>
+      <p class="back-link"><button type="button" class="button-secondary" id="back-button">← Back to shows</button></p>
+      <p class="status" id="show-status" hidden></p>
+      <article class="show" id="show-details">
+        <div class="show-header">
+          <img class="poster" id="show-poster" src="poster.svg" alt="">
+          <div>
+            <h1 id="show-name"></h1>
+            <p class="meta" id="show-meta"></p>
+            <p class="rating" id="show-rating"></p>
+            <p id="show-genres"></p>
+            <p class="intro" id="show-summary"></p>
+            <p class="show-links"><button type="button" id="show-list-button">+ Add to My List</button></p>
+          </div>
+        </div>
+        <section>
+          <h2>Cast</h2>
+          <ul id="show-cast"></ul>
+        </section>
+        <section>
+          <h2>Seasons</h2>
+          <table class="seasons">
+            <thead>
+              <tr><th>Season</th><th>Episodes</th><th>Year</th></tr>
+            </thead>
+            <tbody id="show-seasons"></tbody>
+          </table>
+        </section>
+      </article>
+    </section>
+
+    <!-- View 3: My List -->
+    <section id="mylist-view" hidden>
+      <div class="hero">
+        <h1>My List</h1>
+        <p>The shows you saved. They stay here after a reload.</p>
+      </div>
+      <p class="status" id="mylist-empty">Your list is empty. Press + on a show to add it.</p>
+      <div class="grid" id="mylist-grid"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <!-- "Made by ..." is filled in from site.js -->
+    <p id="made-by" hidden></p>
+    <!-- TVmaze's data is free to use if we say where it comes from -->
+    <p>Built in the Web Dev in 11 Days course · <a href="https://www.tvmaze.com">Data from TVmaze</a></p>
+  </footer>
+
+  <!-- The order matters: each file can use what the files above it made -->
+  <script src="helpers.js"></script>
+  <script src="site.js"></script>
+  <script src="app.js"></script>
+  <script src="extra.js"></script>
+</body>
+</html>
+
+--- file style.css
+{{asset:appCss}}
+
+--- file helpers.js
+// helpers.js: small helper functions (read only)
+
+// ratingLabel(9.2) -> "Must watch", ratingLabel(7.5) -> "Worth a try", ratingLabel(5) -> "Skip it"
+function ratingLabel(rating) {
+  if (rating >= 8.5) {
+    return "Must watch";
+  } else if (rating >= 7) {
+    return "Worth a try";
+  } else {
+    return "Skip it";
+  }
+}
+
+// yearsLabel(1994, 2004) -> "1994–2004", yearsLabel(2019, 2019) -> "2019",
+// yearsLabel(2019, null) -> "2019–now" (still running), yearsLabel(null, null) -> ""
+function yearsLabel(premiered, ended) {
+  if (!premiered) {
+    return "";
+  }
+  if (!ended) {
+    return premiered + "–now";
+  }
+  if (premiered === ended) {
+    return String(premiered);
+  }
+  return premiered + "–" + ended;
+}
+
+// getByGenre(shows, "Comedy") -> only the shows that have this genre
+function getByGenre(list, genre) {
+  return list.filter((show) => show.genres.includes(genre));
+}
+
+// allGenres(shows) -> ["Action", "Adventure", "Comedy", ...]: every genre once, from A to Z
+function allGenres(list) {
+  const result = [];
+  for (const show of list) {
+    for (const genre of show.genres) {
+      if (!result.includes(genre)) {
+        result.push(genre);
+      }
+    }
+  }
+  return result.sort();
+}
+
+// ---------- Helpers for TVmaze's data ----------
+
+// stripTags("<p><b>Dark</b> is a mystery.</p>") -> "Dark is a mystery."
+// TVmaze writes its summaries in HTML. We keep only the text.
+function stripTags(html) {
+  if (!html) {
+    return "";
+  }
+  return html.replace(/<[^>]*>/g, "").replace(/&amp;/g, "&").trim();
+}
+
+// yearOf("2019-06-21") -> 2019, yearOf(null) -> null
+function yearOf(date) {
+  if (!date) {
+    return null;
+  }
+  return Number(date.slice(0, 4));
+}
+
+// toShow(apiShow): one show in TVmaze's shape -> one show in OUR shape.
+// Some of TVmaze's fields can be null, so each one gets a safe value.
+function toShow(apiShow) {
+  let network = "";
+  if (apiShow.network) {
+    network = apiShow.network.name;
+  } else if (apiShow.webChannel) {
+    network = apiShow.webChannel.name;   // streaming shows have a web channel instead
+  }
+
+  let image = null;
+  if (apiShow.image) {
+    image = apiShow.image.medium;        // the medium-sized poster
+  }
+
+  let rating = null;
+  if (apiShow.rating) {
+    rating = apiShow.rating.average ?? null;
+  }
+
+  return {
+    id: apiShow.id,
+    name: apiShow.name,
+    genres: apiShow.genres ?? [],
+    rating: rating,
+    premiered: yearOf(apiShow.premiered),
+    ended: yearOf(apiShow.ended),
+    runtime: apiShow.averageRuntime ?? apiShow.runtime ?? null,
+    network: network,
+    image: image,
+    summary: stripTags(apiShow.summary),
+  };
+}
+
+--- file app.js
+// app.js: ShowShelf, your finished app (read only today)
+// This is your app from Day 9, tidied: the same code, in a clearer order.
+// Two small things are new today (look for "Day 11"):
+//   - render() calls afterRender() at its end, if extra.js has one
+//   - "Your site's details", near the bottom, puts SITE from site.js on the page
+//
+// Loaded before this file:
+//   helpers.js -> ratingLabel, yearsLabel, getByGenre, allGenres, yearOf, toShow, stripTags
+//   site.js    -> SITE: your site's name, tagline and owner
+// Loaded after this file:
+//   extra.js   -> your own features. They can use everything in this file.
+
+// ---------- Elements: the parts of the page we change ----------
+
+// The home view: search, genres and the grid of shows
+const grid = document.querySelector("#grid");
+const searchInput = document.querySelector("#search");
+const searchForm = document.querySelector("#search-form");
+const emptyMessage = document.querySelector("#empty-message");
+const genresBox = document.querySelector("#genres");
+const statusMessage = document.querySelector("#status");
+
+// The three views, and the header links that switch between them
+const homeView = document.querySelector("#home-view");
+const showView = document.querySelector("#show-view");
+const myListView = document.querySelector("#mylist-view");
+const logoLink = document.querySelector("#logo");
+const homeLink = document.querySelector("#nav-home");
+const myListLink = document.querySelector("#nav-mylist");
+const listCount = document.querySelector("#list-count");
+
+// The show view
+const backButton = document.querySelector("#back-button");
+const showStatus = document.querySelector("#show-status");
+const showDetails = document.querySelector("#show-details");
+const showPoster = document.querySelector("#show-poster");
+const showName = document.querySelector("#show-name");
+const showMeta = document.querySelector("#show-meta");
+const showRating = document.querySelector("#show-rating");
+const showGenres = document.querySelector("#show-genres");
+const showSummary = document.querySelector("#show-summary");
+const showListButton = document.querySelector("#show-list-button");
+const castList = document.querySelector("#show-cast");
+const seasonsBody = document.querySelector("#show-seasons");
+
+// The My List view
+const myListGrid = document.querySelector("#mylist-grid");
+const myListEmpty = document.querySelector("#mylist-empty");
+
+// Day 11: the places for your site's details from site.js
+const heroText = document.querySelector("#tagline");
+const madeBy = document.querySelector("#made-by");
+const descriptionTag = document.querySelector('meta[name="description"]');
+
+// ---------- State: everything on the page that can change ----------
+const state = {
+  view: "home",           // which view is showing: "home", "show" or "mylist"
+  shows: [],              // the shows on the home page, from TVmaze (in our shape)
+  genre: "",              // the chosen genre ("" means all genres)
+  myList: loadMyList(),   // small objects for the shows in My List (see loadMyList below)
+  currentShow: null,      // the show open in the show view (null when none is)
+};
+
+// ---------- My List, saved in the browser ----------
+// Each show in My List is saved with what a card needs, so the My List view
+// can draw it without asking TVmaze:
+//   { id: 431, name: "Friends", image: null, genres: ["Comedy", "Romance"], rating: 8.8 }
+
+// Read My List from localStorage (the key is "myList")
+function loadMyList() {
+  const saved = JSON.parse(localStorage.getItem("myList")) ?? [];
+  // On Day 7 this key held plain ids, like [2, 5]. Keep only the objects.
+  return saved.filter((item) => typeof item === "object");
+}
+
+// Save My List in the browser (localStorage keeps text only, so we turn it into JSON text)
+function saveMyList() {
+  localStorage.setItem("myList", JSON.stringify(state.myList));
+}
+
+// Is this show in My List? Gives true or false.
+function isInMyList(id) {
+  return state.myList.some((item) => item.id === id);
+}
+
+// Add the show to My List, or take it out if it's already there
+function toggleMyList(show) {
+  if (isInMyList(show.id)) {
+    state.myList = state.myList.filter((item) => item.id !== show.id);
+  } else {
+    state.myList.push({
+      id: show.id,
+      name: show.name,
+      image: show.image,
+      genres: show.genres,
+      rating: show.rating,
+    });
+  }
+  saveMyList();
+  render();
+}
+
+// ---------- TVmaze: asking for data ----------
+
+// The address of the TVmaze API. Every request starts with it.
+const API = "https://api.tvmaze.com";
+
+// The search address: searchUrl("the office") -> ".../search/shows?q=the%20office"
+function searchUrl(term) {
+  return `${API}/search/shows?q=${encodeURIComponent(term)}`;
+}
+
+// Search TVmaze. Gives back a list of shows in OUR shape, ready for createCard.
+async function searchShows(term) {
+  const response = await fetch(searchUrl(term));
+  if (!response.ok) {
+    throw new Error("TVmaze answered " + response.status);   // stop here: we have no shows
+  }
+  const results = await response.json();
+  return results.map((result) => toShow(result.show));
+}
+
+// Page 0 of TVmaze's list of shows: the first 250
+async function getShowsPage() {
+  const response = await fetch(`${API}/shows?page=0`);
+  if (!response.ok) {
+    throw new Error("TVmaze answered " + response.status);
+  }
+  const apiShows = await response.json();
+  return apiShows.map(toShow);
+}
+
+// Ask TVmaze for one show, with its cast and seasons in the same answer
+// getShowById(431) -> { show: {...our shape...}, cast: [...], seasons: [...] }, or null if there's no such show
+async function getShowById(id) {
+  const response = await fetch(`${API}/shows/${id}?embed[]=cast&embed[]=seasons`);
+  if (response.status === 404) {
+    return null;   // TVmaze has no show with this id
+  }
+  if (!response.ok) {
+    throw new Error("TVmaze answered " + response.status);
+  }
+  const data = await response.json();
+  return {
+    show: toShow(data),
+    cast: data._embedded.cast,
+    seasons: data._embedded.seasons,
+  };
+}
+
+// Load the shows for the home page (page 0 when the search is empty),
+// with a loading message, an error message, and a message when nothing is found
+async function loadShows(term) {
+  statusMessage.textContent = "Loading shows…";
+  statusMessage.classList.remove("error");
+  statusMessage.hidden = false;
+  emptyMessage.hidden = true;   // an old "nothing found" doesn't belong to the new search
+  try {
+    if (term === "") {
+      state.shows = await getShowsPage();   // empty search box: the first page of shows
+    } else {
+      state.shows = await searchShows(term);
+    }
+    statusMessage.hidden = true;
+    state.genre = "";   // the new shows may not have the chosen genre
+    emptyMessage.textContent = `No shows found for "${term}". Try another word.`;
+    render();
+  } catch (error) {
+    // No internet, or TVmaze answered with an error: tell the person, in red
+    statusMessage.textContent = "Sorry, the shows could not be loaded (" + error.message + "). Check your internet connection and try again.";
+    statusMessage.classList.add("error");
+  }
+}
+
+// ---------- One card for one show ----------
+// createCard(show) builds a card and gives it back. It doesn't put it on the page.
+function createCard(show) {
+  const card = document.createElement("article");
+  card.className = "card";
+
+  const poster = document.createElement("img");
+  poster.className = "poster";
+  poster.src = show.image ?? "poster.svg";   // no picture (null)? use poster.svg
+  poster.alt = "";                           // the name is under the poster, so no alt text
+  poster.loading = "lazy";                   // load the picture only when it scrolls into view
+
+  const body = document.createElement("div");
+  body.className = "card-body";
+
+  // Real shows can have no genres at all, so only add a badge when there is one
+  if (show.genres.length > 0) {
+    const badge = document.createElement("span");
+    badge.className = "badge";
+    badge.textContent = show.genres[0];
+    body.append(badge);
+  }
+
+  const title = document.createElement("h3");
+  title.textContent = show.name;
+
+  // Real shows can have no rating yet (null)
+  const rating = document.createElement("p");
+  rating.className = "rating";
+  if (show.rating === null) {
+    rating.textContent = "No rating yet";
+  } else {
+    rating.textContent = "★ " + show.rating + " · " + ratingLabel(show.rating);
+  }
+
+  const meta = document.createElement("p");
+  meta.className = "meta";
+  meta.textContent = yearsLabel(show.premiered, show.ended);
+
+  body.append(title, rating, meta);
+  card.append(poster, body);
+  card.append(createListButton(show));
+  card.addEventListener("click", () => {
+    openShow(show.id);
+  });
+  return card;
+}
+
+// The round button on a card: "+" adds the show, "✓" means it's in My List
+function createListButton(show) {
+  const button = document.createElement("button");
+  button.className = "list-btn";
+  if (isInMyList(show.id)) {
+    button.textContent = "✓";
+  } else {
+    button.textContent = "+";
+  }
+  button.setAttribute("aria-pressed", isInMyList(show.id));   // "true" when the show is in My List
+  button.setAttribute("aria-label", "My List: " + show.name);
+  button.addEventListener("click", (event) => {
+    event.stopPropagation();   // a click on the button is not a click on the card
+    toggleMyList(show);
+  });
+  return button;
+}
+
+// ---------- Draw the page from the state ----------
+
+function render() {
+  // Show the view that matches state.view, and hide the other two
+  homeView.hidden = state.view !== "home";
+  showView.hidden = state.view !== "show";
+  myListView.hidden = state.view !== "mylist";
+
+  let list = state.shows;
+  if (state.genre !== "") {
+    list = getByGenre(list, state.genre);
+  }
+
+  renderGrid(list);
+  renderGenres();
+  listCount.textContent = state.myList.length;
+  renderMyList();
+  renderShowListButton();
+
+  // Day 11: if extra.js has a function called afterRender, it runs at the end of every render
+  if (typeof afterRender === "function") {
+    afterRender();
+  }
+}
+
+// Draw a list of shows in the grid
+function renderGrid(list) {
+  grid.replaceChildren();   // remove the old cards first
+  for (const show of list) {
+    grid.append(createCard(show));
+  }
+  emptyMessage.hidden = list.length > 0;   // show the message only when there are no shows
+}
+
+// One button (a "chip") per genre. The chosen one gets the class "active".
+function renderGenres() {
+  genresBox.replaceChildren();
+  for (const genre of allGenres(state.shows)) {
+    const chip = document.createElement("button");
+    chip.className = "chip";
+    chip.textContent = genre;
+    if (genre === state.genre) {
+      chip.classList.add("active");
+    }
+    chip.addEventListener("click", () => {
+      if (state.genre === genre) {
+        state.genre = "";      // clicked the chosen genre again: all genres
+      } else {
+        state.genre = genre;
+      }
+      render();
+    });
+    genresBox.append(chip);
+  }
+}
+
+// Draw the saved shows, with the same createCard as the home page
+function renderMyList() {
+  myListGrid.replaceChildren();
+  for (const show of state.myList) {
+    myListGrid.append(createCard(show));
+  }
+  myListEmpty.hidden = state.myList.length > 0;
+}
+
+// The My List button in the show view. Its text follows the state.
+function renderShowListButton() {
+  if (!state.currentShow) {
+    return;   // no show is open yet
+  }
+  if (isInMyList(state.currentShow.id)) {
+    showListButton.textContent = "✓ In My List";
+  } else {
+    showListButton.textContent = "+ Add to My List";
+  }
+  showListButton.setAttribute("aria-pressed", isInMyList(state.currentShow.id));
+}
+
+// ---------- The show view ----------
+
+// Open the show view for one show (a click on a card calls this)
+async function openShow(id) {
+  state.view = "show";
+  render();
+  window.scrollTo(0, 0);   // start at the top of the page
+
+  // While loading: hide the old show and say what's happening
+  showDetails.hidden = true;
+  showStatus.textContent = "Loading show…";
+  showStatus.classList.remove("error");
+  showStatus.hidden = false;
+
+  try {
+    const data = await getShowById(id);
+    if (data === null) {
+      showStatus.textContent = "Show not found. Go back and pick another one.";
+      return;
+    }
+    state.currentShow = data.show;
+    renderShow(data.show);
+    renderCast(data.cast);
+    renderSeasons(data.seasons);
+    renderShowListButton();
+    showStatus.hidden = true;
+    showDetails.hidden = false;
+  } catch (error) {
+    // No internet, or TVmaze answered with an error
+    showStatus.textContent = "Sorry, this show could not be loaded (" + error.message + "). Check your internet connection and try again.";
+    showStatus.classList.add("error");
+  }
+}
+
+// Fill the show view with one show (in our shape)
+function renderShow(show) {
+  showPoster.src = show.image ?? "poster.svg";
+  showPoster.alt = "Poster for " + show.name;
+  showName.textContent = show.name;
+
+  showMeta.textContent = yearsLabel(show.premiered, show.ended);
+  if (show.network !== "") {
+    showMeta.textContent += " · " + show.network;   // += adds to the end of the text
+  }
+
+  if (show.rating === null) {
+    showRating.textContent = "No rating yet";
+  } else {
+    showRating.textContent = "★ " + show.rating + " · " + ratingLabel(show.rating);
+  }
+
+  // textContent, never innerHTML: the summary is text from the internet
+  showSummary.textContent = show.summary;
+  if (show.summary === "") {
+    showSummary.textContent = "No summary yet.";
+  }
+
+  // One badge per genre
+  showGenres.replaceChildren();
+  for (const genre of show.genres) {
+    const badge = document.createElement("span");
+    badge.className = "badge";
+    badge.textContent = genre;
+    showGenres.append(badge);
+    showGenres.append(" ");   // a space between the badges
+  }
+}
+
+// The cast as a list: "Jennifer Aniston as Rachel Green"
+function renderCast(cast) {
+  castList.replaceChildren();
+  for (const member of cast) {
+    const item = document.createElement("li");
+    item.textContent = member.person.name + " as " + member.character.name;
+    castList.append(item);
+  }
+  if (cast.length === 0) {
+    const empty = document.createElement("li");
+    empty.textContent = "No cast information yet.";
+    castList.append(empty);
+  }
+}
+
+// One table cell (<td>) with some text
+function createCell(text) {
+  const cell = document.createElement("td");
+  cell.textContent = text;
+  return cell;
+}
+
+// The seasons as table rows: season number, episodes, year
+function renderSeasons(seasons) {
+  seasonsBody.replaceChildren();
+  for (const season of seasons) {
+    const row = document.createElement("tr");
+    row.append(
+      createCell(season.number),
+      createCell(season.episodeOrder),
+      createCell(yearOf(season.premiereDate))
+    );
+    seasonsBody.append(row);
+  }
+}
+
+// ---------- Events: what happens when someone uses the page ----------
+
+// Pressing Enter or Search asks TVmaze
+searchForm.addEventListener("submit", (event) => {
+  event.preventDefault();   // don't reload the page
+  loadShows(searchInput.value.trim());
+});
+
+// The back button in the show view goes home
+backButton.addEventListener("click", () => {
+  state.view = "home";
+  render();
+});
+
+// The logo goes home
+logoLink.addEventListener("click", (event) => {
+  event.preventDefault();   // don't follow the link: we switch views ourselves
+  state.view = "home";
+  render();
+});
+
+// The Home link goes home too
+homeLink.addEventListener("click", (event) => {
+  event.preventDefault();
+  state.view = "home";
+  render();
+});
+
+// The My List link opens the My List view
+myListLink.addEventListener("click", (event) => {
+  event.preventDefault();
+  state.view = "mylist";
+  render();
+});
+
+// Add the open show to My List, or take it out
+showListButton.addEventListener("click", () => {
+  toggleMyList(state.currentShow);
+});
+
+// ---------- Day 11: your site's details, from site.js ----------
+
+// SITE comes from site.js. If site.js has a mistake, SITE doesn't exist,
+// so we use an empty object and the page keeps its normal text.
+let siteInfo = {};
+if (typeof SITE === "object" && SITE !== null) {
+  siteInfo = SITE;
+}
+
+// The text of one field of SITE, or "" when it's missing or isn't text
+function siteText(field) {
+  if (typeof siteInfo[field] !== "string") {
+    return "";
+  }
+  return siteInfo[field].trim();
+}
+
+if (siteText("name") !== "") {
+  logoLink.textContent = siteText("name");   // the logo
+  document.title = siteText("name");         // the browser tab
+}
+if (siteText("tagline") !== "") {
+  heroText.textContent = siteText("tagline");   // under the big heading
+}
+if (siteText("owner") !== "") {
+  madeBy.textContent = "Made by " + siteText("owner");   // the footer
+  madeBy.hidden = false;
+}
+if (siteText("description") !== "") {
+  descriptionTag.setAttribute("content", siteText("description"));   // for search engines
+}
+
+// ---------- Start: load the first shows from TVmaze ----------
+loadShows("");
+
+--- default site
+// site.js: the details of YOUR website.
+// app.js reads them and puts them on the page: the logo, the browser tab,
+// the sentence under the big heading, and the footer.
+// Change the text between the quotes. Keep the quotes, the colons and the commas.
+
+const SITE = {
+  name: "ShowShelf",
+  tagline: "Search real shows from TVmaze and keep your watchlist.",
+  owner: "Your name",
+};
+
+--- default theme
+/* my-theme.css: your own look.
+   It's loaded after style.css, so what you write here wins. */
+
+:root {
+  /* Your Day 2 colours are already in use. To change a colour, add a line
+     here with its name and a new value. The colours of ShowShelf:
+       --color-accent         buttons, links, the logo
+       --color-accent-dark    buttons and links under the mouse
+       --color-bg             the page background
+       --color-surface        cards, the header, the show page
+       --color-text           normal text
+       --color-muted          grey text (years, the footer)
+       --color-border         thin lines, empty posters, badges
+       --color-star           the rating
+     And one that isn't a colour:
+       --radius               how round the corners of the cards are */
+
+}
+
+--- default extra
+// extra.js: your own features. This file runs last, so everything in app.js is ready:
+//   state          state.shows (the shows loaded now), state.myList, state.view ...
+//   render()       draws the whole page from the state
+//   openShow(id)   opens the show view for one show
+//   toggleMyList(show), saveMyList(), homeView, grid ... and more.
+// Open the app.js tab to see them all.
+
+
+=== step tour
+title: Tour your app
+minutes: 20
+slot: site
+--- explain
+Today you don't rebuild anything: you make the app yours. First, find your way around.
+
+Your website is made of **seven files**. Four are finished and read-only: open their tabs above the code box.
+
+- **index.html (whole page)**: the HTML. At the bottom, four `<script>` lines load the JavaScript files **in order**. A file can use what the files above it made.
+- **style.css**: all the CSS from the course, with your Day 2 colours at the end.
+- **helpers.js** and **app.js**: your Day 9 app.
+
+The other three are yours: **site.js** (this box), **my-theme.css** and **extra.js**.
+
+site.js holds one **object**, `SITE`. Remember objects: **properties** with a name, a colon and a value, separated by commas.
+
+```js
+const PET = {
+  name: "Biscuit",
+  owner: "Sam",
+};
+```
+
+app.js reads `SITE.name` and puts it in the logo and the browser tab. Text from site.js never goes in with `innerHTML`, so any name is safe.
+--- task
+1. Open the **index.html (whole page)** tab. Find the four `<script src="...">` lines at the bottom. Which file loads last?
+2. Open **app.js**. Find the `state` object and the function `openShow`. You'll use both later.
+3. Near the bottom of app.js, find **Your site's details**. Which fields of `SITE` does it use?
+4. Back in **site.js**, change `name` to a name for your site, like "Couch Club" or "Ana's Shelf". Watch the logo.
+--- hint
+Click the **site.js** tab to come back to your code. Change only the text between the quotes after `name:`.
+--- hint
+```js
+const SITE = {
+  name: "Ana's Shelf",
+  tagline: "Search real shows from TVmaze and keep your watchlist.",
+  owner: "Your name",
+};
+```
+Keep the double quotes around the name, even when it has an apostrophe.
+--- solution
+// site.js: the details of YOUR website.
+// app.js reads them and puts them on the page: the logo, the browser tab,
+// the sentence under the big heading, and the footer.
+// Change the text between the quotes. Keep the quotes, the colons and the commas.
+
+const SITE = {
+  name: "Ana's Shelf",
+  tagline: "Search real shows from TVmaze and keep your watchlist.",
+  owner: "Your name",
+};
+--- check
+const SITE = t.get("SITE");
+t.expect(SITE && typeof SITE === "object", "I can't find `SITE`. There may be a typing mistake in site.js: look in the Console for a red message. Every line inside `{ }` needs its quotes and a comma at the end. **Start again** brings the box back.");
+t.expect(typeof SITE.name === "string", "I can't find `name` in `SITE`. Keep the line `name: \"...\",` inside the curly brackets, with the quotes.");
+const name = SITE.name.trim();
+t.expect(name !== "", "`name` is empty. Write your site's name between the quotes, for example `name: \"Couch Club\",`.");
+t.expect(name !== "ShowShelf", "`name` still says \"ShowShelf\". Change it to a name of your own, for example `\"Couch Club\"` or `\"Ana's Shelf\"`. Keep the quotes.");
+t.expect(t.text("#logo") === name, `The logo says "${t.text("#logo")}" instead of "${name}". Look in the Console for an error.`);
+--- learned
+Your site has its own name, in the logo and in the browser tab. You changed one value in an object, and app.js did the rest: that's how real sites keep their settings apart from their code.
+--- summary
+A website is several files loaded in order; settings live in one object (`SITE`).
+--- mistakes
+- Single quotes around a name with an apostrophe: `'Ana's Shelf'` ends the text too early. Use double quotes.
+- Deleting the comma at the end of the line, or a quote.
+- Typing in a read-only tab and wondering why nothing changes.
+--- teacher
+Give students a few minutes to read app.js properly: steps 5 to 7 use `state`, `openShow`, `render` and `afterRender`. The order of the `<script>` lines explains why extra.js can use everything in app.js.
+
+
+=== step made-by
+title: A tagline and your name
+minutes: 10
+slot: site
+--- explain
+A good website says in one sentence what it's for. That sentence is called a **tagline**, and on your site it sits under the big heading.
+
+And every website you're proud of deserves a signature. app.js puts `SITE.owner` in the footer as "Made by ...". If `owner` is missing or empty, the footer line stays hidden, so nothing breaks.
+
+```js
+const SITE = {
+  name: "Film Night",
+  tagline: "Every Friday, one film, chosen by the group.",
+  owner: "Sam Lee",
+};
+```
+
+> The tagline is text, so it can have commas and full stops inside the quotes. The comma that separates the properties goes **after** the closing quote.
+--- task
+In `SITE`:
+
+1. Change `tagline` to your own sentence about your site.
+2. Change `owner` to your name.
+
+Scroll down in the preview to see the footer.
+--- hint
+Change only the text between the quotes on the `tagline:` and `owner:` lines. Keep the comma at the end of each line.
+--- hint
+```js
+const SITE = {
+  name: "Ana's Shelf",
+  tagline: "The shows Ana loves, and the ones she's saving for later.",
+  owner: "Ana Novak",
+};
+```
+--- solution
+// site.js: the details of YOUR website.
+// app.js reads them and puts them on the page: the logo, the browser tab,
+// the sentence under the big heading, and the footer.
+// Change the text between the quotes. Keep the quotes, the colons and the commas.
+
+const SITE = {
+  name: "Ana's Shelf",
+  tagline: "The shows Ana loves, and the ones she's saving for later.",
+  owner: "Ana Novak",
+};
+--- check
+const SITE = t.get("SITE");
+t.expect(SITE && typeof SITE === "object", "I can't find `SITE` any more. Look in the Console for a red message: often a missing quote or comma.");
+const tag = typeof SITE.tagline === "string" ? SITE.tagline.trim() : "";
+t.expect(tag !== "", "`tagline` is empty or missing. Write one short sentence between its quotes.");
+t.expect(tag !== "Search real shows from TVmaze and keep your watchlist.", "The `tagline` is still the one we wrote. Write your own sentence about your site, for example `\"The shows Ana loves, and the ones she's saving for later.\"`.");
+const owner = typeof SITE.owner === "string" ? SITE.owner.trim() : "";
+t.expect(owner !== "" && owner.toLowerCase() !== "your name", "Now put your own name in `owner`, between the quotes: `owner: \"Ana Novak\",`.");
+t.expect(t.text("#tagline") === tag, `The sentence under the heading says "${t.text("#tagline")}". Look in the Console for an error.`);
+const mb = t.$("#made-by");
+t.expect(mb && !mb.hidden && t.text(mb) === "Made by " + owner, `The footer should say "Made by ${owner}". Look in the Console for an error.`);
+t.expect(SITE.name !== "ShowShelf", "Keep your site's own `name` from step 1.");
+--- learned
+The page now introduces your site and says who made it. All three details live in one small file, so you can change them any time without touching the app.
+--- summary
+The tagline and "Made by" come from `SITE.tagline` and `SITE.owner`.
+--- mistakes
+- Putting the comma inside the quotes: `owner: "Ana Novak,"` (it works, but the footer shows the comma).
+- A double quote inside the tagline: `"The "best" shows"` ends the text early.
+
+
+=== step colours
+title: Your colours
+minutes: 20
+slot: theme
+--- explain
+Your Day 2 colours are already in style.css. **my-theme.css** is loaded after it, so a variable you set here **overrides** (replaces) the earlier one. That's the "cascade" in CSS: when two rules say different things, the later one wins.
+
+The comment in the box lists every colour variable. Four do most of the work:
+
+- `--color-accent`: buttons, links, the logo
+- `--color-bg`: the page behind everything
+- `--color-surface`: cards, the header and the show page
+- `--color-text`: the normal text
+
+One thing matters more than taste: **contrast**, how different two colours are in lightness. Text needs plenty of it against its background, or it's hard to read, especially on a phone in the sun.
+
+```css
+:root {
+  --color-accent: #b5306b;
+  --color-bg: #fbf3f6;
+}
+```
+
+> To find hex codes, search the web for "colour picker". Dark backgrounds are fine, but then `--color-text` and `--color-surface` must change too.
+--- task
+Inside `:root { }`, under the comment, set:
+
+1. `--color-accent`
+2. `--color-bg`
+3. `--color-surface`
+4. one more colour of your choice from the list (for example `--color-accent-dark`, a darker shade of your accent)
+
+The check also measures the contrast of your text and buttons.
+--- hint
+Each line is a variable name with two dashes, a colon, a colour, and a semicolon. They all go between the `{` and the `}` of `:root`, below the comment.
+--- hint
+```css
+:root {
+  /* ... the comment ... */
+  --color-accent: #0a7d5a;
+  --color-accent-dark: #075c42;
+  --color-bg: #f1f7f4;
+  --color-surface: #ffffff;
+}
+```
+--- solution
+/* my-theme.css: your own look.
+   It's loaded after style.css, so what you write here wins. */
+
+:root {
+  /* Your Day 2 colours are already in use. To change a colour, add a line
+     here with its name and a new value. The colours of ShowShelf:
+       --color-accent         buttons, links, the logo
+       --color-accent-dark    buttons and links under the mouse
+       --color-bg             the page background
+       --color-surface        cards, the header, the show page
+       --color-text           normal text
+       --color-muted          grey text (years, the footer)
+       --color-border         thin lines, empty posters, badges
+       --color-star           the rating
+     And one that isn't a colour:
+       --radius               how round the corners of the cards are */
+  --color-accent: #0a7d5a;
+  --color-accent-dark: #075c42;
+  --color-bg: #f1f7f4;
+  --color-surface: #ffffff;
+}
+--- check
+const code = t.clean;
+t.expect(/:root\s*\{/.test(code), "Keep the `:root { }` rule: your colours go between its curly brackets.");
+const vars = {};
+for (const m of code.matchAll(/(--[\w-]+)\s*:\s*([^;{}]+)/g)) vars[m[1]] = m[2].trim();
+const norm = (s) => String(s).replace(/\s+/g, "").toLowerCase();
+const examples = { "--color-accent": "#0a7d5a", "--color-bg": "#f1f7f4", "--color-surface": "#ffffff" };
+const applied = (name) => {
+  t.expect(t.win.CSS.supports("color", vars[name]), `\`${vars[name]}\` (for \`${name}\`) isn't a colour the browser understands. A hex code is a # and six characters from 0–9 and a–f, like \`#0a7d5a\`.`);
+  t.expect(norm(t.cssVar(name)) === norm(vars[name]), `\`${name}\` is in your code, but the page doesn't use it. Put the line inside the \`:root { }\` rule, between the curly brackets, and end it with \`;\`.`);
+};
+for (const name of Object.keys(examples)) {
+  t.expect(vars[name], `Add a line for \`${name}\` inside \`:root { }\`, for example \`${name}: ${examples[name]};\`. Two dashes at the start, a colon, and a semicolon at the end.`);
+  applied(name);
+}
+const others = Object.keys(vars).filter((n) => /^--color-/.test(n) && !(n in examples));
+t.expect(others.length, "Good. Now change one more colour of your choice: `--color-accent-dark`, `--color-text`, `--color-muted`, `--color-border` or `--color-star` (they're described in the comment).");
+others.forEach(applied);
+const probe = t.doc.createElement("i");
+t.doc.body.append(probe);
+const colourOf = (v) => { probe.style.color = v; return t.win.getComputedStyle(probe).color; };
+const text = colourOf("var(--color-text)"), bg = colourOf("var(--color-bg)"), surface = colourOf("var(--color-surface)"), accent = colourOf("var(--color-accent)");
+probe.remove();
+const lum = (c) => {
+  const x = t.rgb(c);
+  if (!x) return null;
+  const [r, g, b] = x.slice(0, 3).map((v) => { v = v / 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); });
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+};
+const contrast = (a, b) => { const x = lum(a), y = lum(b); if (x === null || y === null) return 21; return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
+const c1 = contrast(text, bg);
+t.expect(c1 >= 4.5, `The text and the page background (\`--color-bg\`) are too alike: the contrast is ${c1.toFixed(1)} to 1, and text needs at least 4.5. Make the background lighter or, for a dark background, add a light \`--color-text\` such as \`#f1f0f7\`.`);
+const c2 = contrast(text, surface);
+t.expect(c2 >= 4.5, `The text on the cards (\`--color-surface\`) is hard to read: the contrast is ${c2.toFixed(1)} to 1, and it needs at least 4.5. Pick a \`--color-surface\` much lighter (or much darker) than \`--color-text\`.`);
+const c3 = contrast("rgb(255, 255, 255)", accent);
+t.expect(c3 >= 3, `The buttons have white text on \`--color-accent\`, and the contrast is only ${c3.toFixed(1)} to 1 (it needs at least 3). Pick a darker, stronger accent colour.`);
+--- learned
+Your site has its own colours, and they're readable: you checked the **contrast**, the thing designers check first. A later rule overriding an earlier one is the cascade at work.
+--- summary
+A later stylesheet overrides an earlier one; text needs enough contrast with its background.
+--- mistakes
+- Writing the new lines inside the comment, before the `*/`, so they're ignored.
+- One dash instead of two: `-color-bg`.
+- A dark `--color-bg` with the default dark text: the check reports low contrast.
+--- teacher
+The contrast numbers follow the web accessibility guidelines (WCAG): 4.5 to 1 for normal text, 3 to 1 for large or bold text like buttons. Light yellow or pale accents usually fail the button test: that's a good conversation about why.
+
+
+=== step shape
+title: Corners and a font
+minutes: 15
+slot: theme
+--- explain
+Two small changes give a site a very different feel.
+
+**Corners.** Cards and the show page use `var(--radius)` for their `border-radius`. A big value like `24px` feels soft and friendly; `0px` feels sharp and serious.
+
+**The font.** Every computer already has some fonts. `font-family` lists your choice first, then backups, then a general family:
+
+```css
+body {
+  font-family: "Courier New", Courier, monospace;
+}
+```
+
+Fonts that are on almost every computer: `Georgia` (a classic **serif**, with small "feet" on the letters), `"Trebuchet MS"` and `Verdana` (round and friendly, **sans-serif**, without feet), `"Courier New"` (typewriter). Names with spaces go in quotes.
+
+> Websites can also download fonts from the internet. We don't today: the Lab works without internet, and fonts already on the computer load instantly.
+--- task
+1. Inside `:root { }`, add `--radius` with a new value, rounder (like `20px`) or sharper (like `0px`).
+2. Under the `:root` rule, add a `body { }` rule with a `font-family` of your choice, ending with a general family (`serif` or `sans-serif`).
+--- hint
+`--radius` goes with your colours, inside `:root`. The `body` rule is a new rule after the `}` of `:root`.
+--- hint
+```css
+  --color-surface: #ffffff;
+  --radius: 20px;
+}
+
+body {
+  font-family: "Trebuchet MS", Arial, sans-serif;
+}
+```
+--- solution-replace
+  --color-surface: #ffffff;
+}
+=>
+  --color-surface: #ffffff;
+  --radius: 20px;
+}
+
+body {
+  font-family: "Trebuchet MS", Arial, sans-serif;
+}
+--- check
+const code = t.clean;
+t.expect(!/@import|url\s*\(|fonts\.googleapis/i.test(code), "Use a font that's already on the computer, like `Georgia, serif`. Fonts from the internet (`@import` or `url(...)`) don't work in the Lab without internet.");
+const m = code.match(/--radius\s*:\s*([^;{}]+)/);
+t.expect(m, "Add `--radius` inside `:root { }`, for example `--radius: 20px;` for rounder corners or `--radius: 0px;` for sharp ones.");
+const rad = m[1].trim();
+t.expect(/^(\d*\.?\d+(px|rem|em|%)|0)$/.test(rad), `\`--radius: ${rad}\` needs a number and a unit, like \`20px\`.`);
+t.expect(t.cssVar("--radius").replace(/\s/g, "") === rad.replace(/\s/g, ""), "`--radius` is in your code, but the page doesn't use it. Put the line inside the `:root { }` rule, with a `;` at the end.");
+t.expect(await t.waitFor(() => t.$$("#grid .card").length === 12, 3000), "The home view should load 12 shows. Look in the Console for an error.");
+t.expect(t.css("#grid .card", "border-top-left-radius") !== "12px", "That's the same roundness as before (12px). Try something clearly different, like `24px` or `0px`.");
+t.expect(/font-family\s*:/.test(code), "Now choose a font: add a `body { }` rule under `:root` with a `font-family`, like `font-family: Georgia, serif;`.");
+const ff = t.css("body", "font-family");
+t.expect(!/^system-ui/i.test(ff), "The page still uses its normal font. Put your `font-family` in a rule for `body`: `body { font-family: Georgia, serif; }`.");
+const last = ff.split(",").pop().trim().replace(/["']/g, "").toLowerCase();
+t.expect(["serif", "sans-serif", "monospace", "cursive", "fantasy", "system-ui"].includes(last), `End your font list with a general family, like \`serif\` or \`sans-serif\`. If a computer doesn't have ${ff.split(",")[0]}, the browser uses that instead.`);
+--- learned
+One variable changed every corner on the site, and one rule changed every letter, because the other elements **inherit** the font from `body`. That's the payoff of variables and inheritance.
+--- summary
+`--radius` sets the corners; `font-family` on `body` changes the whole site's font.
+--- mistakes
+- `--radius: 20;` without `px`: the browser ignores it.
+- The `body` rule inside the `:root { }` brackets.
+- A font name with spaces and no quotes, then a typo: the browser quietly uses the backup.
+
+
+=== step surprise
+title: A "Surprise me" button
+minutes: 20
+slot: extra
+--- explain
+Time for your own features. **extra.js** runs last, so it can use everything app.js made: `state`, `render()`, `openShow(id)`, the element constants.
+
+A button made in JavaScript needs three things: create it, give it text, and put it on the page with `append`. Then listen for its clicks.
+
+To pick at random, you can use Day 4's dice trick on an array. `Math.floor(Math.random() * list.length)` gives a random **index** (position) from 0 to the last one:
+
+```js
+const songs = ["Yesterday", "Help!", "Something"];
+const index = Math.floor(Math.random() * songs.length);   // 0, 1 or 2
+console.log(songs[index]);
+```
+
+The shows loaded now are in `state.shows`, and `openShow` needs a show's **id**.
+
+> Use new names for your constants. Names that app.js already uses, like `grid` or `state`, are taken, and the Console will say "has already been declared".
+--- task
+In extra.js:
+
+1. Create a `button` with the text "Surprise me" and the class `button-secondary`.
+2. Append it to the hero: `document.querySelector("#home-view .hero")`.
+3. On click: pick a random show from `state.shows` and call `openShow` with its `id`.
+
+Try it after a search too: it should only pick from the shows you see.
+--- hint
+Three lines make the button and put it on the page. The click listener needs two lines: the random index, then `openShow(state.shows[index].id);`.
+--- hint
+```js
+const surpriseButton = document.createElement("button");
+surpriseButton.className = "button-secondary";
+surpriseButton.textContent = "Surprise me";
+document.querySelector("#home-view .hero").append(surpriseButton);
+
+surpriseButton.addEventListener("click", () => {
+  const index = Math.floor(Math.random() * state.shows.length);
+  openShow(state.shows[index].id);
+});
+```
+--- solution
+// extra.js: your own features. This file runs last, so everything in app.js is ready:
+//   state          state.shows (the shows loaded now), state.myList, state.view ...
+//   render()       draws the whole page from the state
+//   openShow(id)   opens the show view for one show
+//   toggleMyList(show), saveMyList(), homeView, grid ... and more.
+// Open the app.js tab to see them all.
+
+// ---------- Surprise me: open a random show ----------
+const surpriseButton = document.createElement("button");
+surpriseButton.className = "button-secondary";
+surpriseButton.textContent = "Surprise me";
+document.querySelector("#home-view .hero").append(surpriseButton);
+
+surpriseButton.addEventListener("click", () => {
+  if (state.shows.length === 0) {
+    return;   // no shows loaded (yet)
+  }
+  const index = Math.floor(Math.random() * state.shows.length);
+  openShow(state.shows[index].id);
+});
+--- check
+const declared = t.errors.find((e) => /already been declared/.test(e));
+t.expect(!declared, `The Console says: *${declared}*. app.js already uses that name, so give yours a new one, like \`surpriseButton\` or \`sortButton\`.`);
+t.expect(await t.waitFor(() => t.$$("#grid .card").length === 12, 3000), "The home view should load 12 shows. Look in the Console for an error: it may come from your code in extra.js.");
+const btns = t.$$("#home-view .hero button").filter((b) => !b.closest("form"));
+if (!btns.length) {
+  t.expect(t.$$("#search-form button").length < 2, "Your button is inside the search form, so clicking it would search. Append it to the hero instead: `document.querySelector(\"#home-view .hero\").append(...)`.");
+  t.fail("I can't find a new button in the hero, the part with the big heading. Create one with `document.createElement(\"button\")` and `append` it to `document.querySelector(\"#home-view .hero\")`.");
+}
+const btn = btns.find((b) => /surprise/i.test(t.text(b))) || btns[0];
+t.expect(t.text(btn) !== "", "Your button has no text. Give it some: `surpriseButton.textContent = \"Surprise me\";`.");
+const details = t.$("#show-details"), status = t.$("#show-status");
+await t.type("#search", "office");
+await t.submit("#search-form");
+t.expect(await t.waitFor(() => t.$$("#grid .card").length === 1, 3000), "A search for office should show 1 card. Look in the Console for an error.");
+const errorsBefore = t.errors.length;
+await t.click(btn);
+const opened = await t.waitFor(() => !t.$("#show-view").hidden, 1000);
+const crash = t.errors.slice(errorsBefore)[0];
+t.expect(opened || !crash, `After a search for office there is only 1 show, and your button crashed: *${crash}*. Pick the index with \`state.shows.length\`, not a fixed number, so it always points at a show that's there.`);
+t.expect(opened, "Clicking your button should open a show. In its click listener, call `openShow(...)` with the id of a random show from `state.shows`.");
+t.expect(await t.waitFor(() => !details.hidden || status.classList.contains("error") || /not found/i.test(t.text(status)), 3000), "The show view keeps saying it's loading. Look in the Console for an error.");
+t.expect(!details.hidden, "Your button opened the show view, but with an error instead of a show. Give `openShow` the show's **id**: `openShow(state.shows[index].id)`.");
+t.expect(t.text("#show-name") === "The Office", `After a search for office, only The Office is loaded, but your button opened ${t.text("#show-name")}. Pick from the shows loaded now, \`state.shows\`, and use \`state.shows.length\` instead of a fixed number.`);
+await t.click("#back-button");
+await t.type("#search", "");
+await t.submit("#search-form");
+t.expect(await t.waitFor(() => t.$$("#grid .card").length === 12, 3000), "An empty search should load the 12 shows again.");
+const seen = new Set();
+for (let i = 0; i < 6; i++) {
+  await t.click("#back-button");
+  await t.click(btn);
+  await t.waitFor(() => !details.hidden, 3000);
+  seen.add(t.text("#show-name"));
+}
+await t.click("#back-button");
+t.expect(seen.size > 1, `I pressed your button 6 times and it always opened ${[...seen][0]}. Use \`Math.floor(Math.random() * state.shows.length)\` to pick a different show each time.`);
+--- learned
+Your first feature on top of a finished app: a new element, a click listener, and the app's own `state` and `openShow`. You didn't touch app.js at all.
+--- summary
+Add features from a separate file by using the app's `state` and functions.
+--- mistakes
+- `openShow(state.shows[index])`: the whole show instead of its `id`, so TVmaze can't find it.
+- `Math.random() * 12`: works until a search loads fewer shows.
+- Naming the button `button` or `grid`: "has already been declared".
+--- teacher
+If a student's Console says "has already been declared", they reused a name from app.js. Any new name fixes it.
+
+
+=== step top-rated
+title: Top rated first
+minutes: 15
+slot: extra
+--- explain
+Now a button that changes the **order** of the grid: the best-rated shows first.
+
+You may have met `sort` in an extra challenge. It needs to know how to compare two items, `a` and `b`. For numbers, the comparison is a subtraction:
+
+```js
+prices.sort((a, b) => a - b);   // cheapest first
+prices.sort((a, b) => b - a);   // most expensive first
+```
+
+`sort` changes the array itself. So the plan for the button is the app's usual pattern:
+
+1. Change the state: sort `state.shows` by `rating`, highest first.
+2. Call `render()`, which draws the grid from the state.
+
+Because `render()` filters `state.shows` by genre, the sorted order stays when someone picks a genre too.
+
+> Real shows with no rating (`null`) count as 0 in a subtraction, so they go to the end.
+--- task
+In extra.js, under your Surprise me code:
+
+1. Create a button with the text "Top rated first" and the class `chip`, and append it to the toolbar: `document.querySelector(".toolbar")`.
+2. On click: sort `state.shows` from the highest `rating` to the lowest, then call `render()`.
+--- hint
+The button is made like the Surprise me button. In the listener, `sort` gets a function with `a` and `b` that subtracts their ratings.
+--- hint
+```js
+const sortButton = document.createElement("button");
+sortButton.className = "chip";
+sortButton.textContent = "Top rated first";
+document.querySelector(".toolbar").append(sortButton);
+
+sortButton.addEventListener("click", () => {
+  state.shows.sort((a, b) => b.rating - a.rating);
+  render();
+});
+```
+--- solution-append
+// ---------- Top rated first: sort the grid by rating ----------
+const sortButton = document.createElement("button");
+sortButton.className = "chip";
+sortButton.textContent = "★ Top rated first";
+document.querySelector(".toolbar").append(sortButton);
+
+sortButton.addEventListener("click", () => {
+  state.shows.sort((a, b) => b.rating - a.rating);   // highest rating first
+  render();
+});
+--- check
+const declared = t.errors.find((e) => /already been declared/.test(e));
+t.expect(!declared, `The Console says: *${declared}*. app.js already uses that name, so give yours a new one, like \`surpriseButton\` or \`sortButton\`.`);
+t.expect(await t.waitFor(() => t.$$("#grid .card").length === 12, 3000), "The home view should load 12 shows. Look in the Console for an error: it may come from your code in extra.js.");
+const candidates = t.$$("#home-view button").filter((b) => !b.closest("form") && !b.closest("#genres") && !b.closest("#grid"));
+const btn = candidates.find((b) => /top|rat|best|sort|high|★/i.test(t.text(b))) || candidates.find((b) => !/surprise/i.test(t.text(b)));
+t.expect(btn, "I can't find your new button. Create it, give it text like \"Top rated first\", and `append` it to `document.querySelector(\".toolbar\")`.");
+const ratings = () => t.$$("#grid .card .rating").map((r) => { const m = t.text(r).match(/(\d+(\.\d+)?)/); return m ? Number(m[1]) : 0; });
+const down = (list) => list.every((v, i) => i === 0 || list[i - 1] >= v);
+const up = (list) => list.every((v, i) => i === 0 || list[i - 1] <= v);
+await t.click(btn);
+await t.waitFor(() => down(ratings()), 1000);
+t.expect(!t.$("#home-view").hidden, "Clicking your button left the home view. It should only change the order of the grid.");
+const list = ratings();
+t.expect(list.length === 12, `After clicking, the grid shows ${list.length} cards. Keep all 12 shows: only change their order.`);
+t.expect(!up(list) || down(list), "The grid is sorted, but lowest first. Swap them: `(a, b) => b.rating - a.rating`.");
+const st = t.get("state");
+const stateSorted = st && Array.isArray(st.shows) && down(st.shows.map((s) => s.rating ?? 0));
+t.expect(down(list) || !stateSorted, "You sorted `state.shows`, but the grid didn't change. Call `render();` after sorting.");
+t.expect(down(list), "After clicking your button, the cards should go from the highest rating to the lowest. In the click listener: `state.shows.sort((a, b) => b.rating - a.rating);`, then `render();`.");
+--- learned
+Change the state, then `render()`: the same pattern as every feature in the app. That's why the genre buttons keep your new order without any extra code.
+--- summary
+`sort((a, b) => b.rating - a.rating)` puts the highest first; change the state, then `render()`.
+--- mistakes
+- `a.rating - b.rating`: lowest first.
+- Forgetting `render()`: the state is sorted but the page isn't redrawn.
+- `state.shows = state.shows.sort(...)` works too, but isn't needed: `sort` changes the array itself.
+
+
+=== step personal
+title: A personal touch
+minutes: 15
+slot: extra
+--- explain
+One more feature, and you choose it. Two of the choices must stay up to date: when the shows or My List change, the page is drawn again, and your extra must be drawn again too.
+
+For that, app.js has a **hook**: a place where the app calls code you write. At the end of `render()` it says:
+
+```js
+if (typeof afterRender === "function") {
+  afterRender();
+}
+```
+
+So if extra.js has a function called exactly `afterRender`, it runs after **every** render, when the new cards are already on the page:
+
+```js
+const clock = document.createElement("p");
+document.body.append(clock);
+
+function afterRender() {
+  clock.textContent = "Last drawn at " + new Date().toLocaleTimeString();
+}
+```
+
+> There can be only one `afterRender`. If you build two of the choices, put both inside the same function.
+--- task
+Choose **one** (or more):
+
+1. **A welcome line** with your name in the hero, like "Welcome! This shelf belongs to Ana." (`SITE.owner` has your name.)
+2. **A count line** in the hero, like "Shows loaded: 12", that changes after every search. Set its text in `afterRender`, from `state.shows.length`.
+3. **A badge** on the cards of shows in My List. In `afterRender`, loop over the cards: a card's round button has `aria-pressed` "true" when its show is in My List (see `createListButton` in app.js).
+--- hint
+Choices 1 and 2: create a `p`, `append` it to `document.querySelector("#home-view .hero")`. For choice 1 set its text once; for choice 2 set it inside `function afterRender() { ... }`.
+--- hint
+Choice 1:
+```js
+const welcome = document.createElement("p");
+welcome.textContent = "Welcome! This shelf belongs to " + SITE.owner + ".";
+document.querySelector("#home-view .hero").append(welcome);
+```
+Choice 2:
+```js
+const countLine = document.createElement("p");
+document.querySelector("#home-view .hero").append(countLine);
+
+function afterRender() {
+  countLine.textContent = "Shows loaded: " + state.shows.length;
+}
+```
+Choice 3:
+```js
+function afterRender() {
+  for (const card of document.querySelectorAll(".card")) {
+    if (card.querySelector(".list-btn").getAttribute("aria-pressed") === "true") {
+      const badge = document.createElement("span");
+      badge.className = "badge";
+      badge.textContent = "On my list";
+      card.querySelector(".card-body").append(badge);
+    }
+  }
+}
+```
+--- solution-append
+// ---------- A personal touch: how many shows are loaded ----------
+const countLine = document.createElement("p");
+countLine.className = "meta";
+document.querySelector("#home-view .hero").append(countLine);
+
+// app.js calls afterRender at the end of every render(), so the line stays up to date
+function afterRender() {
+  countLine.textContent = "Shows loaded: " + state.shows.length;
+}
+--- check
+t.win.localStorage.removeItem("myList");
+await t.rerun();
+const declared = t.errors.find((e) => /already been declared/.test(e));
+t.expect(!declared, `The Console says: *${declared}*. app.js already uses that name, so give yours a new one, like \`surpriseButton\` or \`sortButton\`.`);
+t.expect(await t.waitFor(() => t.$$("#grid .card").length === 12, 3000), "The home view should load 12 shows. Look in the Console for an error: it may come from your code in extra.js.");
+const SITE = t.get("SITE") || {};
+const owner = typeof SITE.owner === "string" ? SITE.owner.trim().toLowerCase() : "";
+const first = owner.split(/\s+/)[0] || "";
+const skip = "#logo, #made-by, #tagline, #grid, #mylist-grid, #genres, #show-view, script, style, [hidden]";
+const texts = () => {
+  const out = [];
+  const walker = t.doc.createTreeWalker(t.doc.body, t.win.NodeFilter.SHOW_TEXT);
+  let n;
+  while ((n = walker.nextNode())) {
+    const el = n.parentElement;
+    if (!el || !n.textContent.trim() || el.closest(skip)) continue;
+    out.push(el.textContent.replace(/\s+/g, " ").trim());
+  }
+  return out;
+};
+const words = (s) => s.toLowerCase().split(/[^\p{L}\p{N}]+/u);
+// choice 1: a welcome line
+if (texts().some((s) => /\b(welcome|hello|hi)\b/i.test(s) || (first.length > 1 && (words(s).includes(first) || (owner.includes(" ") && s.toLowerCase().includes(owner)))))) return;
+// choice 2: a count line that follows the search
+if (texts().some((s) => /\b12\b/.test(s) && /show/i.test(s))) {
+  await t.type("#search", "office");
+  await t.submit("#search-form");
+  t.expect(await t.waitFor(() => t.$$("#grid .card").length === 1, 3000), "A search for office should show 1 card. Look in the Console for an error.");
+  t.expect(texts().some((s) => /\b1\b/.test(s) && /show/i.test(s)), "Your count line says 12, but after a search for office it should say 1. Set its text inside `function afterRender() { ... }`, so it changes after every render.");
+  return;
+}
+// choice 3: a badge on the cards of shows in My List
+const cardHtml = (i) => {
+  const card = t.$$("#grid .card")[i].cloneNode(true);
+  const b = card.querySelector(".list-btn");
+  if (b) b.remove();
+  return card.outerHTML;
+};
+const before0 = cardHtml(0), before1 = cardHtml(1);
+const plain = t.$$("#grid .card").every((c) => c.querySelectorAll(".badge").length <= 1);
+t.expect(plain, "There's an extra badge on every card, but My List is empty. Only add it when the card's `.list-btn` has `aria-pressed` \"true\": put an `if` around it.");
+await t.click(t.$$("#grid .card .list-btn")[0]);
+const after0 = cardHtml(0), after1 = cardHtml(1);
+await t.click(t.$$("#grid .card .list-btn")[0]);
+const removed0 = cardHtml(0);
+t.win.localStorage.removeItem("myList");
+if (after0 !== before0) {
+  t.expect(after1 === before1, "Your badge appeared on a show that isn't in My List. Only add it when the card's `.list-btn` has `aria-pressed` \"true\".");
+  t.expect(removed0 === before0, "When a show leaves My List, its badge should go too. Build the badge inside `afterRender`, which runs on fresh cards after every change.");
+  return;
+}
+t.fail("I can't find your personal touch yet. Pick one: a welcome line with your name in the hero, a line like \"Shows loaded: 12\" that follows the search, or a badge on the cards of shows in My List.");
+--- learned
+You used a **hook**: app.js calls your `afterRender` at the right moment, and your code stays up to date without changing the app. Many real tools and plugins work exactly like this.
+--- summary
+A hook (`afterRender`) lets extra code run at the right moment in someone else's code.
+--- mistakes
+- Spelling the hook differently (`afterrender`, `afterRendering`): app.js never calls it.
+- Setting the count once at the top: it says 0, because the shows haven't loaded yet.
+- Two functions called `afterRender`: only the last one counts.
+--- teacher
+Any of the three choices passes. The badge is the hardest; point stronger students at it.
+
+
+=== step download
+title: Download your website
+minutes: 15
+slot: site
+download: index.html
+--- explain
+Your website is ready to leave the Lab. The button below the task saves it as **one file**, `index.html`, with all seven files packed inside it: the CSS in `<style>` tags, the JavaScript in `<script>` tags, and the poster picture built in.
+
+`index.html` is a special name: a web server shows it when someone visits the address of a folder. That's why the home page of most websites is called `index.html`.
+
+One last touch before it goes public. Search engines like Google show a sentence under each result, from a tag in the `<head>`:
+
+```html
+<meta name="description" content="Recipes for one, ready in 20 minutes.">
+```
+
+app.js already fills it from `SITE.description`, if there is one. Add it to `SITE` as a new property:
+
+```js
+const BOOK = {
+  title: "Dune",
+  author: "Frank Herbert",
+  year: 1965,
+};
+```
+
+Each property ends with a comma, so a new one goes on a new line before the `}`.
+--- task
+1. In `SITE`, add a `description`: one sentence about your site, at least 20 characters.
+2. Press **Check**. It makes sure the page has no errors and that your name and the site's name are set.
+3. Press **Download my website**. The file goes to your **Downloads** folder. (If there's already an `index.html` there, your browser may call it `index (1).html`. Rename it to `index.html`.)
+4. Open your Downloads folder and **double-click** `index.html`: your site opens in the browser, with real data and real posters from TVmaze. It needs internet now, and My List starts empty there.
+--- hint
+Add a new line after the `owner` line: `description: "...",`. Keep the comma at the end of the `owner` line too.
+--- hint
+```js
+const SITE = {
+  name: "Ana's Shelf",
+  tagline: "The shows Ana loves, and the ones she's saving for later.",
+  owner: "Ana Novak",
+  description: "My TV show finder: search real shows, see their cast and seasons, and keep a watchlist.",
+};
+```
+--- solution
+// site.js: the details of YOUR website.
+// app.js reads them and puts them on the page: the logo, the browser tab,
+// the sentence under the big heading, and the footer.
+// Change the text between the quotes. Keep the quotes, the colons and the commas.
+
+const SITE = {
+  name: "Ana's Shelf",
+  tagline: "The shows Ana loves, and the ones she's saving for later.",
+  owner: "Ana Novak",
+  description: "My TV show finder: search real shows, see their cast and seasons, and keep a watchlist.",
+};
+--- check
+t.expect(await t.waitFor(() => t.$$("#grid .card").length === 12, 3000), "The home view should load 12 shows before you publish. Look in the Console for an error.");
+t.expect(!t.errors.length, `Your page has an error in the Console: *${(t.errors[0] || "").slice(0, 140)}*. Fix it before you publish. If it comes from extra.js, go back to steps 5 to 7 and press Check there to find it.`);
+const SITE = t.get("SITE");
+t.expect(SITE && typeof SITE === "object", "I can't find `SITE`. Look in the Console for a red message: often a missing quote or comma.");
+const val = (k) => (typeof SITE[k] === "string" ? SITE[k].trim() : "");
+t.expect(val("name") !== "" && val("name") !== "ShowShelf", "Give your site its own `name` before you publish (step 1).");
+t.expect(val("owner") !== "" && val("owner").toLowerCase() !== "your name", "Put your own name in `owner` before you publish (step 2).");
+const desc = val("description");
+t.expect(desc !== "", "Add a `description` to `SITE`: a new line before the `}`, like `description: \"Search TV shows and keep a watchlist.\",`.");
+t.expect(desc.length >= 20, `Your description is very short ("${desc}"). Write a whole sentence, at least 20 characters.`);
+const meta = t.$('meta[name="description"]');
+t.expect(meta && meta.getAttribute("content") === desc, "Your description isn't in the page's `<meta>` tag. Look in the Console for an error.");
+--- learned
+Your website is one file on your computer, and it works on its own: no Lab needed. Next, you put it on the internet so anyone can open it.
+--- summary
+A website can be one `index.html` file; `<meta name="description">` is the sentence search engines show.
+--- mistakes
+- Forgetting the comma at the end of the `owner` line before the new `description` line.
+- Downloading twice and opening the old `index.html` instead of `index (1).html`.
+- Opening the file without internet: the page says the shows could not be loaded (the Lab's sample data isn't in the file).
+--- teacher
+Some browsers ask where to save; tell students to choose Downloads or the Desktop and remember where. If a student only sees the code when opening the file, it was opened in a text editor: right-click, Open with, and choose a browser.
+
+
+=== step online
+title: Put it online
+minutes: 25
+slot: url
+--- explain
+Right now your website lives on your computer. To let anyone open it, it needs to be on a **web server**: a computer that's always on and always connected. Renting space on one is called **hosting**, and putting your files there is called **deploying**.
+
+For a site like yours, made only of HTML, CSS and JavaScript, hosting is free. Two good options: **Netlify Drop** (the quickest) and **GitHub Pages** (the one many developers use). Both need a free account. Pick one.
+
+Online, your site behaves like the file you opened in step 8: real TVmaze data and real posters. The Lab's offline sample data isn't in the file, so the site needs an internet connection, like any website.
+
+> Your address is public: anyone who has it can open your site. Your My List stays in each visitor's own browser, so nobody sees yours.
+--- task
+**Option A: Netlify Drop**
+
+1. On your computer, make a new folder, for example `my-showshelf`, and move your `index.html` into it.
+2. Open [app.netlify.com/drop](https://app.netlify.com/drop). If it asks you to sign up or log in, make a free account: you need one so your site stays online.
+3. Drag the **folder** from your computer onto the page and drop it.
+4. Wait a few seconds. Netlify shows your site's address, ending in `.netlify.app`. Open it.
+
+**Option B: GitHub Pages**
+
+1. Sign up or log in at [github.com](https://github.com).
+2. Make a new repository: **+** (top right), **New repository**. Name it, for example `showshelf`, choose **Public**, and press **Create repository**.
+3. On the new page, click the link **uploading an existing file**, drag in your `index.html`, and press **Commit changes**.
+4. Open **Settings**, then **Pages** (left menu). Under "Build and deployment", choose **Deploy from a branch**, then the branch `main` and the folder `/ (root)`, and press **Save**.
+5. After a minute or two, your site is at `https://USERNAME.github.io/REPO/` (your user name, then the repository's name). Reload the Pages settings to see the link.
+
+**Then:** open your site, copy its address from the address bar, and paste it on the first line of the box.
+--- hint
+The address starts with `https://` and ends in `.netlify.app` (Netlify) or contains `.github.io` (GitHub Pages). Copy it from the browser's address bar while your site is open, not from Netlify's or GitHub's own pages.
+--- hint
+It looks like one of these, with your own names in it:
+```
+https://cheerful-otter-1a2b3c.netlify.app
+https://ananovak.github.io/showshelf/
+```
+--- solution
+https://ana-novak-showshelf.netlify.app
+--- check
+const lines = t.code.split("\n").map((l) => l.trim()).filter((l) => l !== "");
+t.expect(lines.length, "Paste your website's address into the box: the whole line from the browser's address bar, starting with `https://`.");
+const url = lines[0];
+t.expect(!/^file:/i.test(url), "That's the address of the file on your own computer, so only you can open it. Put the site online (Netlify or GitHub Pages) and paste the address they give you.");
+t.expect(!/app\.netlify\.com/i.test(url), "That's Netlify's page for managing your site, not the site itself. Open your site and copy its address: it ends in `.netlify.app`.");
+const gh = url.match(/github\.com\/([\w-]+)\/([\w.-]+)/i);
+if (gh) t.fail(`That's the page of your repository, where the files are kept. Your website has its own address: \`https://${gh[1].toLowerCase()}.github.io/${gh[2]}/\`. Open it (it can take a minute or two), then paste it here.`);
+t.expect(!/^http:\/\//i.test(url), "Use the secure address, which starts with `https://` (with an s).");
+t.expect(/^https:\/\//i.test(url), "Paste the whole address, including the start: `https://`. The easiest way: click in the browser's address bar, copy (Ctrl + C), and paste here (Ctrl + V).");
+t.expect(!/\s/.test(url), "Put only the address on the first line, with no spaces.");
+let host = "";
+try { host = new URL(url).hostname.toLowerCase(); } catch (e) { host = ""; }
+t.expect(/\.(netlify\.app|github\.io|vercel\.app|pages\.dev)$/.test(host), `I don't recognise "${host || url}" as a free hosting address. This check knows addresses ending in netlify.app, github.io, vercel.app or pages.dev. If you used another host, show your site to your teacher: you can still go on to step 10.`);
+--- learned
+Your website is on the internet. Send the address to a friend: it works on their phone, laptop or tablet, anywhere in the world.
+--- summary
+Hosting puts your files on a web server; deploying is uploading them.
+--- mistakes
+- Dropping the `index.html` file instead of the folder on Netlify Drop, or a folder where the file is called `index (1).html`.
+- Pasting the repository address (`github.com/...`) instead of the site address (`....github.io/...`).
+- A private repository: GitHub Pages needs it to be public on a free account.
+--- teacher
+Both options need an email address for the account. A student who doesn't want an account can skip this step and give the demo from the downloaded file (with internet). GitHub Pages can take a few minutes the first time; let students start step 10 while they wait. To update a site later: on Netlify, open the site and drag the folder onto its Deploys page; on GitHub, upload the new `index.html` into the same repository.
+
+
+=== step demo
+title: Prepare your demo
+minutes: 10
+slot: demo
+--- explain
+At the end of the day, everyone shows their site to the group, in **2 minutes**. Two minutes go fast, so plan them.
+
+A good demo **shows** more than it tells. Have your site open, online, before it's your turn. Then:
+
+1. Say in one sentence what the site does.
+2. Show it working: a search, a show page, adding something to My List.
+3. Show the part you're proudest of, and say why.
+4. End with what you'd add next.
+
+Writing the sentences down first stops you from rambling, and it's what developers do before any presentation.
+
+> Nervous? Everyone in the room built the same app in the same 11 days. They want to see what **you** did with it.
+--- task
+In the box, write **three lines**, each at least a full sentence:
+
+1. What your site does.
+2. The part you're proudest of, and why.
+3. What you'd add next if you had another week.
+
+Then practise once, out loud, with the site open.
+--- hint
+Press Enter between the lines. Each line should be a sentence of at least 20 characters, not a single word.
+--- hint
+```
+Ana's Shelf finds any TV show and keeps a watchlist of the ones I want to see.
+I'm proudest of the Surprise me button, because it helped me choose tonight's show.
+Next I'd add a page for each actor, with all the shows they're in.
+```
+--- solution
+Ana's Shelf finds any TV show and keeps a watchlist of the ones I want to see.
+I'm proudest of the Surprise me button, because it helped me choose tonight's show.
+Next I'd add a page for each actor, with all the shows they're in.
+--- check
+const lines = t.code.split("\n").map((l) => l.trim()).filter((l) => l !== "");
+const about = ["what your site does", "the part you're proudest of", "what you'd add next"];
+t.expect(lines.length, "Write your three lines in the box: what your site does, the part you're proudest of, and what you'd add next.");
+t.expect(lines.length >= 3, `You have ${lines.length} line${lines.length === 1 ? "" : "s"}. Write three, with Enter between them: ${about.join(", ")}.`);
+for (let i = 0; i < 3; i++) {
+  t.expect(lines[i].length >= 20, `Line ${i + 1} ("${lines[i]}") is very short. Say a bit more about ${about[i]}: a whole sentence, at least 20 characters.`);
+}
+--- learned
+You built a website from nothing, put it online, and you can explain it. That's the whole job of a web developer, in small. Well done.
+--- summary
+A short demo: what it does, what you're proud of, what's next.
+--- mistakes
+- One long line with all three answers: press Enter between them.
+- Planning to demo from the Lab instead of the real site.
+--- teacher
+Keep demos to 2 minutes with a visible timer. Have a backup: if the network is slow, students can demo from the downloaded file or from the Lab preview.
+
+
+=== step dark
+title: A dark theme button
+minutes: 20
+slot: extra
+bonus: yes
+template: dark
+download: index.html
+--- explain
+For this challenge, the page has a new CSS rule: open the whole-page tab and look for `body.dark` in the `<head>`. It sets dark values for the colour variables, but only when `<body>` has the class `dark`. So switching themes is one class.
+
+`classList.toggle` adds a class when it's missing and removes it when it's there. `classList.contains` tells you which it is now:
+
+```js
+menu.classList.toggle("open");
+if (menu.classList.contains("open")) {
+  console.log("The menu is open");
+}
+```
+
+To remember the choice after a reload, save it in `localStorage`, and read it when the page starts.
+
+> This challenge has its own **Download** button, so your site can have it too. Every challenge starts from your step 7 code: to keep two challenges, paste the first one's code into the second one's box before you download.
+--- task
+In extra.js:
+
+1. Create a button with the text "Dark mode" and the class `chip`, and append it to the header's `.nav`.
+2. On click: toggle the class `dark` on `document.body`, then save `"dark"` or `"light"` in `localStorage` under the key `"theme"`.
+3. At the start (outside the listener): if the saved theme is `"dark"`, add the class `dark` to `document.body`.
+--- hint
+The click listener has the toggle line, then an `if` with `document.body.classList.contains("dark")` that saves `"dark"`, and an `else` that saves `"light"`.
+--- hint
+```js
+const themeButton = document.createElement("button");
+themeButton.className = "chip";
+themeButton.textContent = "Dark mode";
+document.querySelector(".nav").append(themeButton);
+
+if (localStorage.getItem("theme") === "dark") {
+  document.body.classList.add("dark");
+}
+
+themeButton.addEventListener("click", () => {
+  document.body.classList.toggle("dark");
+  if (document.body.classList.contains("dark")) {
+    localStorage.setItem("theme", "dark");
+  } else {
+    localStorage.setItem("theme", "light");
+  }
+});
+```
+--- solution-append
+// ---------- Extra: a dark theme button ----------
+const themeButton = document.createElement("button");
+themeButton.className = "chip";
+themeButton.textContent = "Dark mode";
+document.querySelector(".nav").append(themeButton);
+
+// Start dark if that was the last choice
+if (localStorage.getItem("theme") === "dark") {
+  document.body.classList.add("dark");
+}
+
+themeButton.addEventListener("click", () => {
+  document.body.classList.toggle("dark");
+  if (document.body.classList.contains("dark")) {
+    localStorage.setItem("theme", "dark");
+  } else {
+    localStorage.setItem("theme", "light");
+  }
+});
+--- check
+// the preview's storage (read it again after every rerun: each run is a new window)
+const own = () => {
+  const store = t.win.localStorage, keys = [];
+  for (let i = 0; i < store.length; i++) {
+    const k = store.key(i);
+    if (!/^showshelf-lab/.test(k) && k !== "myList") keys.push(k);
+  }
+  return keys;
+};
+const forget = () => own().forEach((k) => t.win.localStorage.removeItem(k));
+forget();
+await t.rerun();
+t.expect(await t.waitFor(() => t.$$("#grid .card").length === 12, 3000), "The home view should load 12 shows. Look in the Console for an error: it may come from your code in extra.js.");
+const isDark = () => t.doc.body.classList.contains("dark");
+t.expect(!isDark(), "The page starts dark even though nothing is saved. Add the class at the start only when `localStorage.getItem(\"theme\") === \"dark\"`.");
+const findBtn = () => t.$$("button").find((b) => /dark|light|theme|mode|night/i.test(t.text(b)));
+t.expect(findBtn(), "I can't find your theme button. Create a button with text like \"Dark mode\" and `append` it to `document.querySelector(\".nav\")`.");
+await t.click(findBtn());
+if (!isDark()) {
+  const cls = t.doc.body.className.trim();
+  t.expect(!cls, `Your button gave \`<body>\` the class "${cls}". Use the class \`dark\`: that's the one the page's CSS knows (look for \`body.dark\` in the whole-page tab).`);
+  t.fail("Clicking your button should switch the class `dark` on `<body>`: `document.body.classList.toggle(\"dark\");`.");
+}
+t.expect(own().length, "The page turns dark, but the choice isn't saved. In the click listener, save it: `localStorage.setItem(\"theme\", \"dark\");`.");
+await t.rerun();
+const darkAfterReload = isDark();
+t.expect(darkAfterReload, "After a reload, the page should still be dark. At the start of your code, read the saved choice: `if (localStorage.getItem(\"theme\") === \"dark\") { document.body.classList.add(\"dark\"); }`.");
+t.expect(findBtn(), "After a reload, your theme button has gone. Look in the Console for an error.");
+await t.click(findBtn());
+t.expect(!isDark(), "Clicking the button again should switch back to light. Use `classList.toggle`, which adds the class when it's missing and removes it when it's there.");
+await t.rerun();
+const darkAgain = isDark();
+forget();
+t.expect(!darkAgain, "After switching back to light and reloading, the page came back dark. Save the light choice too: `localStorage.setItem(\"theme\", \"light\");` when the class is gone.");
+--- learned
+A whole theme from one class and a few variables, remembered with `localStorage`. Big sites switch themes exactly like this.
+--- summary
+`classList.toggle` switches a class; `localStorage` remembers the choice.
+--- teacher
+The dark colours are fixed in the page (the `body.dark` rule), so students only write the JavaScript. Their own `my-theme.css` colours still apply in light mode.
+
+
+=== step clear-list
+title: Clear My List
+minutes: 15
+slot: extra
+bonus: yes
+download: index.html
+--- explain
+Emptying a whole list is easy to do by accident, so good apps ask first. `confirm(question)` shows a box with **OK** and **Cancel**, waits for the answer, and gives back `true` for OK or `false` for Cancel:
+
+```js
+if (confirm("Delete all your photos?")) {
+  photos = [];
+}
+```
+
+Clearing My List is a change of state, so the rest follows the app's pattern: change `state.myList`, save it with `saveMyList()`, and `render()`.
+
+> This challenge has its own **Download** button, so your site can have it too. Every challenge starts from your step 7 code: to keep two challenges, paste the first one's code into the second one's box before you download.
+--- task
+In extra.js:
+
+1. Create a button with the text "Clear My List" and the class `button-secondary`, and append it to the hero of the My List view: `document.querySelector("#mylist-view .hero")`.
+2. On click: if `confirm(...)` says OK, set `state.myList` to an empty array, then call `saveMyList()` and `render()`.
+
+Add a few shows, open **My List**, and try both Cancel and OK.
+--- hint
+Inside the listener, everything goes in one `if (confirm("...")) { ... }` block: three lines.
+--- hint
+```js
+clearButton.addEventListener("click", () => {
+  if (confirm("Remove every show from My List?")) {
+    state.myList = [];
+    saveMyList();
+    render();
+  }
+});
+```
+--- solution-append
+// ---------- Extra: clear My List, after asking ----------
+const clearButton = document.createElement("button");
+clearButton.className = "button-secondary";
+clearButton.textContent = "Clear My List";
+document.querySelector("#mylist-view .hero").append(clearButton);
+
+clearButton.addEventListener("click", () => {
+  if (confirm("Remove every show from My List?")) {
+    state.myList = [];
+    saveMyList();
+    render();
+  }
+});
+--- check
+t.win.localStorage.removeItem("myList");
+await t.rerun();
+t.expect(await t.waitFor(() => t.$$("#grid .card").length === 12, 3000), "The home view should load 12 shows. Look in the Console for an error: it may come from your code in extra.js.");
+await t.click(t.$$("#grid .card .list-btn")[0]);
+await t.click(t.$$("#grid .card .list-btn")[1]);
+await t.click("#nav-mylist");
+t.expect(!t.$("#mylist-view").hidden && t.$$("#mylist-grid .card").length === 2, "After adding two shows, the My List view should show them. Look in the Console for an error.");
+const heroBtns = t.$$("#mylist-view button").filter((b) => !b.closest(".card"));
+const btn = heroBtns.find((b) => /clear|empty|remove|delete/i.test(t.text(b))) || heroBtns[0];
+t.expect(btn, "I can't find your button in the My List view. Create it and `append` it to `document.querySelector(\"#mylist-view .hero\")`.");
+let asked = 0;
+const realConfirm = t.win.confirm;
+try {
+  t.win.confirm = () => { asked++; return false; };
+  await t.click(btn);
+  t.expect(asked > 0, "Ask first: put `confirm(\"Remove every show from My List?\")` in an `if`, and clear the list only when it gives `true`.");
+  t.expect(t.$$("#mylist-grid .card").length === 2, "When the person presses Cancel, My List should stay as it is. Clear it only inside `if (confirm(...)) { ... }`.");
+  t.win.confirm = () => { asked++; return true; };
+  await t.click(btn);
+} finally {
+  t.win.confirm = realConfirm;
+}
+const st = t.get("state");
+const savedAfter = JSON.parse(t.win.localStorage.getItem("myList") || "[]");
+t.win.localStorage.removeItem("myList");
+t.expect(st && st.myList.length === 0, "After OK, `state.myList` should be empty: `state.myList = [];`.");
+t.expect(t.$$("#mylist-grid .card").length === 0 && t.text("#list-count") === "0", "My List is empty now, but the page still shows the old cards. Call `render();` after clearing.");
+t.expect(savedAfter.length === 0, "The empty list isn't saved, so after a reload the shows would come back. Call `saveMyList();` after clearing.");
+--- learned
+`confirm` gives the person a way back before something can't be undone. The clearing itself was the app's usual three steps: change the state, save, render.
+--- summary
+`confirm()` asks OK or Cancel and gives `true` or `false`.
+
+
+=== step about
+title: An About section
+minutes: 15
+slot: extra
+bonus: yes
+download: index.html
+--- explain
+Visitors like to know who's behind a site. Add a small **About** section at the bottom of the home view, built in JavaScript like your buttons.
+
+An element can hold other elements you create, and `append` can take several at once:
+
+```js
+const box = document.createElement("section");
+const heading = document.createElement("h2");
+heading.textContent = "Opening hours";
+const text = document.createElement("p");
+text.textContent = "Monday to Friday, 9 to 5.";
+box.append(heading, text);
+```
+
+The class `show` gives a section the white card look of the show page. And `SITE.owner` has your name, so the section can use it.
+
+> This challenge has its own **Download** button, so your site can have it too. Every challenge starts from your step 7 code: to keep two challenges, paste the first one's code into the second one's box before you download.
+--- task
+In extra.js:
+
+1. Create a `section` with the class `show`.
+2. Inside it, put an `h2` that says "About this site" and a `p` with a few sentences about you and how you built the site.
+3. Append the section to `homeView`.
+--- hint
+Create three elements, set the two texts, `append` the heading and the paragraph to the section, then `homeView.append(...)` the section.
+--- hint
+```js
+const about = document.createElement("section");
+about.className = "show";
+const aboutTitle = document.createElement("h2");
+aboutTitle.textContent = "About this site";
+const aboutText = document.createElement("p");
+aboutText.textContent = "I'm " + SITE.owner + ". I built this site in the Web Dev in 11 Days course.";
+about.append(aboutTitle, aboutText);
+homeView.append(about);
+```
+--- solution-append
+// ---------- Extra: an About section ----------
+const about = document.createElement("section");
+about.className = "show";
+const aboutTitle = document.createElement("h2");
+aboutTitle.textContent = "About this site";
+const aboutText = document.createElement("p");
+aboutText.textContent = "I'm " + SITE.owner + ". I built this site in the Web Dev in 11 Days course, starting from zero: HTML, CSS, JavaScript and the free TVmaze API.";
+about.append(aboutTitle, aboutText);
+homeView.append(about);
+--- check
+t.expect(await t.waitFor(() => t.$$("#grid .card").length === 12, 3000), "The home view should load 12 shows. Look in the Console for an error: it may come from your code in extra.js.");
+const heads = t.$$("h1, h2, h3").filter((h) => /about/i.test(t.text(h)) && !h.closest(".site-header, #show-view, #grid"));
+t.expect(heads.length, "I can't find a heading that says About. Create an `h2` with the text \"About this site\" and put it in your section.");
+const h = heads[0];
+t.expect(!h.closest("[hidden]"), "Your About section is in a part of the page that's hidden now. Append it to `homeView`.");
+const box = h.parentElement;
+t.expect(box && !/^(BODY|MAIN)$/.test(box.tagName) && box !== t.$("#home-view") && !box.classList.contains("hero"), "Put the heading and the paragraph together in their own `section`, then append the section to `homeView`.");
+t.expect([...box.querySelectorAll("p")].some((p) => t.text(p).length >= 30), "Under the heading, in the same section, add a paragraph of at least one full sentence about you and the site.");
+--- learned
+You built a whole part of the page from JavaScript: a section with a heading and a paragraph inside. Your site now says who made it and how.
+--- summary
+Build a section in JavaScript: create elements, `append` them together, then add them to the page.

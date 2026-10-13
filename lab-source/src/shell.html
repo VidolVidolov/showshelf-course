@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ShowShelf Lab</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='2' y='7' width='28' height='20' rx='5' fill='%235b3fd6'/%3E%3Cpath d='M13 12v10l8-5z' fill='white'/%3E%3C/svg%3E">
+<style>
+/*CSS*/
+</style>
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="#/">
+    <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M11 3l5 5 5-5" fill="none" stroke="#5b3fd6" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><rect x="2" y="8" width="28" height="20" rx="5" fill="#5b3fd6"/><path d="M13 13v10l8-5z" fill="#fff"/></svg>
+    ShowShelf Lab
+  </a>
+  <nav class="crumbs" id="crumbs" aria-label="Where you are"></nav>
+  <span class="spacer"></span>
+  <button class="btn ghost" id="helpBtn">Help</button>
+</header>
+<main id="app"></main>
+<nav class="stepper" id="stepper" hidden aria-label="Steps"></nav>
+<dialog id="help" aria-label="Help"></dialog>
+<dialog id="ask" aria-label="Please confirm" style="width:min(440px,calc(100vw - 32px))"></dialog>
+<div class="toast" id="toast" role="status"></div>
+<noscript><p style="padding:24px">ShowShelf Lab needs JavaScript. Please turn it on in your browser.</p></noscript>
+<!--SCRIPTS-->
+</body>
+</html>

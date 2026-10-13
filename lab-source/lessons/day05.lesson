@@ -1,0 +1,1072 @@
+=== day
+n: 5
+title: Functions and decisions
+subtitle: Reusable code, if and else
+hours: 3 hours
+page: index.html
+slot: js | js | app.js
+file: app.js = js
+refs: @page, page.js
+
+--- intro
+Yesterday you wrote instructions that run once, from top to bottom. Today you package them into **functions**: named pieces of code you can run again and again, with different numbers each time.
+
+The page shows four show cards. Every card has grey notes like *(write watchTime)*. A helper file, **page.js**, is already written: it runs after your code and uses your functions to fill in the cards. So each function you finish makes all four cards light up at once.
+
+You'll also learn the most important difference in today's lesson: a function can *print* a value, or *give it back*. Only one of them fills the cards.
+
+--- template
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tonight's shortlist · ShowShelf</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* A small hero and short posters, so the cards fit in the Lab preview */
+    .hero { padding: 16px 0 12px; }
+    .hero h1 { font-size: 1.5rem; }
+    .hero p { margin: 0; }
+    .card .poster { aspect-ratio: 4 / 1; }
+    .card-body p { margin: 2px 0; }
+    .card-body p:empty { display: none; }
+    .todo { color: var(--color-muted); font-size: 0.8rem; font-style: italic; font-weight: 400; text-transform: none; letter-spacing: 0; }
+    .badge:has(.todo) { background: none; padding: 0; }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo">ShowShelf</a>
+      <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="about.html">About me</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <h1>Tonight's shortlist</h1>
+      <p>Each grey note waits for a function in app.js.</p>
+    </section>
+
+    <div class="grid">
+      <article class="card" data-premiered="1994" data-ended="2004" data-episodes="236" data-runtime="30" data-rating="8.8">
+        <img class="poster" src="poster.svg" alt="Poster for Friends">
+        <div class="card-body">
+          <span class="badge years"></span>
+          <h3>Friends</h3>
+          <p class="rating label"></p>
+          <p class="meta watch"></p>
+          <p class="meta runtime"></p>
+          <p class="meta episodes"></p>
+          <p class="meta quick"></p>
+          <p class="meta code"></p>
+          <p class="meta binge"></p>
+        </div>
+      </article>
+
+      <article class="card" data-premiered="2008" data-ended="2013" data-episodes="62" data-runtime="60" data-rating="9.2">
+        <img class="poster" src="poster.svg" alt="Poster for Breaking Bad">
+        <div class="card-body">
+          <span class="badge years"></span>
+          <h3>Breaking Bad</h3>
+          <p class="rating label"></p>
+          <p class="meta watch"></p>
+          <p class="meta runtime"></p>
+          <p class="meta episodes"></p>
+          <p class="meta quick"></p>
+          <p class="meta code"></p>
+          <p class="meta binge"></p>
+        </div>
+      </article>
+
+      <article class="card" data-premiered="2005" data-ended="2013" data-episodes="201" data-runtime="30" data-rating="8.6">
+        <img class="poster" src="poster.svg" alt="Poster for The Office">
+        <div class="card-body">
+          <span class="badge years"></span>
+          <h3>The Office</h3>
+          <p class="rating label"></p>
+          <p class="meta watch"></p>
+          <p class="meta runtime"></p>
+          <p class="meta episodes"></p>
+          <p class="meta quick"></p>
+          <p class="meta code"></p>
+          <p class="meta binge"></p>
+        </div>
+      </article>
+
+      <article class="card" data-premiered="2019" data-ended="2019" data-episodes="5" data-runtime="60" data-rating="9.1">
+        <img class="poster" src="poster.svg" alt="Poster for Chernobyl">
+        <div class="card-body">
+          <span class="badge years"></span>
+          <h3>Chernobyl</h3>
+          <p class="rating label"></p>
+          <p class="meta watch"></p>
+          <p class="meta runtime"></p>
+          <p class="meta episodes"></p>
+          <p class="meta quick"></p>
+          <p class="meta code"></p>
+          <p class="meta binge"></p>
+        </div>
+      </article>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <p>ShowShelf · Web Dev in 11 Days</p>
+  </footer>
+
+  <script src="app.js"></script>
+  <script src="page.js"></script>
+</body>
+</html>
+
+--- file style.css
+{{asset:appCss}}
+
+--- file page.js
+// page.js: fills in the cards with YOUR functions from app.js.
+// It runs after app.js, so your functions already exist. You don't need to change it.
+(function () {
+  // Finds one of your functions by its name. Gives null if it isn't there yet.
+  function yours(name) {
+    try {
+      const found = eval(name);
+      return typeof found === "function" ? found : null;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  // Fills one line of a card with the text made from your function's answer.
+  function fill(card, selector, name, makeText, isExtra) {
+    const line = card.querySelector(selector);
+    const yourFunction = yours(name);
+    if (!yourFunction) {
+      line.innerHTML = isExtra ? "" : `<span class="todo">(write ${name})</span>`;
+      return;
+    }
+    try {
+      line.textContent = makeText(yourFunction);
+    } catch (error) {
+      line.innerHTML = `<span class="todo">(${name} crashed: see the Console)</span>`;
+      console.error(`${name} crashed: ${error.message}`);
+    }
+  }
+
+  for (const card of document.querySelectorAll(".card")) {
+    // The numbers come from the data-... attributes in the HTML (see the whole page tab)
+    const premiered = Number(card.dataset.premiered);
+    const ended = Number(card.dataset.ended);
+    const episodes = Number(card.dataset.episodes);
+    const runtime = Number(card.dataset.runtime);
+    const rating = Number(card.dataset.rating);
+
+    fill(card, ".years", "yearsLabel", (f) => f(premiered, ended));
+    fill(card, ".label", "ratingLabel", (f) => `★ ${rating} · ${f(rating)}`);
+    fill(card, ".episodes", "plural", (f) => f(episodes));
+    fill(card, ".runtime", "formatRuntime", (f) => `${f(runtime)} per episode`);
+    fill(card, ".watch", "watchTime", (f) => `Watch it all: ${f(episodes, runtime)} hours`);
+    fill(card, ".quick", "isQuickWatch", (f) => `Quick watch: ${f(episodes, runtime)}`);
+
+    // Extra challenges: these lines stay hidden until the function exists
+    fill(card, ".code", "episodeCode", (f) => `First episode: ${f(1, 1)}`, true);
+    fill(card, ".binge", "binge", (f) => `At 2 hours a day: ${f(Math.round(episodes * runtime / 60), 2)} days`, true);
+  }
+})();
+
+--- default js
+// app.js: your functions. page.js uses them to fill in the cards.
+
+
+=== step first-function
+title: Your first function
+minutes: 15
+slot: js
+--- explain
+A **function** is a piece of code with a name. You write it once and run it whenever you like, as often as you like.
+
+Working with a function has two parts:
+
+1. **Define** it: write the recipe. Nothing happens yet.
+2. **Call** it: cook the recipe. Write its name followed by `()`.
+
+```js
+function cheer() {
+  console.log("Go team!");
+}
+
+cheer();
+cheer();
+```
+
+The Console shows *Go team!* twice: once per call.
+
+- `function`, then the name, then `()`, then the **body** in curly brackets `{ }`.
+- Indent the body with two spaces, like yesterday's `if` blocks.
+- Function names follow the same rules as variable names: camelCase, no spaces.
+
+> Look at the cards in the preview. Each grey note names a function you'll write today.
+--- task
+1. Define a function called `sayHello` that logs **Hello from a function!**
+2. Under it, call it twice.
+--- hint
+The `console.log` line goes inside the `{ }` of the function. The calls go below the closing `}`, each on its own line: `sayHello();`.
+--- hint
+```js
+function sayHello() {
+  console.log("Hello from a function!");
+}
+
+sayHello();
+sayHello();
+```
+--- solution-append
+function sayHello() {
+  console.log("Hello from a function!");
+}
+
+sayHello();
+sayHello();
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it, fix that line, then check again.`);
+const f = t.get("sayHello");
+if (f === undefined) {
+  t.expect(!/function\s+sayhello\b/i.test(t.clean), "Check the capitals: the name is `sayHello`, with a capital H.");
+  t.fail("I can't find a function called `sayHello`. Start with `function sayHello() {`.");
+}
+t.expect(typeof f === "function", "`sayHello` should be a function: `function sayHello() { ... }`.");
+const before = t.logs.length;
+try { f(); } catch (e) { t.fail("Your function crashed: " + e.message); }
+t.expect(t.logs.length > before, "When I call `sayHello()`, nothing appears in the Console. Put a `console.log(...)` inside its curly brackets.");
+const said = t.logs[t.logs.length - 1].text;
+const times = t.logs.slice(0, before).filter((l) => l.text === said).length;
+t.expect(times >= 1, "The function is ready, but nobody calls it yet. Under the closing `}`, write `sayHello();`.");
+t.expect(times >= 2, "You called it once. Call it a second time: another `sayHello();` line.");
+--- learned
+You defined a function once and ran it twice. Defining is writing the recipe; calling, with `()`, is cooking it.
+--- summary
+`function name() { ... }` defines a function; `name();` calls it.
+--- mistakes
+- Defining the function but never calling it (nothing appears).
+- Calling it without brackets: `sayHello;` does nothing.
+- Putting the calls inside the function's own `{ }`.
+
+
+=== step parameters
+title: Parameters and arguments
+minutes: 15
+slot: js
+--- explain
+A function becomes much more useful when you can give it information each time you call it.
+
+```js
+function cheer(team) {
+  console.log(`Go ${team}!`);
+}
+
+cheer("Lions");    // Go Lions!
+cheer("Tigers");   // Go Tigers!
+```
+
+- `team` is a **parameter**: a variable in the brackets of the definition. It has no value yet.
+- `"Lions"` is an **argument**: the value you put in the brackets when you call the function.
+
+When `cheer("Lions")` runs, `team` holds `"Lions"`. On the next call it holds `"Tigers"`. Same code, different result.
+
+A parameter only exists inside its function's `{ }`. Outside, JavaScript doesn't know the name `team`.
+--- task
+1. Define a function `greet` with one parameter, `name`. It logs a greeting with the name, like **Hello, Ana!**
+2. Call it twice, with two different names.
+--- hint
+The parameter goes in the brackets: `function greet(name) {`. Inside, use `${name}` in a template literal (backticks).
+--- hint
+```js
+function greet(name) {
+  console.log(`Hello, ${name}!`);
+}
+
+greet("Ana");
+greet("Ben");
+```
+--- solution-append
+function greet(name) {
+  console.log(`Hello, ${name}!`);
+}
+
+greet("Ana");
+greet("Ben");
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it, fix that line, then check again.`);
+const f = t.get("greet");
+t.expect(f !== undefined, "I can't find a function called `greet`. Start with `function greet(name) {`.");
+t.expect(typeof f === "function", "`greet` should be a function: `function greet(name) { ... }`.");
+t.expect(f.length >= 1, "`greet` needs a parameter: put `name` between its brackets, `function greet(name) {`.");
+const before = t.logs.length;
+try { f("Zed"); } catch (e) { t.fail("Your function crashed: " + e.message); }
+const out = t.logs.slice(before).map((l) => l.text);
+t.expect(out.length, "When I call `greet(\"Zed\")`, nothing appears in the Console. Put a `console.log` inside the function.");
+const line = out[0];
+if (!line.includes("Zed")) {
+  t.expect(!/\$\{\s*name\s*\}/.test(line), `\`greet("Zed")\` printed "${line}". Use backticks around the text, not quotes, so \`\${name}\` is filled in.`);
+  t.expect(!/\bname\b/.test(line), `\`greet("Zed")\` printed "${line}": the word *name*, not the value. Write \`\${name}\` inside backticks.`);
+  t.fail(`\`greet("Zed")\` printed "${line}". Use the parameter \`name\` in the message, so it says Zed.`);
+}
+const pre = line.slice(0, line.indexOf("Zed")), post = line.slice(line.indexOf("Zed") + 3);
+const calls = t.logs.slice(0, before).map((l) => l.text).filter((x) => x.startsWith(pre) && x.endsWith(post) && x.length > pre.length + post.length);
+t.expect(calls.length, "Your function works. Now call it below the function: `greet(\"Ana\");`.");
+t.expect(new Set(calls).size >= 2, "Call `greet` a second time, with a different name.");
+--- learned
+Parameters are the function's empty boxes; arguments are what you put in them when you call it. One function, many results.
+--- summary
+Parameters are named in the definition; arguments are the values in the call.
+--- mistakes
+- Quotes around the parameter inside the function: `"Hello, name!"`.
+- Calling with no argument: `greet()` prints *Hello, undefined!*
+--- teacher
+If a student asks about `undefined`: it's JavaScript's word for "no value yet". It becomes important in the next two steps.
+
+
+=== step watch-log
+title: Two parameters
+minutes: 15
+slot: js
+--- explain
+A function can have several parameters, separated by commas. The arguments go in the **same order**:
+
+```js
+function price(tickets, pricePerTicket) {
+  console.log(tickets * pricePerTicket);
+}
+
+price(3, 12);   // 36
+price(2, 15);   // 30
+```
+
+In the first call, `tickets` is 3 and `pricePerTicket` is 12. The order decides which argument goes into which parameter, not the names.
+
+Now for the cards. page.js wants a function `watchTime` that works out how many hours it takes to watch a whole show. Open the **page.js** tab and find the line with `watchTime`: it calls your function with each card's numbers.
+--- task
+1. Define `watchTime` with two parameters, `episodes` and `runtime`. It logs the hours: episodes times runtime, divided by 60.
+2. Call it for Friends, `watchTime(236, 30)`, and for Breaking Bad, `watchTime(62, 60)`.
+
+Then look closely:
+
+- The Console shows more numbers than you asked for. Where do the others come from?
+- The cards say *Watch it all: undefined hours*. Why? The next step explains.
+--- hint
+Same pattern as `price`, with a different calculation inside: `episodes * runtime / 60`.
+--- hint
+```js
+function watchTime(episodes, runtime) {
+  console.log(episodes * runtime / 60);
+}
+
+watchTime(236, 30);
+watchTime(62, 60);
+```
+--- solution-append
+function watchTime(episodes, runtime) {
+  console.log(episodes * runtime / 60);
+}
+
+watchTime(236, 30);
+watchTime(62, 60);
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it, fix that line, then check again.`);
+const f = t.get("watchTime");
+if (f === undefined) {
+  t.expect(!/function\s+watchtime\b/i.test(t.clean), "Check the capitals: the name is `watchTime`, with a capital T.");
+  t.fail("I can't find a function called `watchTime`. Start with `function watchTime(episodes, runtime) {`.");
+}
+t.expect(typeof f === "function", "`watchTime` should be a function.");
+t.expect(f.length === 2, "`watchTime` needs two parameters, separated by a comma: `function watchTime(episodes, runtime) {`.");
+const before = t.logs.length;
+let r;
+try { r = f(10, 30); } catch (e) { t.fail("Your function crashed: " + e.message); }
+const out = t.logs.slice(before).map((l) => l.text.trim());
+if (!(out.includes("5") || r === 5)) {
+  t.expect(!(out.includes("300") || r === 300), "`watchTime(10, 30)` gave 300: that's minutes. Divide by 60 to get hours: `episodes * runtime / 60`.");
+  t.expect(out.length || r !== undefined, "When I call `watchTime(10, 30)`, nothing appears in the Console. Put `console.log(episodes * runtime / 60);` inside the function.");
+  t.fail(`\`watchTime(10, 30)\` gave ${out.length ? out[0] : r}. It should be 5 hours: episodes times runtime, divided by 60.`);
+}
+t.expect((t.clean.match(/watchTime\s*\(/g) || []).length >= 2, "Now call your function under it, with the numbers for Friends: `watchTime(236, 30);`.");
+--- learned
+Two parameters, two arguments, in the same order. The extra numbers in the Console came from page.js, which calls your function once per card. That's the point of a function: written once, used everywhere.
+--- summary
+Several parameters are separated by commas; arguments go in the same order.
+--- mistakes
+- Arguments in the wrong order (the result is the same here, but not in general).
+- Using the numbers inside the function instead of the parameters: `console.log(236 * 30 / 60)`.
+
+
+=== step return
+title: Give the answer back with return
+minutes: 15
+slot: js
+--- explain
+Why do the cards say *undefined*? Because `console.log` shows a value to **you**, in the Console. The code that called the function gets nothing back. In JavaScript, "nothing" is called **undefined**.
+
+To give a value back to the caller, use **return**:
+
+```js
+function price(tickets, pricePerTicket) {
+  return tickets * pricePerTicket;
+}
+
+const total = price(3, 12);
+console.log(total);            // 36
+console.log(price(2, 15));     // 30
+```
+
+Now `price(3, 12)` *becomes* 36, and you can store it, log it, or use it in a sentence. That's what page.js does with your answer.
+
+`return` also ends the function: any lines after it inside the `{ }` don't run.
+
+> Think of `console.log` as saying the answer out loud, and `return` as handing it over on paper.
+--- task
+1. Change `watchTime` so that it **returns** the hours, rounded with `Math.round`, instead of logging them.
+2. Your two calls now print nothing. Replace them with one line that logs the answer: `console.log(watchTime(62, 60));`.
+
+Look at the cards: the watch times appear.
+--- hint
+Inside the function, replace `console.log(` with `return Math.round(`. Keep the calculation inside the brackets.
+--- hint
+```js
+function watchTime(episodes, runtime) {
+  return Math.round(episodes * runtime / 60);
+}
+
+console.log(watchTime(62, 60));
+```
+--- solution-replace
+  console.log(episodes * runtime / 60);
+}
+
+watchTime(236, 30);
+watchTime(62, 60);
+=>
+  return Math.round(episodes * runtime / 60);
+}
+
+console.log(watchTime(62, 60));
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it, fix that line, then check again.`);
+const f = t.get("watchTime");
+t.expect(typeof f === "function", "I can't find your `watchTime` function. Press **Start again** to get it back.");
+let r;
+try { r = f(236, 30); } catch (e) { t.fail("Your function crashed: " + e.message); }
+t.expect(r !== undefined, "`watchTime(236, 30)` gives back `undefined`: the function logs the answer but doesn't return it. Inside the function, replace `console.log(` with `return `.");
+t.expect(typeof r === "number", `\`watchTime(236, 30)\` gives back "${r}", which is text. Return the number itself: \`return Math.round(episodes * runtime / 60);\`.`);
+t.expect(r === 118, `\`watchTime(236, 30)\` gives back ${r}. It should be 118: episodes times runtime, divided by 60.`);
+const r2 = f(201, 30);
+t.expect(r2 !== 100, "`watchTime(201, 30)` gives 100, but 100.5 hours should round up to 101. Use `Math.round`, not `Math.floor`.");
+t.expect(r2 === 101, `\`watchTime(201, 30)\` gives ${r2}. Round the result: put \`Math.round( )\` around the whole calculation.`);
+t.expect(/118/.test(t.text(".card .watch")), "The first card should now show 118 hours. Press **Run again** above the preview.");
+t.expect(t.logs.some((l) => l.text.trim() === "62"), "Test your function: `console.log(watchTime(62, 60));` should print 62 in the Console.");
+--- learned
+`return` hands a value back to whoever called the function, and page.js put it on four cards. Most functions you'll write from now on return something.
+--- summary
+`return` gives a value back to the caller; `console.log` only shows it to you.
+--- mistakes
+- Keeping `console.log` inside and adding `return` after it (fine, but remove the log).
+- `return` on its own line with the value on the next line: JavaScript returns `undefined`.
+- Writing lines after `return` and wondering why they never run.
+--- teacher
+This is the key idea of the day. If a student is unsure, ask: "Who needs the answer, you or page.js?"
+
+
+=== step rating-label
+title: Decisions inside a function
+minutes: 20
+slot: js
+--- explain
+Yesterday's `if / else if / else` works inside functions too. Each block can `return` its own answer:
+
+```js
+function temperatureLabel(degrees) {
+  if (degrees >= 30) {
+    return "Hot";
+  } else if (degrees >= 15) {
+    return "Mild";
+  } else {
+    return "Cold";
+  }
+}
+
+console.log(temperatureLabel(32));   // Hot
+console.log(temperatureLabel(20));   // Mild
+```
+
+JavaScript checks the conditions from the top and stops at the first one that's true. Because `return` ends the function, only one label ever comes back.
+
+The order matters: 32 is also `>= 15`, so the strictest test must come first.
+--- task
+Write `ratingLabel(rating)` that returns:
+
+- **Must watch** for 9 or more
+- **Good** for 8 or more
+- **OK** for 6 or more
+- **Skip** for anything lower
+
+Test it with `console.log(ratingLabel(6.5));` and `console.log(ratingLabel(3));`. All our shows are rated 8 or more, so only the Console shows the last two labels.
+--- hint
+Four cases: `if`, two `else if`, and a final `else`. Use `>=`, so that exactly 9 counts as Must watch.
+--- hint
+```js
+function ratingLabel(rating) {
+  if (rating >= 9) {
+    return "Must watch";
+  } else if (rating >= 8) {
+    return "Good";
+  } else if (rating >= 6) {
+    return "OK";
+  } else {
+    return "Skip";
+  }
+}
+
+console.log(ratingLabel(6.5));
+console.log(ratingLabel(3));
+```
+--- solution-append
+function ratingLabel(rating) {
+  if (rating >= 9) {
+    return "Must watch";
+  } else if (rating >= 8) {
+    return "Good";
+  } else if (rating >= 6) {
+    return "OK";
+  } else {
+    return "Skip";
+  }
+}
+
+console.log(ratingLabel(6.5));
+console.log(ratingLabel(3));
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Look for a missing bracket near the line it names.`);
+const f = t.get("ratingLabel");
+t.expect(f !== undefined, "I can't find a function called `ratingLabel`. Start with `function ratingLabel(rating) {`.");
+t.expect(typeof f === "function", "`ratingLabel` should be a function.");
+const cases = [[9.2, "Must watch"], [9, "Must watch"], [8.8, "Good"], [8, "Good"], [7, "OK"], [6, "OK"], [5.9, "Skip"], [3, "Skip"]];
+for (const [x, want] of cases) {
+  let got;
+  try { got = f(x); } catch (e) { t.fail("Your function crashed: " + e.message); }
+  t.expect(got !== undefined, `\`ratingLabel(${x})\` gives back \`undefined\`. Every block needs a \`return\` with its label.`);
+  if (String(got).trim().toLowerCase() !== want.toLowerCase()) {
+    let tip = "";
+    if ([9, 8, 6].includes(x)) tip = ` Use \`>=\`, so that exactly ${x} counts too.`;
+    else if (x > 9 && /good|ok/i.test(String(got))) tip = " Check the order: test `>= 9` first, because 9.2 is also `>= 8`.";
+    t.fail(`\`ratingLabel(${x})\` gives "${got}". It should give "${want}".${tip}`);
+  }
+}
+t.expect(/must watch/i.test(t.text(".card:nth-child(2) .label")), "The Breaking Bad card should say Must watch. Press **Run again** above the preview.");
+t.expect(t.logs.some((l) => /^ok$/i.test(l.text.trim())), "Test the lower labels in the Console: `console.log(ratingLabel(6.5));` should print OK.");
+--- learned
+A function can choose between several answers with `if / else if / else`, and `return` hands back exactly one. The rating line on every card now comes from your code.
+--- summary
+Functions can use `if / else if / else` and return a different value in each block.
+--- mistakes
+- The conditions in the wrong order (`>= 6` first catches everything).
+- `>` instead of `>=`: a rating of exactly 9 becomes Good.
+- `console.log` in each block instead of `return`.
+
+
+=== step years-label
+title: Compare two parameters
+minutes: 15
+slot: js
+--- explain
+Conditions can compare two parameters with each other, not only with fixed numbers:
+
+```js
+function scoreLine(home, away) {
+  if (home === away) {
+    return "A draw";
+  } else {
+    return `${home} to ${away}`;
+  }
+}
+
+console.log(scoreLine(2, 2));   // A draw
+console.log(scoreLine(3, 1));   // 3 to 1
+```
+
+Remember: three equals signs `===` *ask* whether two values are the same. One `=` would *change* a value, and the condition would behave strangely.
+
+Most shows run for several years, so a card should say **1994–2004**. But Chernobyl started and ended in the same year, and "2019–2019" looks silly.
+--- task
+Write `yearsLabel(premiered, ended)`:
+
+- when both years are the same, return only one year, like **2019**
+- otherwise, return both with a dash between them, like **1994–2004**
+
+The long dash `–` can be hard to type: a normal `-` is fine too.
+--- hint
+`if (premiered === ended)`, then `return` a template literal with one year; `else`, return one with both years.
+--- hint
+```js
+function yearsLabel(premiered, ended) {
+  if (premiered === ended) {
+    return `${premiered}`;
+  } else {
+    return `${premiered}–${ended}`;
+  }
+}
+```
+--- solution-append
+function yearsLabel(premiered, ended) {
+  if (premiered === ended) {
+    return `${premiered}`;
+  } else {
+    return `${premiered}–${ended}`;
+  }
+}
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Look for a missing bracket near the line it names.`);
+const f = t.get("yearsLabel");
+t.expect(f !== undefined, "I can't find a function called `yearsLabel`. Start with `function yearsLabel(premiered, ended) {`.");
+t.expect(typeof f === "function" && f.length === 2, "`yearsLabel` needs two parameters: `function yearsLabel(premiered, ended) {`.");
+const norm = (s) => String(s).replace(/\s+/g, "").replace(/[‐-―−]/g, "-");
+const call = (a, b) => { try { return f(a, b); } catch (e) { t.fail("Your function crashed: " + e.message); } };
+const a = call(2008, 2013);
+t.expect(a !== undefined, "`yearsLabel(2008, 2013)` gives back `undefined`. Each block needs a `return`.");
+t.expect(norm(a) !== "2013" && norm(a) !== "2008", `\`yearsLabel(2008, 2013)\` gives "${a}". Compare with three equals signs: \`if (premiered === ended)\`.`);
+t.expect(norm(a) !== "20082013", `\`yearsLabel(2008, 2013)\` gives "${a}". Put a dash between the two years.`);
+t.expect(norm(a) === "2008-2013", `\`yearsLabel(2008, 2013)\` gives "${a}". It should give "2008–2013".`);
+t.expect(norm(call(1994, 2004)) === "1994-2004", `\`yearsLabel(1994, 2004)\` gives "${call(1994, 2004)}". It should give "1994–2004". Use the parameters, not fixed years.`);
+const b = call(2019, 2019);
+t.expect(norm(b) === "2019", `\`yearsLabel(2019, 2019)\` gives "${b}". When both years are the same, return only one: "2019".`);
+t.expect(norm(call(2001, 2001)) === "2001", `\`yearsLabel(2001, 2001)\` gives "${call(2001, 2001)}". It should give "2001". Use the parameters, not a fixed year.`);
+t.expect(norm(t.text(".card:nth-child(4) .years")) === "2019", "The Chernobyl card should show 2019. Press **Run again** above the preview.");
+--- learned
+You compared two parameters with `===`. Look at the badges: three show a range of years, and Chernobyl shows just one.
+--- summary
+Conditions can compare parameters with each other: `if (premiered === ended)`.
+--- mistakes
+- One `=` in the condition: it changes `premiered` and the result is always the second year.
+- Returning `"premiered–ended"` in quotes instead of a template literal.
+
+
+=== step format-runtime
+title: Hours and minutes
+minutes: 20
+slot: js
+--- explain
+Two new maths tools help with time:
+
+- `Math.floor( )` rounds **down** to a whole number: `Math.floor(2.9)` is 2.
+- `%` gives the **remainder** of a division, what's left over: `17 % 7` is 3, because 17 is two sevens and 3 left over.
+
+Together they split a number into whole parts and the rest:
+
+```js
+const totalDays = 17;
+const weeks = Math.floor(totalDays / 7);   // 2
+const days = totalDays % 7;                // 3
+console.log(`${weeks} weeks and ${days} days`);
+```
+
+The cards want the length of one episode as text, like **45 min**, **1 h** or **1 h 30 min**. We added the start of a `formatRuntime` function at the bottom of your code: it already works out `hours` and `rest`. You write the decisions.
+--- task
+In `formatRuntime`, replace the three `TODO` comments with an `if / else if / else` that returns:
+
+1. `"45 min"` style when `hours` is 0
+2. `"1 h"` style when `rest` is 0
+3. `"1 h 30 min"` style otherwise
+
+Use template literals with `${hours}` and `${rest}`. Test it: `console.log(formatRuntime(90));`.
+--- starter-append
+function formatRuntime(minutes) {
+  const hours = Math.floor(minutes / 60);
+  const rest = minutes % 60;
+  // TODO: if hours is 0, return something like "45 min"
+  // TODO: else if rest is 0, return something like "1 h"
+  // TODO: else return something like "1 h 30 min"
+}
+--- hint
+The first condition is `if (hours === 0) {`, the second `} else if (rest === 0) {`. Each block returns a template literal.
+--- hint
+```js
+  if (hours === 0) {
+    return `${rest} min`;
+  } else if (rest === 0) {
+    return `${hours} h`;
+  } else {
+    return `${hours} h ${rest} min`;
+  }
+```
+--- solution-append
+function formatRuntime(minutes) {
+  const hours = Math.floor(minutes / 60);
+  const rest = minutes % 60;
+  if (hours === 0) {
+    return `${rest} min`;
+  } else if (rest === 0) {
+    return `${hours} h`;
+  } else {
+    return `${hours} h ${rest} min`;
+  }
+}
+
+console.log(formatRuntime(90));
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Look for a missing bracket near the line it names.`);
+const f = t.get("formatRuntime");
+t.expect(typeof f === "function", "I can't find `formatRuntime`. Press **Start again** to get the starting code back.");
+const norm = (s) => String(s).replace(/\s+/g, "").toLowerCase();
+const cases = [[45, "45 min"], [30, "30 min"], [60, "1 h"], [120, "2 h"], [90, "1 h 30 min"], [150, "2 h 30 min"]];
+for (const [x, want] of cases) {
+  let got;
+  try { got = f(x); } catch (e) { t.fail("Your function crashed: " + e.message); }
+  t.expect(got !== undefined, `\`formatRuntime(${x})\` gives back \`undefined\`. Replace the TODO comments with an \`if / else if / else\`, and \`return\` a text in each block.`);
+  if (norm(got) !== norm(want)) {
+    let tip = "";
+    if (x < 60 && /h/.test(String(got))) tip = " When `hours` is 0, leave the hours out.";
+    if (x % 60 === 0 && /min/.test(String(got))) tip = " When `rest` is 0, return only the hours.";
+    if (/\$\{/.test(String(got))) tip = " Use backticks, not quotes, so `${ }` is filled in.";
+    t.fail(`\`formatRuntime(${x})\` gives "${got}". It should give "${want}".${tip}`);
+  }
+}
+t.expect(/30 ?min/.test(t.text(".card .runtime")), "The Friends card should show 30 min per episode. Press **Run again** above the preview.");
+--- learned
+`Math.floor` and `%` split minutes into hours and the rest, and `if / else if / else` picks the right format. The cards show 30 min and 1 h, and the Console shows 1 h 30 min.
+--- summary
+`Math.floor()` rounds down; `%` is the remainder of a division.
+--- mistakes
+- Checking `minutes === 0` instead of `hours === 0`.
+- Forgetting `return` in one of the blocks.
+--- teacher
+If `%` is confusing, use a clock: 90 minutes is 1 hour and 30 left over. `90 % 60` gives the left-over part.
+
+
+=== step quick-watch
+title: Functions that use functions
+minutes: 15
+slot: js
+--- explain
+A function can call another function. That's how programs grow: small, tested pieces combined into bigger ones.
+
+A function can also return `true` or `false`. The comparison itself is the answer, so you can return it directly:
+
+```js
+function price(tickets, pricePerTicket) {
+  return tickets * pricePerTicket;
+}
+
+function isCheap(tickets, pricePerTicket) {
+  return price(tickets, pricePerTicket) < 20;
+}
+
+console.log(isCheap(3, 12));   // false (36 is not less than 20)
+console.log(isCheap(1, 12));   // true
+```
+
+`isCheap` doesn't repeat the price calculation. It asks `price` for the answer and compares it. If the price rules change one day, you fix one function and both are right.
+
+> Functions that return `true` or `false` often have names that start with `is`, `has` or `can`.
+--- task
+Write `isQuickWatch(episodes, runtime)`. It returns `true` when the whole show takes **10 hours or less**, and `false` otherwise.
+
+Use your `watchTime` function inside it. Only one of the four shows is a quick watch. Can you guess which one before you look?
+--- hint
+The answer is one comparison: `watchTime(episodes, runtime) <= 10`. Return it directly.
+--- hint
+```js
+function isQuickWatch(episodes, runtime) {
+  return watchTime(episodes, runtime) <= 10;
+}
+```
+--- solution-append
+function isQuickWatch(episodes, runtime) {
+  return watchTime(episodes, runtime) <= 10;
+}
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Look for a missing bracket near the line it names.`);
+const f = t.get("isQuickWatch");
+t.expect(f !== undefined, "I can't find a function called `isQuickWatch`. Start with `function isQuickWatch(episodes, runtime) {`.");
+t.expect(typeof f === "function" && f.length === 2, "`isQuickWatch` needs two parameters: `function isQuickWatch(episodes, runtime) {`.");
+const cases = [[5, 60, true], [62, 60, false], [20, 30, true], [12, 60, false], [236, 30, false]];
+for (const [e, r, want] of cases) {
+  let got;
+  try { got = f(e, r); } catch (err) { t.fail("Your function crashed: " + err.message); }
+  t.expect(got !== undefined, `\`isQuickWatch(${e}, ${r})\` gives back \`undefined\`. Add \`return\` before the comparison.`);
+  t.expect(typeof got === "boolean", `\`isQuickWatch(${e}, ${r})\` gives "${got}". Return the comparison itself (true or false), without quotes: \`return watchTime(episodes, runtime) <= 10;\`.`);
+  if (got !== want) {
+    const tip = e === 20 ? " That's exactly 10 hours: use `<=` so that 10 counts too." : "";
+    t.fail(`\`isQuickWatch(${e}, ${r})\` gives ${got}. It should give ${want}: that show takes ${Math.round(e * r / 60)} hours.${tip}`);
+  }
+}
+t.expect(/watchTime\s*\(/.test(String(f)), "It works! Now use your `watchTime` function inside `isQuickWatch`, instead of doing the maths again.");
+t.expect(/true/.test(t.text(".card:nth-child(4) .quick")), "The Chernobyl card should say Quick watch: true. Press **Run again** above the preview.");
+--- learned
+`isQuickWatch` reuses `watchTime` and returns a boolean. The cards print `true` and `false` because that's exactly what your function gives back.
+--- summary
+Functions can call other functions, and can return `true` or `false`.
+--- mistakes
+- Returning the strings `"true"` / `"false"` instead of booleans.
+- Copying the maths from `watchTime` instead of calling it.
+- `< 10` instead of `<= 10`.
+
+
+=== step arrow
+title: Arrow functions
+minutes: 15
+slot: js
+--- explain
+There's a second, shorter way to write a function: the **arrow function**. You'll see it everywhere, and tomorrow you'll use it inside other functions.
+
+```js
+function price(tickets, pricePerTicket) {
+  return tickets * pricePerTicket;
+}
+
+// exactly the same, as an arrow function:
+const price = (tickets, pricePerTicket) => tickets * pricePerTicket;
+```
+
+- It's stored in a variable with `const`.
+- The parameters go in brackets, followed by an arrow `=>`.
+- When the body is one value, you don't need `{ }` or `return`: the value is returned automatically.
+
+If the body needs more lines, use `{ }` and `return` as usual: `(a, b) => { ... return ...; }`.
+
+> One difference: an arrow function only exists from its line on. Keep it **above** the lines that call it.
+--- task
+Rewrite `watchTime` as an arrow function, on one line:
+
+1. Write `const watchTime = (episodes, runtime) => ...` with the calculation (and `Math.round`) after the arrow.
+2. Delete the old `function watchTime ...` block, from `function` to its `}`. Two functions with the same name cause an error.
+
+The cards and the Console should look exactly the same as before.
+--- hint
+Everything after `return` in the old function goes after the `=>`, without the semicolon inside the brackets. Put the new line where the old function was, so it stays above `console.log(watchTime(62, 60));`.
+--- hint
+```js
+const watchTime = (episodes, runtime) => Math.round(episodes * runtime / 60);
+
+console.log(watchTime(62, 60));
+```
+--- solution-replace
+function watchTime(episodes, runtime) {
+  return Math.round(episodes * runtime / 60);
+}
+=>
+const watchTime = (episodes, runtime) => Math.round(episodes * runtime / 60);
+--- check
+if (t.errors.length) {
+  t.expect(!/already been declared/.test(t.errors[0]), "There are two `watchTime`s now. Delete the old `function watchTime(...) { ... }` block and keep only the arrow function.");
+  t.expect(!/before initiali[sz]ation/.test(t.errors[0]), "Your code uses `watchTime` before the line that creates it. Move `const watchTime = ...` above `console.log(watchTime(62, 60));`.");
+  t.fail(`There's an error in the Console: "${t.errors[0]}". Read the help under it, fix that line, then check again.`);
+}
+t.expect(!/function\s+watchTime\b/.test(t.clean), "Delete the old `function watchTime(...) { ... }` block: the arrow function replaces it.");
+t.expect(/(const|let)\s+watchTime\s*=/.test(t.clean), "Create the arrow function in a variable: `const watchTime = (episodes, runtime) => ...`.");
+t.expect(/(const|let)\s+watchTime\s*=\s*(\([^)]*\)|\w+)\s*=>/.test(t.clean), "After `const watchTime =` write the parameters in brackets and an arrow: `(episodes, runtime) => ...`.");
+const f = t.get("watchTime");
+let r;
+try { r = f(236, 30); } catch (e) { t.fail("Your function crashed: " + e.message); }
+t.expect(r !== undefined, "`watchTime(236, 30)` gives back `undefined`. With curly brackets `{ }` you need `return`. On one line, leave out the `{ }` and the value is returned by itself.");
+t.expect(r === 118 && f(201, 30) === 101, `\`watchTime(236, 30)\` gives ${r}. It should still be 118: \`Math.round(episodes * runtime / 60)\`.`);
+t.expect(/118/.test(t.text(".card .watch")), "The first card should still show 118 hours. Press **Run again** above the preview.");
+--- learned
+Same function, shorter code. Arrow functions are perfect for small calculations, and tomorrow you'll pass them to other functions.
+--- summary
+Arrow functions: `const name = (a, b) => value;`
+--- mistakes
+- Keeping both versions: "Identifier 'watchTime' has already been declared".
+- `{ }` around the body without `return`: the function returns `undefined`.
+- Putting the arrow function below the line that calls it.
+
+
+=== step default-param
+title: A default value
+minutes: 20
+slot: js
+--- explain
+Sometimes a parameter almost always has the same value. You can give it a **default**: the value it gets when the call leaves it out.
+
+```js
+function order(item, amount = 1) {
+  return `${amount} × ${item}`;
+}
+
+console.log(order("coffee"));      // 1 × coffee
+console.log(order("coffee", 3));   // 3 × coffee
+```
+
+`amount = 1` in the brackets means: "if nobody gives me an amount, use 1". An argument, when there is one, always wins.
+
+The cards want to say **236 episodes**. But English is tricky: one episode, two episode**s**. A function can handle both, and with a default value it works for seasons too.
+--- task
+Write `plural(count, word = "episode")`:
+
+- when `count` is 1, return the count and the word: **1 episode**
+- otherwise, return the count, the word and an **s**: **236 episodes**
+
+page.js calls `plural(episodes)` with one argument, so the default is used. Test the other word in the Console: `console.log(plural(3, "season"));` should print **3 seasons**.
+--- hint
+`if (count === 1)`, return a template literal with `${count}`, a space and `${word}`. Else return the same with an `s` straight after `${word}`.
+--- hint
+```js
+function plural(count, word = "episode") {
+  if (count === 1) {
+    return `${count} ${word}`;
+  } else {
+    return `${count} ${word}s`;
+  }
+}
+
+console.log(plural(3, "season"));
+```
+--- solution-append
+function plural(count, word = "episode") {
+  if (count === 1) {
+    return `${count} ${word}`;
+  } else {
+    return `${count} ${word}s`;
+  }
+}
+
+console.log(plural(3, "season"));
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Look for a missing bracket near the line it names.`);
+const f = t.get("plural");
+t.expect(f !== undefined, "I can't find a function called `plural`. Start with `function plural(count, word = \"episode\") {`.");
+t.expect(typeof f === "function", "`plural` should be a function.");
+const norm = (s) => String(s).replace(/\s+/g, " ").trim().toLowerCase();
+const call = (...args) => { try { return f(...args); } catch (e) { t.fail("Your function crashed: " + e.message); } };
+const a = call(236);
+t.expect(a !== undefined, "`plural(236)` gives back `undefined`. Each block needs a `return`.");
+t.expect(!/undefined/.test(String(a)), `\`plural(236)\` gives "${a}". Give \`word\` a default value in the brackets: \`word = "episode"\`.`);
+t.expect(norm(a) === "236 episodes", `\`plural(236)\` gives "${a}". It should give "236 episodes".`);
+const one = call(1);
+t.expect(norm(one) === "1 episode", `\`plural(1)\` gives "${one}". When \`count\` is 1, leave out the s: "1 episode".`);
+const s3 = call(3, "season");
+t.expect(norm(s3) !== "3 episodes", "`plural(3, \"season\")` gives \"3 episodes\". Use the parameter: `${word}` instead of the word episode.");
+t.expect(norm(s3) === "3 seasons", `\`plural(3, "season")\` gives "${s3}". It should give "3 seasons".`);
+t.expect(norm(call(1, "season")) === "1 season", `\`plural(1, "season")\` gives "${call(1, "season")}". It should give "1 season".`);
+t.expect(/236 episodes/i.test(t.text(".card .episodes")), "The Friends card should show 236 episodes. Press **Run again** above the preview.");
+--- learned
+A default value makes a parameter optional. One small function now handles episodes, seasons, or anything else, in the singular and the plural. Every grey note on the cards is gone.
+--- summary
+Default values: `function f(a, b = "x")` uses `"x"` when `b` is left out.
+--- mistakes
+- `word == "episode"` or `word: "episode"` in the brackets instead of `word = "episode"`.
+- Writing `episodes` in the text instead of `${word}s`.
+--- teacher
+All six grey notes should now be filled. Students who finish early can try the extra challenges, which add two more lines to every card.
+
+
+=== step episode-code
+title: Episode codes like S01E05
+minutes: 15
+slot: js
+bonus: yes
+--- explain
+Fans write episodes as codes: **S01E05** is season 1, episode 5. Each number always has two digits.
+
+Strings have a method for that: `padStart(length, character)` adds characters at the start until the text is long enough.
+
+```js
+console.log("7".padStart(2, "0"));    // 07
+console.log("12".padStart(2, "0"));   // 12 (already long enough)
+```
+
+Numbers don't have `padStart`, so turn a number into text first with `String( )`:
+
+```js
+const day = 7;
+console.log(String(day).padStart(2, "0"));   // 07
+```
+--- task
+Write `episodeCode(season, episode)` that returns a code like **S01E05**. Each card gets a new line: *First episode: S01E01*.
+
+Test it: `console.log(episodeCode(10, 18));` should print **S10E18**.
+--- hint
+Make two padded strings first, one for the season and one for the episode. Then return a template literal with an S, the season, an E and the episode.
+--- hint
+```js
+function episodeCode(season, episode) {
+  const s = String(season).padStart(2, "0");
+  const e = String(episode).padStart(2, "0");
+  return `S${s}E${e}`;
+}
+```
+--- solution-append
+function episodeCode(season, episode) {
+  const s = String(season).padStart(2, "0");
+  const e = String(episode).padStart(2, "0");
+  return `S${s}E${e}`;
+}
+
+console.log(episodeCode(10, 18));
+--- check
+if (t.errors.length) {
+  t.expect(!/padStart is not a function/.test(t.errors[0]), "Numbers don't have `padStart`. Turn them into text first: `String(season).padStart(2, \"0\")`.");
+  t.fail(`There's an error in the Console: "${t.errors[0]}". Read the help under it and fix that line.`);
+}
+const f = t.get("episodeCode");
+t.expect(typeof f === "function", "I can't find a function called `episodeCode`. Start with `function episodeCode(season, episode) {`.");
+for (const [s, e, want] of [[1, 5, "S01E05"], [10, 18, "S10E18"], [2, 12, "S02E12"], [1, 1, "S01E01"]]) {
+  let got;
+  try { got = f(s, e); } catch (err) {
+    t.fail(/padStart/.test(err.message) ? "Numbers don't have `padStart`. Turn them into text first: `String(season).padStart(2, \"0\")`." : "Your function crashed: " + err.message);
+  }
+  t.expect(String(got).toUpperCase() === want, `\`episodeCode(${s}, ${e})\` gives "${got}". It should give "${want}".`);
+}
+--- learned
+`String()` turns a number into text, and `padStart` fills it up to a fixed length. You'll see this trick in clocks, dates and codes everywhere.
+--- summary
+`String(n).padStart(2, "0")` gives two-digit numbers like 05.
+
+
+=== step binge
+title: How many days to binge it?
+minutes: 15
+slot: js
+bonus: yes
+--- explain
+`Math.round` rounds to the nearest whole number and `Math.floor` always rounds down. The third one, `Math.ceil`, always rounds **up** (*ceiling*, like the top of a room):
+
+```js
+console.log(Math.round(2.2));   // 2
+console.log(Math.floor(2.9));   // 2
+console.log(Math.ceil(2.2));    // 3
+```
+
+Rounding up is right when a part still counts as a whole one. If a trip needs 2.2 buses, you need 3 buses.
+--- task
+Write `binge(hours, hoursPerDay)` that returns how many days it takes to watch `hours` of TV at `hoursPerDay` a day. A started day counts as a whole day, so round up.
+
+Every card gets a new line: *At 2 hours a day: 59 days*.
+--- hint
+Divide `hours` by `hoursPerDay`, and wrap it in `Math.ceil( )`.
+--- hint
+```js
+function binge(hours, hoursPerDay) {
+  return Math.ceil(hours / hoursPerDay);
+}
+```
+--- solution-append
+function binge(hours, hoursPerDay) {
+  return Math.ceil(hours / hoursPerDay);
+}
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it and fix that line.`);
+const f = t.get("binge");
+t.expect(typeof f === "function", "I can't find a function called `binge`. Start with `function binge(hours, hoursPerDay) {`.");
+for (const [h, d, want] of [[118, 2, 59], [5, 2, 3], [62, 3, 21], [10, 5, 2]]) {
+  let got;
+  try { got = f(h, d); } catch (e) { t.fail("Your function crashed: " + e.message); }
+  t.expect(got !== undefined, `\`binge(${h}, ${d})\` gives back \`undefined\`. Add \`return\`.`);
+  t.expect(got !== h / d || Number.isInteger(got), `\`binge(${h}, ${d})\` gives ${got}. Round it up with \`Math.ceil( )\`.`);
+  t.expect(got === want, `\`binge(${h}, ${d})\` gives ${got}. It should give ${want}: ${h} hours at ${d} a day, rounded up.`);
+}
+--- learned
+`Math.ceil` rounds up. Now you know all three: `round` to the nearest, `floor` down, `ceil` up.
+--- summary
+`Math.ceil()` rounds up to the next whole number.

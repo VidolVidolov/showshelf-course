@@ -1,0 +1,157 @@
+=== day
+n: 99
+title: Engine test
+slot: js | js | app.js
+slot: ui | jsx | App.jsx
+slot: server | js | server.js
+file: app.js = js
+--- template
+<!doctype html>
+<html><head><meta charset="utf-8"></head>
+<body><h1 id="t">x</h1><div id="root"></div>
+<script src="app.js"></script>
+</body></html>
+--- template react
+<!doctype html>
+<html><head><meta charset="utf-8"><script>{{asset:react}}</script></head>
+<body><div id="root"></div>
+<script>
+{{slot:ui}}
+</script>
+</body></html>
+--- template srv
+<!doctype html>
+<html><head><meta charset="utf-8"><script>{{asset:expressLite}}</script></head>
+<body><ul id="list"></ul>
+<script>
+{{slot:server}}
+</script>
+<script>
+fetch("/api/mylist").then(r => r.json()).then(items => { document.getElementById("list").innerHTML = items.map(i => "<li>" + i.name + "</li>").join(""); });
+</script>
+</body></html>
+
+=== step js
+title: JS
+slot: js
+--- explain
+x
+--- task
+x
+--- solution
+const showName = "Friends";
+function double(n) { return n * 2; }
+console.log("Hello", showName, [1, 2]);
+document.querySelector("#t").textContent = showName;
+--- check
+t.expect(t.get("showName") === "Friends", "no showName");
+t.expect(t.get("double")(4) === 8, "double");
+t.expect(t.logged("Hello Friends [1,2]"), "log: " + JSON.stringify(t.logs));
+t.expect(t.text("#t") === "Friends", "text");
+
+=== step fetch
+title: Fetch
+slot: js
+starter: 
+--- explain
+x
+--- task
+x
+--- solution
+async function go() {
+  const r = await fetch("https://api.tvmaze.com/search/shows?q=friends");
+  const data = await r.json();
+  console.log(data[0].show.name, data[0].show.id);
+  const one = await (await fetch("https://api.tvmaze.com/shows/431?embed[]=cast&embed[]=seasons")).json();
+  console.log(one._embedded.cast.length, one._embedded.seasons.length);
+  const bad = await fetch("https://api.tvmaze.com/shows/1");
+  console.log("status", bad.status);
+}
+go();
+--- check
+t.expect(await t.waitFor(() => t.logged("Friends 431")), "search: " + JSON.stringify(t.logs));
+t.expect(await t.waitFor(() => t.logged("6 10")), "embed: " + JSON.stringify(t.logs));
+t.expect(await t.waitFor(() => t.logged("status 404")), "404");
+
+=== step react
+title: React
+slot: ui
+template: react
+--- explain
+x
+--- task
+x
+--- solution
+function Counter({ label }) {
+  const [n, setN] = React.useState(0);
+  return (
+    <button onClick={() => setN(n + 1)}>
+      {label} {n}
+    </button>
+  );
+}
+function App() {
+  const shows = ["Friends", "Dark"];
+  return (
+    <>
+      <ul>{shows.map((s) => <li key={s}>{s}</li>)}</ul>
+      <Counter label="Clicked" />
+    </>
+  );
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+--- check
+t.expect(await t.waitFor(() => t.$("button")), "no button " + JSON.stringify(t.logs));
+t.expect(t.$$("li").length === 2, "lis");
+await t.click("button"); await t.click("button");
+t.expect(await t.waitFor(() => t.text("button") === "Clicked 2"), "count " + t.text("button"));
+
+=== step react-error
+title: React error
+slot: ui
+template: react
+starter: const x = <p>Hi</div>;
+--- explain
+x
+--- task
+x
+--- solution
+const x = <p>Hi</p>;
+--- check
+t.expect(!t.errors.length, "errors: " + JSON.stringify(t.errors));
+
+=== step server
+title: Server
+slot: server
+template: srv
+--- explain
+x
+--- task
+x
+--- solution
+const app = express();
+app.use(express.json());
+let myList = [{ id: 1, name: "Friends" }];
+app.get("/api/mylist", (req, res) => {
+  res.json(myList);
+});
+app.post("/api/mylist", (req, res) => {
+  const item = { id: Date.now(), name: req.body.name };
+  myList.push(item);
+  res.status(201).json(item);
+});
+app.delete("/api/mylist/:id", (req, res) => {
+  myList = myList.filter((i) => i.id !== Number(req.params.id));
+  res.status(204).end();
+});
+app.listen(3000);
+--- check
+t.expect(await t.waitFor(() => t.$$("#list li").length === 1), "list " + JSON.stringify(t.logs));
+const r = await t.win.fetch("/api/mylist", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({ name: "Dark" }) });
+t.expect(r.status === 201, "post status " + r.status);
+const item = await r.json();
+const d = await t.win.fetch("/api/mylist/" + item.id, { method: "DELETE" });
+t.expect(d.status === 204, "delete " + d.status);
+const nf = await t.win.fetch("/api/nothing");
+t.expect(nf.status === 404, "404");
+t.expect(t.logged(/GET \/api\/mylist/), "request log");

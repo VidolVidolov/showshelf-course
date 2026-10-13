@@ -1,0 +1,122 @@
+### Test the API from VS Code
+### Install the "REST Client" extension, then click "Send Request" above each block.
+### (Thunder Client or Postman work too: copy the method, URL and body.)
+
+### Is the server running?
+GET http://localhost:3000/
+
+### All shows in My List
+GET http://localhost:3000/api/mylist
+
+### Add a show -> 201
+POST http://localhost:3000/api/mylist
+Content-Type: application/json
+
+{
+  "id": 169,
+  "name": "Breaking Bad",
+  "image": null,
+  "genres": ["Drama", "Crime", "Thriller"],
+  "rating": 9.2
+}
+
+### Add a second show (only id and name are required) -> 201
+POST http://localhost:3000/api/mylist
+Content-Type: application/json
+
+{
+  "id": 431,
+  "name": "Friends"
+}
+
+### Same show again -> 409
+POST http://localhost:3000/api/mylist
+Content-Type: application/json
+
+{
+  "id": 169,
+  "name": "Breaking Bad"
+}
+
+### Missing name -> 400
+POST http://localhost:3000/api/mylist
+Content-Type: application/json
+
+{
+  "id": 169
+}
+
+### id is text, not a number -> 400
+POST http://localhost:3000/api/mylist
+Content-Type: application/json
+
+{
+  "id": "169",
+  "name": "Breaking Bad"
+}
+
+### Broken JSON (look at the comma at the end) -> 400
+POST http://localhost:3000/api/mylist
+Content-Type: application/json
+
+{
+  "id": 169,
+  "name": "Breaking Bad",
+}
+
+### One show
+GET http://localhost:3000/api/mylist/169
+
+### A show that is not in the list -> 404
+GET http://localhost:3000/api/mylist/999999
+
+### Update status, my rating and note (stretch) -> 200
+PATCH http://localhost:3000/api/mylist/169
+Content-Type: application/json
+
+{
+  "status": "watching",
+  "myRating": 5,
+  "note": "Up to season 3"
+}
+
+### Clear my rating again (null is allowed) -> 200
+PATCH http://localhost:3000/api/mylist/169
+Content-Type: application/json
+
+{
+  "myRating": null
+}
+
+### Bad status -> 400
+PATCH http://localhost:3000/api/mylist/169
+Content-Type: application/json
+
+{
+  "status": "finished"
+}
+
+### myRating must be 1 to 5 -> 400
+PATCH http://localhost:3000/api/mylist/169
+Content-Type: application/json
+
+{
+  "myRating": 7
+}
+
+### PATCH a show that is not in the list -> 404
+PATCH http://localhost:3000/api/mylist/999999
+Content-Type: application/json
+
+{
+  "status": "watched"
+}
+
+### Delete -> 204
+DELETE http://localhost:3000/api/mylist/169
+
+### Delete again -> 404
+DELETE http://localhost:3000/api/mylist/169
+
+### A route that doesn't exist -> 404
+GET http://localhost:3000/api/nothing-here

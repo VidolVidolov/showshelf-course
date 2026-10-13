@@ -1,0 +1,1227 @@
+=== day
+n: 3
+title: Lay out the home page
+subtitle: Flexbox, Grid and phones
+hours: 3 hours
+page: index.html
+slot: css | css | layout.css
+file: layout.css = css
+refs: @page, base.css
+
+--- intro
+Yesterday you gave a page colours and fonts. Today you decide **where things go**. You build the layout of the ShowShelf **home page**: a top bar, a search bar and a grid of show cards.
+
+The HTML is ready, and so are the colours, fonts and the look of each card: they're in **base.css** (open its tab above the code box to see it). But base.css has no layout at all, so right now everything is stacked in one long column. Your job is **layout.css**.
+
+You'll use three tools that almost every website uses:
+
+- **Flexbox** to put things in a row: the top bar and the search bar
+- **Grid** to arrange the cards in columns
+- **Media queries** to show more columns on bigger screens
+
+Your colours from Day 2 are already in the page. Open the **index.html (whole page)** tab any time to see the class names you can use.
+
+--- default css
+/* layout.css: where things go on the page */
+
+--- template
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ShowShelf</title>
+  <link rel="stylesheet" href="base.css">
+  <link rel="stylesheet" href="layout.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo">ShowShelf</a>
+      <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="show.html">Show</a>
+        <a href="about.html">About</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <h1>What are we watching tonight?</h1>
+      <p>Find TV shows and keep your watchlist.</p>
+      <form class="search" action="#">
+        <input type="search" id="search" placeholder="Search shows, e.g. office" aria-label="Search shows">
+        <button type="submit">Search</button>
+      </form>
+    </section>
+
+    <section class="shows-section">
+      <h2>Popular shows</h2>
+
+      <div class="grid">
+        <article class="card">
+          <img class="poster" src="poster.svg" alt="">
+          <div class="card-body">
+            <span class="badge">Comedy</span>
+            <h3>Friends</h3>
+            <p class="rating">★ 8.8</p>
+            <p class="meta">1994–2004 · NBC</p>
+          </div>
+        </article>
+
+        <article class="card">
+          <img class="poster" src="poster.svg" alt="">
+          <div class="card-body">
+            <span class="badge">Drama</span>
+            <h3>Breaking Bad</h3>
+            <p class="rating">★ 9.2</p>
+            <p class="meta">2008–2013 · AMC</p>
+          </div>
+        </article>
+
+        <article class="card">
+          <img class="poster" src="poster.svg" alt="">
+          <div class="card-body">
+            <span class="badge">Comedy</span>
+            <h3>The Office</h3>
+            <p class="rating">★ 8.6</p>
+            <p class="meta">2005–2013 · NBC</p>
+          </div>
+        </article>
+
+        <article class="card">
+          <img class="poster" src="poster.svg" alt="">
+          <div class="card-body">
+            <span class="badge">Drama</span>
+            <h3>Game of Thrones</h3>
+            <p class="rating">★ 8.9</p>
+            <p class="meta">2011–2019 · HBO</p>
+          </div>
+        </article>
+
+        <article class="card">
+          <img class="poster" src="poster.svg" alt="">
+          <div class="card-body">
+            <span class="badge">Drama</span>
+            <h3>The Crown</h3>
+            <p class="rating">★ 8.0</p>
+            <p class="meta">2016–2023 · Netflix</p>
+          </div>
+        </article>
+
+        <article class="card">
+          <img class="poster" src="poster.svg" alt="">
+          <div class="card-body">
+            <span class="badge">Drama</span>
+            <h3>Dark</h3>
+            <p class="rating">★ 8.7</p>
+            <p class="meta">2017–2020 · Netflix</p>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>ShowShelf · Web Dev in 11 Days</p>
+  </footer>
+</body>
+</html>
+
+--- file base.css
+/* =========================================================
+   base.css: colours, fonts and the look of each part.
+   There is NO layout in this file: no rows, no columns,
+   no widths. That is your job, in layout.css.
+   ========================================================= */
+
+/* ---------- Colours and sizes (variables) ---------- */
+:root {
+  --color-bg: #f6f5fb;
+  --color-surface: #ffffff;
+  --color-text: #1c1b29;
+  --color-muted: #676580;
+  --color-border: #e3e0f0;
+  --color-accent: #5b3fd6;
+  --color-accent-dark: #3d2a99;
+  --color-star: #b7791f;
+  --radius: 12px;
+}
+
+/* ---------- Base ---------- */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  line-height: 1.6;
+  color: var(--color-text);
+  background-color: var(--color-bg);
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+a {
+  color: var(--color-accent);
+}
+
+a:hover {
+  color: var(--color-accent-dark);
+}
+
+h1, h2, h3 {
+  line-height: 1.2;
+}
+
+/* ---------- Header ---------- */
+.site-header {
+  background-color: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  padding: 12px 0;
+}
+
+.logo {
+  font-weight: 800;
+  font-size: 1.3rem;
+  text-decoration: none;
+  letter-spacing: -0.02em;
+}
+
+.nav a {
+  text-decoration: none;
+  color: var(--color-text);
+}
+
+.nav a:hover {
+  color: var(--color-accent);
+}
+
+/* ---------- Hero and search ---------- */
+.hero h1 {
+  font-size: 1.9rem;
+  margin: 0 0 8px;
+}
+
+.hero p {
+  color: var(--color-muted);
+  margin: 0 0 24px;
+}
+
+.search input {
+  padding: 12px 14px;
+  font-size: 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+button {
+  padding: 12px 18px;
+  font-size: 1rem;
+  font-family: inherit;
+  border: none;
+  border-radius: 8px;
+  background-color: var(--color-accent);
+  color: #ffffff;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: var(--color-accent-dark);
+}
+
+/* ---------- Shows and cards ---------- */
+.shows-section {
+  margin-bottom: 48px;
+}
+
+.shows-section h2 {
+  margin: 0 0 16px;
+}
+
+.card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.poster {
+  background-color: var(--color-border);
+}
+
+.card-body {
+  padding: 10px 12px 14px;
+}
+
+.card h3 {
+  margin: 8px 0 4px;
+  font-size: 1rem;
+}
+
+.badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background-color: var(--color-border);
+  color: var(--color-accent-dark);
+}
+
+.rating {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--color-star);
+}
+
+.meta {
+  color: var(--color-muted);
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+/* ---------- Footer ---------- */
+.site-footer {
+  text-align: center;
+  padding: 24px;
+  color: var(--color-muted);
+  font-size: 0.9rem;
+  border-top: 1px solid var(--color-border);
+}
+
+/* ---------- Your colours from Day 2 ---------- */
+{{theme}}
+
+
+=== step container
+title: A centred container
+minutes: 10
+slot: css
+--- explain
+Look at the preview: the text touches the left edge of the page. On a big screen, the lines would also run from one side of the screen to the other.
+
+Most websites fix both with one class, usually called `.container`. It's a box that:
+
+- never gets wider than a size you choose (`max-width`)
+- sits in the middle (`margin: 0 auto`)
+- keeps a little space on the left and right, so text never touches the edge on a phone (`padding`)
+
+You know all three from yesterday. Here's the same idea for a blog:
+
+```css
+.page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+```
+
+Open the **index.html (whole page)** tab: `class="container"` is used twice, on `<main>` and inside the header. One rule styles both.
+--- task
+In layout.css, write a `.container` rule with:
+
+1. `max-width: 1200px;`
+2. `margin: 0 auto;`
+3. `padding: 0 16px;`
+--- hint
+One rule with the selector `.container` (with a dot) and three declarations.
+--- hint
+```css
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+```
+--- solution
+/* layout.css: where things go on the page */
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+--- check
+t.expect(/\.container\s*\{/.test(t.clean) || !/(^|[\s,}])container\s*\{/.test(t.clean), "A class selector starts with a dot: `.container`, not `container`.");
+const main = t.$("main.container");
+t.expect(t.px(main, "padding-left") >= 8 && t.px(main, "padding-right") >= 8, "The text still touches the edge. Add `padding: 0 16px;` to a `.container` rule.");
+const mw = t.css(main, "max-width");
+t.expect(mw !== "none", "Add `max-width: 1200px;` to `.container`, so the content doesn't get too wide on big screens.");
+t.expect(parseFloat(mw) >= 600 && parseFloat(mw) <= 1600, `A max-width of ${mw} is unusual for a whole page. Try \`1200px\`.`);
+const rules = t.rules((sel) => /\.container\b/.test(sel));
+t.expect(rules.some((r) => r.style.marginLeft === "auto" && r.style.marginRight === "auto"), "To centre the container, give it `margin: 0 auto;`.");
+t.expect(t.px(main, "padding-top") < 40, "Padding with two values is top/bottom first, then left/right: `padding: 0 16px;`.");
+--- learned
+Every part of the page that uses `class="container"` is now centred and has room at the sides. Press **Bigger** above the preview to see the centring on a wide screen.
+--- summary
+A `.container` with `max-width`, `margin: 0 auto` and side `padding` centres the page.
+--- mistakes
+- `container { }` without the dot.
+- `padding: 16px 0` (values swapped): space above and below, but the text still touches the sides.
+- `width: 1200px` instead of `max-width`: the page scrolls sideways on a phone.
+--- teacher
+A quick warm-up from Day 2. The preview is narrow, so the centring only shows in the **Bigger** view; the padding is visible straight away.
+
+
+=== step header-row
+title: Flexbox: a row
+minutes: 15
+slot: css
+--- explain
+Look at the top bar: the logo is on one line and the menu is under it. Both are inside `<div class="container header-inner">`. We want them side by side.
+
+That's what **Flexbox** is for. Give a box `display: flex;` and it becomes a **flex container**: its direct children, the **flex items**, line up in a row.
+
+```html
+<div class="player">
+  <button>Play</button>
+  <span>Episode 1</span>
+</div>
+```
+
+```css
+.player {
+  display: flex;
+}
+```
+
+Now the button and the text sit next to each other. Only the **direct children** move into the row, not everything deeper inside them.
+
+> Which box gets `display: flex`? Always the **parent** of the things you want in a row.
+--- task
+Put the logo and the menu side by side: give `.header-inner` the declaration `display: flex;`.
+--- hint
+The logo (`a.logo`) and the menu (`nav.nav`) are the two children of `.header-inner`. So `.header-inner` is the parent that needs `display: flex`.
+--- hint
+```css
+.header-inner {
+  display: flex;
+}
+```
+--- solution-append
+.header-inner {
+  display: flex;
+}
+--- check
+const inner = t.$(".header-inner");
+const disp = t.css(inner, "display");
+if (!/flex/.test(disp)) {
+  t.expect(!/flex/.test(t.css(".site-header", "display")), "You made `.site-header` a flex container, but its only child is the container `div`. Put `display: flex;` on `.header-inner` instead.");
+  t.expect(!/flex/.test(t.css(".nav", "display")), "That made the menu links a row, but the logo and the menu are still on two lines. Put `display: flex;` on `.header-inner`, the parent of both.");
+  t.expect(!/display\s*:\s*flexbox/.test(t.clean), "The value is `flex`, not `flexbox`: `display: flex;`.");
+  t.fail("The logo and the menu are still on two lines. Add a `.header-inner` rule with `display: flex;`.");
+}
+const a = t.$(".logo").getBoundingClientRect(), n = t.$(".nav").getBoundingClientRect();
+t.expect(Math.abs(a.top - n.top) < 4, "The logo and the menu should be on the same line. Check that `display: flex;` is on `.header-inner`.");
+t.expect(t.px("main.container", "padding-left") >= 8, "Keep your `.container` rule from the last step.");
+--- learned
+`display: flex` put the two children of `.header-inner` in a row. The logo and the menu don't know anything changed: the **parent** decides how its children are arranged.
+--- summary
+`display: flex` on a parent puts its direct children in a row.
+--- mistakes
+- Putting `display: flex` on the children (`.logo`, `.nav`) instead of the parent.
+- Using `.site-header`: its only child is the container, so nothing moves.
+- `display: flexbox`.
+--- teacher
+If a student is lost, open the whole page tab together and draw the boxes: header, then container, then logo and nav. "Which box holds the two things we want in a row?"
+
+
+=== step header-align
+title: Logo left, menu right
+minutes: 15
+slot: css
+--- explain
+The row works, but the menu is squashed against the logo. Two properties on the flex container move the items:
+
+- `justify-content` works **along** the row. `flex-start` (the default) packs items on the left, `center` puts them in the middle, and `space-between` pushes the first item to the left, the last to the right, and shares the space between them.
+- `align-items` works **across** the row, up and down. `center` lines up the middle of each item, so a big item and a small one look level.
+
+```css
+.episode-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+```
+
+With this, an episode title would sit on the left and its length ("22 min") on the right, both at the same height.
+
+> Remember the American spelling in CSS: `center`, not `centre`.
+--- task
+In your `.header-inner` rule, add:
+
+1. `justify-content: space-between;` so the logo is on the left and the menu on the right
+2. `align-items: center;` so the small menu text lines up with the middle of the bigger logo
+--- hint
+Both lines go inside the `.header-inner { }` rule, under `display: flex;`.
+--- hint
+```css
+.header-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+```
+--- solution-replace
+.header-inner {
+  display: flex;
+}
+=>
+.header-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+--- check
+const inner = t.$(".header-inner");
+t.expect(/flex/.test(t.css(inner, "display")), "Keep `display: flex;` in `.header-inner`.");
+t.expect(!/:\s*centre\b/.test(t.clean), "CSS uses American spelling: `center`, not `centre`.");
+const jc = t.css(inner, "justify-content");
+t.expect(jc === "space-between", jc === "normal" || jc === "flex-start" ? "The menu is still next to the logo. Add `justify-content: space-between;` to `.header-inner`." : `\`justify-content\` is \`${jc}\`. Use \`space-between\` to push the logo left and the menu right.`);
+const nav = t.$(".nav").getBoundingClientRect();
+const right = inner.getBoundingClientRect().right - t.px(inner, "padding-right");
+t.expect(Math.abs(nav.right - right) < 3, "The menu should end at the right edge of the header. Check `justify-content: space-between;` is on `.header-inner` (not on `.nav`).");
+t.expect(t.css(inner, "align-items") === "center", "Now line up the middles: add `align-items: center;` to `.header-inner`.");
+--- learned
+`justify-content` arranges items **along** the row, `align-items` **across** it. Together they solve most "put this there" problems in a row.
+--- summary
+`justify-content` (along the row) and `align-items` (across it) place flex items.
+--- mistakes
+- `justify-content: centre` or `space between` (with a space).
+- Putting the two properties on `.nav` or `.logo` instead of the flex container.
+- Mixing up the two: `align-items: space-between`.
+
+
+=== step nav-gap
+title: Space between the menu links
+minutes: 10
+slot: css
+--- explain
+The three menu links still sit close together. You could add a margin to each link, but Flexbox has something easier: `gap`, the space **between** items. It never adds space before the first item or after the last one.
+
+```css
+.buttons {
+  display: flex;
+  gap: 8px;
+}
+```
+
+`gap` only works inside a flex (or grid) container. The links are inside `<nav class="nav">`, so the nav must become a flex container too.
+
+A box can be a flex item and a flex container at the same time. Here, `.nav` is an **item** in the header row, and a **container** for its own three links. Boxes inside boxes, like yesterday.
+--- task
+Write a `.nav` rule that:
+
+1. makes the nav a flex container
+2. puts `16px` of `gap` between the links
+--- hint
+It's a new rule for `.nav` with two declarations: `display` and `gap`.
+--- hint
+```css
+.nav {
+  display: flex;
+  gap: 16px;
+}
+```
+--- solution-append
+.nav {
+  display: flex;
+  gap: 16px;
+}
+--- check
+const nav = t.$(".nav");
+t.expect(t.css(".header-inner", "justify-content") === "space-between", "Keep your `.header-inner` rule from the last step.");
+const links = t.$$(".nav a");
+const space = links[1].getBoundingClientRect().left - links[0].getBoundingClientRect().right;
+if (!/flex/.test(t.css(nav, "display"))) {
+  t.expect(!(t.px(nav, "column-gap") > 0), "You added a `gap`, but it only works in a flex container. Add `display: flex;` to `.nav` as well.");
+  t.expect(space < 10, "The links have space, but use Flexbox for it: `.nav { display: flex; gap: 16px; }`.");
+  t.fail("Make the nav a flex container: a `.nav` rule with `display: flex;`.");
+}
+t.expect(space >= 10, "The links are still close together. Add `gap: 16px;` to `.nav`.");
+t.expect(space < 60, `There's ${Math.round(space)}px between the links, which looks a bit lost. Try \`gap: 16px;\`.`);
+--- learned
+`gap` puts space between flex items, never around the outside. And `.nav` is now both a flex item (in the header) and a flex container (for its links).
+--- summary
+`gap` sets the space between flex items. A box can be a flex item and a flex container.
+--- mistakes
+- `gap` on `.nav` without `display: flex`: nothing happens.
+- `gap` on `.header-inner`: it only changes the space between the logo and the nav.
+- `margin` on every link, which also adds space after the last one.
+
+
+=== step hero
+title: The hero: centred text
+minutes: 10
+slot: css
+--- explain
+The big welcome part at the top of a home page is often called the **hero**. Ours is `<section class="hero">` with a heading, a sentence and the search form.
+
+Heroes are usually centred, with generous space above and below, so the page can "breathe". You know the properties from yesterday:
+
+- `text-align: center;` centres the text of a box, and of everything inside it (the children **inherit** it)
+- `padding` adds space inside the box
+
+```css
+.welcome {
+  text-align: center;
+  padding: 64px 0 32px;
+}
+```
+
+With three values, `padding` is top, then left and right, then bottom.
+--- task
+Write a `.hero` rule with:
+
+1. `text-align: center;`
+2. `padding: 40px 0 28px;` (40px above, 28px below)
+--- hint
+One rule for `.hero`. Because the heading and the paragraph are inside it, they are both centred at once.
+--- hint
+```css
+.hero {
+  text-align: center;
+  padding: 40px 0 28px;
+}
+```
+--- solution-append
+.hero {
+  text-align: center;
+  padding: 40px 0 28px;
+}
+--- check
+t.expect(!/text-align\s*:\s*centre/.test(t.clean), "CSS uses American spelling: `text-align: center;`.");
+t.expect(t.css(".hero h1", "text-align") === "center", "The heading isn't centred yet. Add `text-align: center;` to a `.hero` rule.");
+t.expect(t.css(".hero p", "text-align") === "center", "Centre the whole hero, not only the heading: put `text-align: center;` on `.hero`.");
+t.expect(t.px(".hero", "padding-top") >= 16, "Give the hero some space above: `padding: 40px 0 28px;`.");
+t.expect(t.px(".hero", "padding-bottom") >= 8, "Give the hero some space below too: the third padding value, like `28px`.");
+--- learned
+One rule on the parent centred the heading, the text and even the form, because `text-align` is inherited by everything inside.
+--- summary
+`text-align: center` on a parent centres all the text inside it.
+--- mistakes
+- `text-align: centre`.
+- Centring `h1` and `p` separately (works, but one rule on `.hero` is enough).
+
+
+=== step search
+title: A search bar that stretches
+minutes: 15
+slot: css
+--- explain
+Now the search bar. We want the input and the button in a row (Flexbox again), with the input taking **all the space the button doesn't need**.
+
+`flex: 1` on a flex item means "grow and take the free space". Items without it keep their natural size.
+
+```css
+.player {
+  display: flex;
+  gap: 8px;
+}
+
+.progress {
+  flex: 1;
+}
+```
+
+Here the play button and the time keep their size, and the progress bar in the middle stretches to fill the rest. Make the window wider and only the progress bar grows.
+
+Notice where each part goes: `display: flex` and `gap` on the **parent**, `flex: 1` on the **child** that should grow.
+--- task
+1. Write a `.search` rule with `display: flex;` and `gap: 8px;`.
+2. Write a `.search input` rule with `flex: 1;`.
+3. In `.search`, add `max-width: 520px;` and `margin: 0 auto;` so the search bar stays a sensible size and centred on big screens.
+--- hint
+Two rules: `.search { }` for the form (the parent) and `.search input { }` for the input (the child that grows). There's a space in `.search input`: it means "an input inside `.search`".
+--- hint
+```css
+.search {
+  display: flex;
+  gap: 8px;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.search input {
+  flex: 1;
+}
+```
+--- solution-append
+.search {
+  display: flex;
+  gap: 8px;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.search input {
+  flex: 1;
+}
+--- check
+const form = t.$(".search"), input = t.$("#search"), btn = t.$(".search button");
+t.expect(t.css(".hero h1", "text-align") === "center", "Keep your `.hero` rule from the last step.");
+t.expect(/flex/.test(t.css(form, "display")), "Make the form a flex container: a `.search` rule with `display: flex;`.");
+if (t.px(input, "flex-grow") < 1) {
+  t.expect(t.px(form, "flex-grow") < 1, "`flex: 1` goes on the input, the child that should grow: `.search input { flex: 1; }`. Remove it from `.search`.");
+  t.expect(t.px(btn, "flex-grow") < 1, "Now the button grows. `flex: 1` goes on the input only: `.search input { flex: 1; }`.");
+  t.fail("The input keeps its small size. Add a `.search input` rule with `flex: 1;`.");
+}
+t.expect(t.px(btn, "flex-grow") < 1, "Only the input should grow. Remove `flex: 1` from the button.");
+const ir = input.getBoundingClientRect(), br = btn.getBoundingClientRect(), fr = form.getBoundingClientRect();
+t.expect(Math.abs(br.right - fr.right) < 3 && ir.width > br.width, "The input should fill the space next to the button. Check `.search input { flex: 1; }`.");
+t.expect(br.left - ir.right >= 4, "Add some space between the input and the button: `gap: 8px;` in `.search`.");
+t.expect(t.css(form, "max-width") !== "none", "Last part: add `max-width: 520px;` to `.search`, so it doesn't get too wide on big screens.");
+const rules = t.rules((sel) => sel.split(",").some((x) => /\.search$/.test(x.trim())));
+t.expect(rules.some((r) => r.style.marginLeft === "auto" && r.style.marginRight === "auto"), "Centre the search bar with `margin: 0 auto;` in `.search`.");
+--- learned
+`flex: 1` makes one item take all the free space, while the others keep their natural size. You'll see this pattern everywhere: search bars, chat boxes, video players.
+--- summary
+`flex: 1` on a flex item makes it grow to fill the free space.
+--- mistakes
+- `flex: 1` on `.search` (the form) instead of on the input.
+- `.searchinput` or `.search.input` instead of `.search input` (with a space).
+- Forgetting `display: flex` on the form, so `flex: 1` has no effect.
+--- teacher
+Press **Bigger** with them and resize the new window: only the input grows. That picture makes `flex: 1` click.
+
+
+=== step grid
+title: Grid: cards in columns
+minutes: 20
+slot: css
+--- explain
+Flexbox is great for **one row**. For rows **and** columns at once, like the cards, CSS has **Grid**.
+
+```css
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+```
+
+- `display: grid;` turns the box into a **grid container**. Its children become grid items.
+- `grid-template-columns` says how many columns there are and how wide each one is.
+- `fr` means **fraction** of the free space. `1fr 1fr 1fr` is three equal columns. `1fr 2fr` would make the second column twice as wide as the first.
+- `repeat(3, 1fr)` is a short way to write `1fr 1fr 1fr`.
+- `gap` works like in Flexbox: space between the columns and between the rows.
+
+The items fill the grid from left to right. When a row is full, the next item starts a new row. You don't need to say where each card goes.
+--- task
+The six cards are inside `<div class="grid">`. Make it a grid with **2 equal columns** (the right number for a phone) and `16px` of gap.
+--- hint
+Write a `.grid` rule with three declarations: `display`, `grid-template-columns` and `gap`.
+--- hint
+```css
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+```
+--- solution-append
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+--- check
+const grid = t.$(".grid");
+t.expect(/flex/.test(t.css(".search", "display")), "Keep your `.search` rules from the last step.");
+t.expect(!/grid-template-column\s*:/.test(t.clean), "Check the spelling: `grid-template-columns` (with an s at the end).");
+t.expect(/grid/.test(t.css(grid, "display")), /flex/.test(t.css(grid, "display")) ? "Use Grid here, not Flexbox: `.grid { display: grid; }`." : "Turn the card box into a grid: a `.grid` rule with `display: grid;`.");
+const r = t.$$(".grid .card").map((c) => c.getBoundingClientRect());
+const firstRow = r.filter((x) => Math.abs(x.top - r[0].top) < 2).length;
+t.expect(firstRow > 1, "The grid still has one column. Add `grid-template-columns: repeat(2, 1fr);`, with a comma between `2` and `1fr`.");
+t.expect(firstRow === 2, `Your grid has ${firstRow} columns. On a phone, 2 fit best: \`grid-template-columns: repeat(2, 1fr);\`. You'll add more columns for big screens later.`);
+t.expect(Math.abs(r[0].width - r[1].width) < 2, "The two columns should be equally wide: use `1fr` for both, as in `repeat(2, 1fr)`.");
+t.expect(r[1].left - r[0].right >= 8 && r[2].top - r[0].bottom >= 8, "The cards touch each other. Add `gap: 16px;` to `.grid`.");
+--- learned
+Three lines turned a long stack into a two-column grid, and the cards flow into rows by themselves. `fr` shares the free space, so the columns always fit the screen.
+--- summary
+`display: grid` with `grid-template-columns: repeat(2, 1fr)` makes two equal columns; `gap` spaces them.
+--- mistakes
+- `repeat(2 1fr)` without the comma, or `repeat(2, 1 fr)` with a space: the line is ignored.
+- `grid-template-column` (no s).
+- `grid-template-columns: 2;` (a number alone isn't a column size).
+--- teacher
+Good moment to ask: "What would `1fr 2fr` do?" Let them try it, then go back to `repeat(2, 1fr)`.
+
+
+=== step posters
+title: Posters that fill the card
+minutes: 15
+slot: css
+--- explain
+The posters don't fill their cards: they keep their own size. And later in the course, real posters from the internet will arrive in all kinds of sizes, which would make the cards uneven. Three properties fix both:
+
+- `width: 100%;` makes the picture as wide as its card.
+- `aspect-ratio: 2 / 3;` fixes the **shape**: width 2, height 3, the classic tall poster. The browser works out the height.
+- `object-fit: cover;` fills that shape without stretching. If a picture has a different shape, the edges are cut off instead of the picture being squashed.
+
+Here's the same idea for round profile photos, which are square:
+
+```css
+.avatar {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 50%;
+}
+```
+--- task
+Write a `.poster` rule with `width: 100%;`, `aspect-ratio: 2 / 3;` and `object-fit: cover;`.
+--- hint
+One rule for `.poster` with three declarations. The slash in `2 / 3` is part of the value.
+--- hint
+```css
+.poster {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+}
+```
+--- solution-append
+.poster {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+}
+--- check
+t.expect(/grid/.test(t.css(".grid", "display")), "Keep your `.grid` rule from the last step.");
+const img = t.$(".grid .poster"), card = img.closest(".card");
+const b = img.getBoundingClientRect();
+t.expect(Math.abs(b.width - card.clientWidth) < 3, `The poster is ${Math.round(b.width)}px wide, but the card is ${card.clientWidth}px. Add \`width: 100%;\` to a \`.poster\` rule.`);
+const ar = t.css(img, "aspect-ratio");
+t.expect(ar && ar !== "auto", "Give the poster a fixed shape: `aspect-ratio: 2 / 3;`.");
+const ratio = b.height / b.width;
+t.expect(ratio > 1, "The poster is wider than it is tall. Posters are tall: `aspect-ratio: 2 / 3;` (width first, then height).");
+t.expect(Math.abs(ratio - 1.5) < 0.06, `The poster shape is ${ar}. Use \`aspect-ratio: 2 / 3;\`.`);
+t.expect(t.css(img, "object-fit") === "cover", "Add `object-fit: cover;` so pictures with a different shape fill the box without stretching.");
+--- learned
+Every poster now has the same shape, whatever picture arrives. `aspect-ratio` sets the shape and `object-fit: cover` fills it without squashing.
+--- summary
+`width: 100%`, `aspect-ratio: 2 / 3` and `object-fit: cover` give every poster the same shape.
+--- mistakes
+- `aspect-ratio: 3 / 2` (a wide picture instead of a tall one).
+- `height: 300px` instead of `aspect-ratio`: the shape changes when the column width changes.
+- `object-fit: fill` or `contain` (stretched, or empty bars on the sides).
+--- teacher
+The placeholder poster already has a 2:3 shape, so `object-fit` shows no visible change today. Later in the course, with real pictures from TVmaze, it matters. To demo it, temporarily set `aspect-ratio: 1 / 1` and switch `object-fit` between `cover` and `fill`.
+
+
+=== step tablet
+title: Phones first, then bigger screens
+minutes: 20
+slot: css
+--- explain
+Two columns are right on a phone, but on a laptop the cards would be huge. We want **more columns on bigger screens**.
+
+Everything you wrote so far is for phones. That's on purpose: it's called **mobile first**. You write the phone layout first, then add changes for bigger screens with a **media query**, CSS that only applies when a condition is true:
+
+```css
+@media (min-width: 700px) {
+  .gallery {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+```
+
+`min-width: 700px` means "when the page is **at least** 700px wide". Below that, the rule is ignored and the normal `.gallery` rule is used. The width where the layout changes is called a **breakpoint**.
+
+Notice the two pairs of curly brackets: one for `@media`, one for the rule inside it.
+
+> **Why doesn't the preview change?** The preview is narrower than 600px, like a phone. Press **Bigger** above it: your page opens in a new tab. Drag the edge of that window to make it narrower and wider, and watch the columns change. After you change your code, press Bigger again.
+--- task
+At the bottom of layout.css, add a media query for screens **at least 600px** wide, with a `.grid` rule inside it that makes **3 columns**.
+
+Then press **Bigger** and try it.
+--- hint
+The media query starts with `@media (min-width: 600px) {`. Inside it goes a complete rule: `.grid { grid-template-columns: ...; }`. Then close both with `}`.
+--- hint
+```css
+@media (min-width: 600px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+```
+--- solution-append
+@media (min-width: 600px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+--- check
+const all = [];
+for (const sh of t.doc.styleSheets) { try { for (const r of sh.cssRules) all.push(r); } catch (e) {} }
+const cols = (v) => { v = String(v || "").trim(); const m = v.match(/repeat\(\s*(\d+)/); return m ? +m[1] : v ? v.split(/\s+/).length : 0; };
+const minW = (r) => { const m = (r.conditionText || r.media.mediaText || "").match(/min-width:\s*(\d+)px|width\s*>=?\s*(\d+)px/); return m ? +(m[1] || m[2]) : 0; };
+const isMedia = (r) => r.constructor && r.constructor.name === "CSSMediaRule";
+const gridRule = (list) => [...list].find((x) => x.selectorText && /\.grid\s*$/.test(x.selectorText) && x.style.gridTemplateColumns);
+const base = all.findIndex((r) => r.selectorText && /\.grid\s*$/.test(r.selectorText) && r.style.gridTemplateColumns);
+t.expect(base >= 0, "Your `.grid` rule with `grid-template-columns` has gone. Keep it: it's the phone layout.");
+t.expect(cols(all[base].style.gridTemplateColumns) === 2, "Keep 2 columns in your normal `.grid` rule: that's the phone layout. The media query adds the 3 columns.");
+t.expect(t.css(".poster", "object-fit") === "cover", "Keep your `.poster` rule from the last step.");
+t.expect(/@media/.test(t.clean), "Add a media query at the bottom: `@media (min-width: 600px) { ... }`.");
+const medias = all.filter(isMedia);
+t.expect(medias.length, "The browser couldn't read your media query. Check the brackets: `@media (min-width: 600px) {`, then the `.grid` rule, then a second `}`.");
+t.expect(!medias.every((m) => /not all/.test(m.media.mediaText)), "The browser can't read the condition. It needs round brackets and a unit: `@media (min-width: 600px)`.");
+t.expect(!medias.some((m) => /max-width/.test(m.media.mediaText)) || medias.some((m) => minW(m)), "Use `min-width` (at least this wide), not `max-width`. Mobile first: the phone layout is the normal one, bigger screens are the extra.");
+const m = medias.find((x) => minW(x) >= 500 && minW(x) <= 800);
+t.expect(m, "I can't find a media query for 600px. Use `@media (min-width: 600px) {`.");
+const g = gridRule(m.cssRules);
+t.expect(m.cssRules.length, "Your media query is empty. Inside it, write a full rule: `.grid { grid-template-columns: repeat(3, 1fr); }`.");
+t.expect(g, "Inside the media query, write a `.grid` rule with `grid-template-columns`.");
+t.expect(cols(g.style.gridTemplateColumns) === 3, `Inside the 600px media query the grid has ${cols(g.style.gridTemplateColumns)} columns. Make it 3: \`repeat(3, 1fr)\`.`);
+t.expect(all.indexOf(m) > base, "Move the media query **below** your normal `.grid` rule. When two rules say different things, the later one wins.");
+--- learned
+Your page now has two layouts: 2 columns on phones, and 3 from 600px up. The phone rule is the default, and the media query only adds what changes.
+--- summary
+Mobile first: phone CSS first, then `@media (min-width: 600px) { ... }` for bigger screens.
+--- mistakes
+- `max-width` instead of `min-width`.
+- Missing the second `}`, so the rest of the file ends up inside the media query.
+- `@media min-width: 600px` without round brackets, or `600` without `px`.
+- A property directly inside `@media` without a selector: `@media (...) { grid-template-columns: ...; }`.
+--- teacher
+Students often think their code is broken because the preview doesn't change. It's working: the preview is narrower than 600px. Show them the **Bigger** tab and resizing the window. (If the Lab window itself is small, the preview may be wider and show 3 columns directly.)
+
+
+=== step laptop
+title: A second breakpoint for laptops
+minutes: 15
+slot: css
+--- explain
+You can have as many breakpoints as you like. Each media query adds a little more for bigger screens. And a media query can hold **several rules**, not only one:
+
+```css
+@media (min-width: 1000px) {
+  .gallery {
+    grid-template-columns: repeat(5, 1fr);
+  }
+  .welcome h1 {
+    font-size: 3rem;
+  }
+}
+```
+
+**The order matters.** On a 1000px-wide screen, both `min-width: 700px` and `min-width: 1000px` are true. When two rules say different things, the later one wins. So write breakpoints from small to big: the biggest one last.
+
+> `rem` is a size relative to the normal text size: `2rem` is twice as big.
+--- task
+Under your 600px media query, add one for **900px and wider** with two rules:
+
+1. `.grid` with **4 columns**
+2. `.hero h1` with a bigger `font-size`: `2.6rem`
+
+Press **Bigger** and make the window wide to see it.
+--- hint
+Copy your 600px media query, paste it below, and change `600px` to `900px` and `3` to `4`. Then add a `.hero h1` rule inside the same media query, before its last `}`.
+--- hint
+```css
+@media (min-width: 900px) {
+  .grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .hero h1 {
+    font-size: 2.6rem;
+  }
+}
+```
+--- solution-append
+@media (min-width: 900px) {
+  .grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .hero h1 {
+    font-size: 2.6rem;
+  }
+}
+--- check
+const all = [];
+for (const sh of t.doc.styleSheets) { try { for (const r of sh.cssRules) all.push(r); } catch (e) {} }
+const cols = (v) => { v = String(v || "").trim(); const m = v.match(/repeat\(\s*(\d+)/); return m ? +m[1] : v ? v.split(/\s+/).length : 0; };
+const minW = (r) => { const m = (r.conditionText || r.media.mediaText || "").match(/min-width:\s*(\d+)px|width\s*>=?\s*(\d+)px/); return m ? +(m[1] || m[2]) : 0; };
+const isMedia = (r) => r.constructor && r.constructor.name === "CSSMediaRule";
+const gridRule = (list) => [...list].find((x) => x.selectorText && /\.grid\s*$/.test(x.selectorText) && x.style.gridTemplateColumns);
+const medias = all.filter(isMedia);
+const m6 = medias.find((x) => minW(x) >= 500 && minW(x) <= 800 && gridRule(x.cssRules));
+t.expect(m6, "Keep your 600px media query from the last step.");
+const m9 = medias.find((x) => minW(x) > 800 && minW(x) <= 1100);
+if (!m9) {
+  t.expect(!medias.some((m) => /not all/.test(m.media.mediaText)), "The browser can't read one of your conditions. It needs round brackets and a unit: `@media (min-width: 900px)`.");
+  t.fail("Add a second media query under the first one: `@media (min-width: 900px) { ... }`.");
+}
+const g = gridRule(m9.cssRules);
+t.expect(g, "Inside the 900px media query, add a `.grid` rule with `grid-template-columns`.");
+t.expect(cols(g.style.gridTemplateColumns) === 4, `At 900px the grid has ${cols(g.style.gridTemplateColumns)} columns. Make it 4: \`repeat(4, 1fr)\`.`);
+t.expect(all.indexOf(m9) > all.indexOf(m6), "Put the 900px media query **below** the 600px one. On a wide screen both are true, and the later one wins, so the biggest goes last.");
+const h = [...m9.cssRules].find((x) => x.selectorText && /h1\s*$/.test(x.selectorText) && x.style.fontSize);
+t.expect(h, "Also add a `.hero h1` rule with a `font-size` inside the 900px media query, before its last `}`.");
+t.expect(!/^\d+(\.\d+)?$/.test(h.style.fontSize), "Add a unit to the font size: `2.6rem`.");
+--- learned
+Two breakpoints, three layouts: 2 columns on phones, 3 on tablets, 4 on laptops. One media query can change several things at once.
+--- summary
+Several breakpoints, from small to big; one media query can hold several rules.
+--- mistakes
+- The 900px query above the 600px one: on a laptop the 600px rule wins, and you get 3 columns.
+- The `.hero h1` rule placed after the media query's last `}` (then it applies on phones too).
+
+
+=== step hover
+title: Cards that lift
+minutes: 15
+slot: css
+--- explain
+Last step: make the cards feel alive when the mouse moves over them. You met these properties in yesterday's extra challenge:
+
+- `transform: translateY(-4px);` moves an element 4px **up** (the Y direction is up and down; minus is up). It doesn't push anything else around.
+- `box-shadow` adds a soft shadow, so the card seems to float.
+- `transition` makes the change smooth instead of instant.
+
+```css
+.button {
+  transition: transform 0.2s;
+}
+
+.button:hover {
+  transform: scale(1.1);
+}
+```
+
+Put `transition` on the **normal** rule, not on `:hover`. Then it works both ways: when the mouse arrives and when it leaves.
+--- task
+1. Write a `.card` rule with `transition: transform 0.15s, box-shadow 0.15s;`.
+2. Write a `.card:hover` rule with `transform: translateY(-4px);` and a `box-shadow` like `0 8px 20px rgba(0, 0, 0, 0.12)`.
+
+Move your mouse over the cards in the preview.
+--- hint
+Two rules: `.card { }` and `.card:hover { }`. No space between `.card` and `:hover`.
+--- hint
+```css
+.card {
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+```
+--- solution-append
+.card {
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+--- check
+t.expect(/grid/.test(t.css(".grid", "display")), "Keep your `.grid` rule and media queries from the earlier steps.");
+t.expect(!/\.card\s+:hover/.test(t.clean), "Remove the space: `.card:hover`, not `.card :hover`.");
+const hov = t.rules((sel) => /\.card:hover/.test(sel));
+t.expect(hov.length, "Add a `.card:hover` rule.");
+const tr = hov.find((r) => r.style.transform);
+t.expect(tr, "Inside `.card:hover`, add `transform: translateY(-4px);`.");
+t.expect(/translate|scale/.test(tr.style.transform), "Use `transform: translateY(-4px);` to lift the card.");
+t.expect(hov.some((r) => r.style.boxShadow), "Add a `box-shadow` to `.card:hover`, like `0 8px 20px rgba(0, 0, 0, 0.12)`.");
+const dur = t.css(".card", "transition-duration");
+if (!dur || dur.split(",").every((d) => parseFloat(d) === 0)) {
+  t.expect(!hov.some((r) => r.style.transitionDuration), "Move the `transition` from `.card:hover` to `.card`, so it's smooth both ways.");
+  t.fail("Add `transition: transform 0.15s, box-shadow 0.15s;` to a `.card` rule, so the lift is smooth.");
+}
+t.expect(dur.split(",").every((d) => parseFloat(d) <= 1), "That transition is very slow. Try `0.15s`.");
+--- learned
+Your home page is finished: a flex header, a stretching search bar, a grid that grows from 2 to 4 columns, and cards that lift. Later in the course, JavaScript will build these same cards from real data.
+--- summary
+`transform`, `box-shadow` and `transition` on `:hover` make cards lift smoothly.
+--- mistakes
+- `transition` only in `.card:hover`: smooth on the way up, but it jumps back.
+- `translateY(4px)` (positive): the card moves down.
+- `.card :hover` with a space.
+
+
+=== step sticky
+title: A top bar that stays
+minutes: 10
+slot: css
+bonus: yes
+--- explain
+On long pages it's handy when the top bar stays visible while you scroll. That's `position: sticky`:
+
+```css
+.toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+```
+
+- `position: sticky;` lets the element scroll normally until it reaches a point, then it sticks there.
+- `top: 0;` says where: at the very top of the window.
+- `z-index` decides what's on top when things overlap. A bigger number is closer to you. Without it, a lifted card could slide over the bar.
+--- task
+Make the whole top bar (`.site-header`) sticky at the top. Then scroll the preview to try it.
+--- hint
+Put the three declarations in a `.site-header` rule. Use `.site-header`, not `.header-inner`: a sticky box can only stick inside its parent.
+--- hint
+```css
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+```
+--- solution-append
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+--- check
+const pos = t.css(".site-header", "position");
+if (pos !== "sticky") {
+  t.expect(t.css(".header-inner", "position") !== "sticky", "`.header-inner` can't stick: it's as tall as its parent, so there's nowhere to go. Put `position: sticky;` on `.site-header` instead.");
+  t.fail("Add a `.site-header` rule with `position: sticky;`.");
+}
+t.expect(t.css(".site-header", "top") === "0px", "Tell the header where to stick: `top: 0;`.");
+--- learned
+`position: sticky` with `top: 0` keeps the top bar in view. `z-index` keeps it above the cards.
+--- summary
+`position: sticky; top: 0;` keeps an element in view while scrolling.
+
+
+=== step big-screen
+title: Six columns on big screens
+minutes: 10
+slot: css
+bonus: yes
+--- explain
+On a big monitor, even 4 columns make huge cards. Add a third breakpoint for screens at least **1200px** wide. That's also the `max-width` of your container, so from there on the page stops growing and 6 columns fit nicely.
+
+Remember the order rule: the biggest breakpoint goes last.
+--- task
+Add a media query for `min-width: 1200px` that gives the grid **6 columns**. Check it with **Bigger** on a wide window.
+--- hint
+It's the same shape as your other media queries. Put it below the 900px one.
+--- hint
+```css
+@media (min-width: 1200px) {
+  .grid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
+```
+--- solution-append
+@media (min-width: 1200px) {
+  .grid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
+--- check
+const all = [];
+for (const sh of t.doc.styleSheets) { try { for (const r of sh.cssRules) all.push(r); } catch (e) {} }
+const cols = (v) => { v = String(v || "").trim(); const m = v.match(/repeat\(\s*(\d+)/); return m ? +m[1] : v ? v.split(/\s+/).length : 0; };
+const minW = (r) => { const m = (r.conditionText || r.media.mediaText || "").match(/min-width:\s*(\d+)px|width\s*>=?\s*(\d+)px/); return m ? +(m[1] || m[2]) : 0; };
+const medias = all.filter((r) => r.constructor && r.constructor.name === "CSSMediaRule");
+const gridRule = (list) => [...list].find((x) => x.selectorText && /\.grid\s*$/.test(x.selectorText) && x.style.gridTemplateColumns);
+const big = medias.find((x) => minW(x) >= 1100 && minW(x) <= 1600);
+t.expect(big, "Add a media query for big screens: `@media (min-width: 1200px) { ... }`.");
+const g = gridRule(big.cssRules);
+t.expect(g, "Inside the 1200px media query, add a `.grid` rule with `grid-template-columns`.");
+t.expect(cols(g.style.gridTemplateColumns) === 6, `At 1200px the grid has ${cols(g.style.gridTemplateColumns)} columns. Make it 6: \`repeat(6, 1fr)\`.`);
+const later = medias.filter((x) => all.indexOf(x) > all.indexOf(big) && minW(x) < minW(big) && gridRule(x.cssRules));
+t.expect(!later.length, "Move the 1200px media query to the very bottom. The smaller ones below it win on a big screen.");
+--- learned
+Three breakpoints, four layouts: 2, 3, 4 and 6 columns. Six cards now fit in one row on a big screen.
+--- summary
+A 1200px breakpoint for big screens, placed last.
+
+
+=== step auto-fill
+title: A grid without media queries
+minutes: 15
+slot: css
+bonus: yes
+--- explain
+Here's a clever trick: Grid can work out the number of columns **by itself**.
+
+```css
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+}
+```
+
+- `minmax(120px, 1fr)` means "each column is at least 120px, and grows to share the free space".
+- `auto-fill` instead of a number means "fit as many of those columns as there's room for".
+
+So a narrow screen gets 2 columns, a wider one 5, and nobody wrote a breakpoint. The downside: you don't choose exactly how many columns appear at each size.
+--- task
+1. In your normal `.grid` rule, replace `repeat(2, 1fr)` with `repeat(auto-fill, minmax(160px, 1fr))`.
+2. Delete the `.grid` rules inside your media queries (they would overrule it). Keep the `.hero h1` rule.
+
+Try it with **Bigger** and resize the window: the columns appear one by one.
+--- hint
+In the media queries, delete the whole `.grid { ... }` rule, from `.grid {` to its `}`. If a media query is then empty, you can delete it too.
+--- hint
+```css
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 16px;
+}
+```
+and the 900px media query becomes:
+```css
+@media (min-width: 900px) {
+  .hero h1 {
+    font-size: 2.6rem;
+  }
+}
+```
+--- solution-replace
+  grid-template-columns: repeat(2, 1fr);
+=>
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+--- solution-replace
+@media (min-width: 600px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+=>
+--- solution-replace
+@media (min-width: 900px) {
+  .grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .hero h1 {
+=>
+@media (min-width: 900px) {
+  .hero h1 {
+--- check
+const grids = t.rules((sel, r) => /\.grid\s*$/.test(sel) && r.style.gridTemplateColumns);
+const auto = grids.find((r) => /auto-(fill|fit)/.test(r.style.gridTemplateColumns));
+t.expect(auto, "In your `.grid` rule, use `grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));`.");
+t.expect(/minmax\(/.test(auto.style.gridTemplateColumns), "Inside `repeat(auto-fill, ...)`, give a column size with `minmax(160px, 1fr)`.");
+t.expect(grids.length === 1, "There's still a `.grid` rule with `grid-template-columns` inside a media query. Delete it, or it overrules `auto-fill` on bigger screens.");
+const r = t.$$(".grid .card").map((c) => c.getBoundingClientRect());
+t.expect(r.filter((x) => Math.abs(x.top - r[0].top) < 2).length >= 2, "The grid shows only one column. Check the brackets: `repeat(auto-fill, minmax(160px, 1fr))`.");
+--- learned
+`repeat(auto-fill, minmax(160px, 1fr))` makes a grid that picks its own number of columns. Media queries give you exact control; `auto-fill` gives you less code. Both are fine.
+--- summary
+`repeat(auto-fill, minmax(160px, 1fr))` fits as many columns as there's room for.

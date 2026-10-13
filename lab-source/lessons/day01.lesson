@@ -1,0 +1,1150 @@
+=== day
+n: 1
+title: Your first web page
+subtitle: HTML
+hours: 3 hours
+page: show.html
+slot: article | html | show.html · inside <article>
+refs: @page
+
+--- intro
+Today you build a web page about one TV show, **Friends**, using **HTML**: the language that tells the browser what each piece of a page *is*.
+
+You start with an empty box and add one thing at a time: a heading, a paragraph, a picture, lists, a link and a table. The top bar and the footer are already there, so you can focus on the show itself.
+
+Take your time with each step. There's no rush, and every step saves automatically.
+
+--- template
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Friends · ShowShelf</title>
+  <style>
+    /* Two small rules so the page is easy to read in the Lab.
+       Tomorrow you will write all the CSS yourself. */
+    body { font-family: system-ui, sans-serif; max-width: 720px; margin: 0 auto; padding: 0 16px 32px; }
+    img { max-width: 100%; }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a href="index.html" class="logo">ShowShelf</a>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="about.html">About me</a>
+    </nav>
+  </header>
+
+  <main>
+    <article class="show">
+{{slot:article}}
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <p>ShowShelf · Web Dev in 11 Days</p>
+  </footer>
+</body>
+</html>
+
+
+=== step heading
+title: Your first HTML tag
+minutes: 10
+slot: article
+--- explain
+A web page is a plain text file written in **HTML**. HTML uses **tags** to say what each piece of text *is*: a heading, a paragraph, a picture.
+
+A tag is a name inside angle brackets `< >`. Most tags come in pairs:
+
+```html
+<h1>The Simpsons</h1>
+```
+
+- `<h1>` is the **opening tag**.
+- `</h1>` is the **closing tag**. It has a slash `/` before the name.
+- The text between them is the **content**.
+
+All three together are called an **element**. `h1` means *heading, level 1*: the main title of the page.
+
+> The top bar ("ShowShelf") and the footer are already built. To see the whole file, click the **show.html (whole page)** tab above the dark box. Your code goes in the middle of that page.
+--- task
+In the dark code box, write a main heading that says **Friends**.
+
+Watch the preview on the right while you type. Then press **Check**.
+--- hint
+A heading starts with `<h1>` and ends with `</h1>`. The show's name goes between them.
+--- hint
+Type exactly this: `<h1>Friends</h1>`
+--- solution
+<h1>Friends</h1>
+--- check
+const h1 = t.$("article h1");
+if (!h1) {
+  t.expect(!/friends/i.test(t.code), "I can see the word Friends, but it isn't inside an `<h1>` tag yet. Put `<h1>` before it and `</h1>` after it.");
+  t.fail("I can't find an `<h1>` element yet. Start with `<h1>`, then the text, then `</h1>`.");
+}
+t.expect(/<\/h1>/i.test(t.code), "Your heading has no closing tag. Add `</h1>` after the text. Don't forget the slash.");
+const txt = t.text(h1);
+t.expect(txt.toLowerCase() === "friends", `Your heading says "${txt}". It should say **Friends**.`);
+--- learned
+You wrote your first **element**: opening tag, content, closing tag. The browser shows an `h1` big and bold because it is the most important heading on the page.
+--- summary
+An element is an opening tag, content and a closing tag. `<h1>` is the main heading.
+--- mistakes
+- Forgetting the slash in the closing tag: `<h1>Friends<h1>`.
+- A space inside the brackets: `< h1>`.
+- Writing in the preview instead of the dark code box.
+--- teacher
+The goal is only the idea of opening tag, content, closing tag. Let them try breaking it: delete the closing tag and see what happens (the browser guesses).
+
+
+=== step paragraph
+title: Add a paragraph
+minutes: 10
+slot: article
+--- explain
+Text that isn't a heading usually goes in a **paragraph**: the `<p>` element.
+
+```html
+<h1>The Simpsons</h1>
+<p>A yellow family lives in the town of Springfield.</p>
+```
+
+One surprise: the browser ignores extra spaces and new lines in your code. These two are shown exactly the same:
+
+```html
+<p>A yellow family lives in the town of Springfield.</p>
+
+<p>
+  A yellow family lives
+  in the town of Springfield.
+</p>
+```
+
+The tags decide where things go, not the Enter key. That lets you split long text over several lines to keep your code easy to read.
+--- task
+Under your heading, add a paragraph with this text (copy it):
+
+Six friends in their twenties and thirties share apartments, jobs, break-ups and a lot of coffee in New York City.
+--- hint
+Start a new line under your `</h1>`. Type `<p>`, then paste the text, then `</p>`.
+--- hint
+```html
+<h1>Friends</h1>
+<p>Six friends in their twenties ... in New York City.</p>
+```
+Use the whole sentence instead of the three dots.
+--- solution
+<h1>Friends</h1>
+
+<p>
+  Six friends in their twenties and thirties share apartments, jobs,
+  break-ups and a lot of coffee in New York City.
+</p>
+--- check
+t.expect(t.$("article h1"), "Your `<h1>` heading has gone. Keep it at the top, and add the paragraph under it.");
+const p = t.$$("article p").find((x) => t.text(x).length > 20);
+if (!p) {
+  t.expect(!/six friends/i.test(t.code) || /<p/i.test(t.code), "The text is there, but it isn't inside a `<p>` element. Put `<p>` before it and `</p>` after it.");
+  t.fail("I can't find a paragraph with the text yet. Add `<p>`, the text, and `</p>` under your heading.");
+}
+t.expect(/<\/p>/i.test(t.code), "Your paragraph needs a closing tag: `</p>`.");
+--- learned
+Paragraphs are **blocks**: each one starts on a new line with some space around it. And extra spaces or new lines in your code don't show on the page.
+--- summary
+`<p>` makes a paragraph. The browser ignores extra spaces and new lines in your code.
+--- mistakes
+- Putting the paragraph inside the heading: `<h1>Friends <p>...</p></h1>`.
+- Forgetting `</p>` (the browser often guesses, but the check asks for it).
+
+
+=== step emphasis
+title: Bold and italic
+minutes: 10
+slot: article
+--- explain
+Elements can go **inside** other elements. This is called **nesting**.
+
+- `<strong>` marks words as important. Browsers show them **bold**.
+- `<em>` adds emphasis, like when you stress a word when speaking. Browsers show it *in italics*.
+
+```html
+<p>They live in <strong>Springfield</strong>, and Homer <em>loves</em> doughnuts.</p>
+```
+
+When you nest, close the inner element first, like boxes inside boxes:
+
+```html
+<p>This is <strong>right</strong>.</p>
+<p>This is <strong>wrong.</p></strong>
+```
+--- task
+In your paragraph:
+
+1. make **New York City** bold with `<strong>`
+2. make **a lot of coffee** italic with `<em>`
+--- hint
+Put `<strong>` just before "New York City" and `</strong>` just after it, still inside the paragraph.
+--- hint
+The end of your paragraph can look like this:
+```html
+break-ups and <em>a lot of coffee</em> in <strong>New York City</strong>.</p>
+```
+--- solution
+<h1>Friends</h1>
+
+<p>
+  Six friends in their twenties and thirties share apartments, jobs,
+  break-ups and <em>a lot of coffee</em> in <strong>New York City</strong>.
+</p>
+--- check
+const strong = t.$("article p strong");
+t.expect(strong, "I can't find a `<strong>` inside your paragraph yet. Wrap the words New York City: `<strong>New York City</strong>`.");
+t.expect(/new york/i.test(t.text(strong)), `Your \`<strong>\` contains "${t.text(strong)}". Put it around **New York City**.`);
+const em = t.$("article p em");
+t.expect(em, "Now wrap **a lot of coffee** in `<em>` and `</em>`, inside the paragraph.");
+t.expect(/coffee/i.test(t.text(em)), `Your \`<em>\` contains "${t.text(em)}". Put it around **a lot of coffee**.`);
+t.expect(/<\/strong>/i.test(t.code) && /<\/em>/i.test(t.code), "Close each one: `</strong>` and `</em>`.");
+--- learned
+You **nested** elements: `strong` and `em` live inside the `p`. The rule for nesting: close the inner element before the outer one.
+--- summary
+Elements can be nested. `<strong>` is important (bold), `<em>` is emphasis (italic).
+--- mistakes
+- Closing in the wrong order: `<p>...<strong>...</p></strong>`.
+- Using `<b>` and `<i>`. They also work, but `<strong>` and `<em>` say *why* the words are special.
+
+
+=== step meta
+title: Attributes and a class
+minutes: 15
+slot: article
+--- explain
+An opening tag can hold extra information called **attributes**. An attribute has a **name**, an equals sign and a **value** in quotes:
+
+```html
+<p class="meta">Fox · 1989 to today</p>
+```
+
+Here the attribute name is `class` and the value is `meta`.
+
+A **class** is a label you choose. It doesn't change how the page looks yet, but tomorrow you'll use it in CSS to say "make every element with the label `meta` small and grey". Think of it as a sticky note on the element.
+--- task
+Between the heading and the paragraph, add a new paragraph with the class `meta` and this text:
+
+NBC · 1994–2004 · about 22 minutes per episode
+
+The dot `·` is hard to type on some keyboards. A normal dash `-` or a `|` is fine too.
+--- hint
+It's a normal `<p>` element with `class="meta"` inside the opening tag: `<p class="meta">`.
+--- hint
+```html
+<h1>Friends</h1>
+<p class="meta">NBC · 1994–2004 · about 22 minutes per episode</p>
+```
+--- solution
+<h1>Friends</h1>
+<p class="meta">NBC · 1994–2004 · about 22 minutes per episode</p>
+
+<p>
+  Six friends in their twenties and thirties share apartments, jobs,
+  break-ups and <em>a lot of coffee</em> in <strong>New York City</strong>.
+</p>
+--- check
+const meta = t.$("article .meta");
+if (!meta) {
+  t.expect(!/class\s*=\s*meta\b/i.test(t.code), "Put quotes around the class value: `class=\"meta\"`.");
+  t.expect(!/clas+\s*=/i.test(t.code) || /class\s*=/i.test(t.code), "Check the spelling of the attribute: it's `class` (with two s).");
+  t.fail("I can't find an element with `class=\"meta\"` yet. Add `<p class=\"meta\">...</p>` under the heading.");
+}
+t.expect(meta.tagName === "P", "Use a paragraph for the facts line: `<p class=\"meta\">`.");
+t.expect(/nbc/i.test(t.text(meta)) && /1994/.test(t.text(meta)), "Your facts line should mention NBC and the years 1994–2004.");
+t.expect(t.$("article strong") && t.$("article em"), "Keep your paragraph with `<strong>` and `<em>` from the last step.");
+--- learned
+You added an **attribute**: `class="meta"`. Attributes always go inside the opening tag, as `name="value"`. Tomorrow CSS will use the class to style this line.
+--- summary
+Attributes go in the opening tag as `name="value"`. A `class` is a label for CSS.
+--- mistakes
+- No quotes: `class=meta` (works in browsers, but always use quotes).
+- The attribute in the closing tag: `</p class="meta">`.
+
+
+=== step poster
+title: Add the poster
+minutes: 15
+slot: article
+--- explain
+Pictures use the `<img>` element. It has **no closing tag** because it has no text content. Everything it needs is in its attributes:
+
+```html
+<img src="homer.png" alt="Homer Simpson eating a doughnut">
+```
+
+- `src` (source) is the file name or web address of the picture.
+- `alt` (alternative text) describes the picture in words. Screen readers read it out for people who can't see the picture, and browsers show it when the picture can't load.
+
+A file called **poster.svg** is ready for you in the Lab, next to your page.
+--- task
+Under the heading, add the poster:
+
+- `src` is `poster.svg`
+- `alt` describes it, for example "Poster for Friends"
+- also add `class="poster"`, for tomorrow's CSS
+
+Then try this: change `src` to a name that doesn't exist, like `posterr.svg`. What do you see? Change it back before you press Check.
+--- hint
+An `<img>` element with three attributes: `src`, `alt` and `class`. The order of attributes doesn't matter.
+--- hint
+```html
+<img class="poster" src="poster.svg" alt="Poster for Friends">
+```
+--- solution
+<h1>Friends</h1>
+<p class="meta">NBC · 1994–2004 · about 22 minutes per episode</p>
+
+<img class="poster" src="poster.svg" alt="Poster for Friends">
+
+<p>
+  Six friends in their twenties and thirties share apartments, jobs,
+  break-ups and <em>a lot of coffee</em> in <strong>New York City</strong>.
+</p>
+--- check
+const img = t.$("article img");
+t.expect(img, "I can't find an `<img>` yet. Add `<img src=\"poster.svg\" alt=\"Poster for Friends\">` under the heading.");
+t.expect(/poster\.svg/.test(t.code), "The `src` should be exactly `poster.svg`. Check the spelling.");
+t.expect(img.complete && img.naturalWidth > 0, "The picture didn't load. Check that `src=\"poster.svg\"` is spelled exactly like that, with quotes.");
+t.expect((img.getAttribute("alt") || "").trim().length > 2, "Your image needs `alt` text that describes it, for example `alt=\"Poster for Friends\"`.");
+t.expect(img.classList.contains("poster"), "Add `class=\"poster\"` to the image too. We'll need it tomorrow.");
+t.expect(!/<\/img>/i.test(t.code), "`<img>` has no closing tag. Remove the `</img>`.");
+--- learned
+`<img>` is an **empty element**: no content and no closing tag. `src` says where the picture is, and `alt` says what it shows. When the file is missing, the browser shows the alt text instead.
+--- summary
+`<img src="..." alt="...">` shows a picture. It has no closing tag, and `alt` describes the picture.
+--- mistakes
+- Writing `<img src="poster.svg"></img>`.
+- Leaving out `alt`, or writing "image" as the alt text (describe what it shows instead).
+- Typing `scr` instead of `src`.
+
+
+=== step genres
+title: Subheadings and a list
+minutes: 15
+slot: article
+--- explain
+Headings come in six levels, `<h1>` to `<h6>`. The page has one `<h1>` for its title. Parts of the page get `<h2>`, and smaller parts inside them get `<h3>`.
+
+A **list** of items uses two elements together:
+
+- `<ul>` (*unordered list*) is the whole list. It shows bullets.
+- `<li>` (*list item*) is one item. Every `<li>` goes inside the `<ul>`.
+
+```html
+<h2>Characters</h2>
+<ul>
+  <li>Homer</li>
+  <li>Marge</li>
+</ul>
+```
+
+Notice the spaces before each `<li>`. They don't change the page, but they show that the items are inside the list. This is called **indenting**.
+--- task
+Under your paragraph, add:
+
+1. a subheading `<h2>` that says **Genres**
+2. a bulleted list with two items: **Comedy** and **Romance**
+--- hint
+First the `<h2>Genres</h2>`, then `<ul>` on its own line, then one `<li>` per genre, then `</ul>`.
+--- hint
+```html
+<h2>Genres</h2>
+<ul>
+  <li>Comedy</li>
+  <li>Romance</li>
+</ul>
+```
+--- solution
+<h1>Friends</h1>
+<p class="meta">NBC · 1994–2004 · about 22 minutes per episode</p>
+
+<img class="poster" src="poster.svg" alt="Poster for Friends">
+
+<p>
+  Six friends in their twenties and thirties share apartments, jobs,
+  break-ups and <em>a lot of coffee</em> in <strong>New York City</strong>.
+</p>
+
+<h2>Genres</h2>
+<ul>
+  <li>Comedy</li>
+  <li>Romance</li>
+</ul>
+--- check
+const h2 = t.$$("article h2").find((h) => /genre/i.test(t.text(h)));
+t.expect(h2, "I can't find an `<h2>` that says Genres yet.");
+const lis = t.$$("article li");
+t.expect(lis.length >= 2, "Add a list with two `<li>` items: Comedy and Romance.");
+t.expect(lis.every((li) => li.parentElement.tagName === "UL" || li.parentElement.tagName === "OL"), "Every `<li>` must be inside a `<ul>`. Put `<ul>` before the items and `</ul>` after them.");
+const ul = t.$$("article ul").find((u) => /comedy/i.test(t.text(u)));
+t.expect(ul, "Your list should have an item that says Comedy.");
+t.expect(/romance/i.test(t.text(ul)), "Add a second item that says Romance.");
+t.expect(ul.children.length >= 2 && [...ul.children].every((c) => c.tagName === "LI"), "Inside the `<ul>` put only `<li>` items, one per genre.");
+--- learned
+A list is two kinds of elements working together: one `<ul>` around several `<li>`. And `<h2>` headings split the page into parts, like chapters in a book.
+--- summary
+`<h2>` for parts of the page. `<ul>` with `<li>` items makes a bulleted list.
+--- mistakes
+- `<li>` items without a `<ul>` around them.
+- Two separate lists, one per item, instead of one list with two items.
+
+
+=== step cast
+title: A longer list: the cast
+minutes: 10
+slot: article
+--- explain
+You'll write lists all the time, so let's practise once more. Lists can be as long as you like. Every item gets its own `<li>`.
+
+Good habits that make long lists easy to read:
+
+- one `<li>` per line
+- indent the items with two spaces
+- the closing `</ul>` lines up with the opening `<ul>`
+
+> Try the **Tab** key in the code box: it adds two spaces.
+--- task
+Under the genres list, add an `<h2>` that says **Main cast** and a list with **at least three** of these actors:
+
+- Jennifer Aniston as Rachel Green
+- Courteney Cox as Monica Geller
+- Lisa Kudrow as Phoebe Buffay
+- Matt LeBlanc as Joey Tribbiani
+- Matthew Perry as Chandler Bing
+- David Schwimmer as Ross Geller
+--- hint
+It's the same pattern as the genres: `<h2>`, then `<ul>`, then one `<li>` per actor, then `</ul>`.
+--- hint
+```html
+<h2>Main cast</h2>
+<ul>
+  <li>Jennifer Aniston as Rachel Green</li>
+  <li>Courteney Cox as Monica Geller</li>
+  <li>Lisa Kudrow as Phoebe Buffay</li>
+</ul>
+```
+--- solution
+<h1>Friends</h1>
+<p class="meta">NBC · 1994–2004 · about 22 minutes per episode</p>
+
+<img class="poster" src="poster.svg" alt="Poster for Friends">
+
+<p>
+  Six friends in their twenties and thirties share apartments, jobs,
+  break-ups and <em>a lot of coffee</em> in <strong>New York City</strong>.
+</p>
+
+<h2>Genres</h2>
+<ul>
+  <li>Comedy</li>
+  <li>Romance</li>
+</ul>
+
+<h2>Main cast</h2>
+<ul>
+  <li>Jennifer Aniston as Rachel Green</li>
+  <li>Courteney Cox as Monica Geller</li>
+  <li>Lisa Kudrow as Phoebe Buffay</li>
+  <li>Matt LeBlanc as Joey Tribbiani</li>
+  <li>Matthew Perry as Chandler Bing</li>
+  <li>David Schwimmer as Ross Geller</li>
+</ul>
+--- check
+t.expect(t.$$("article h2").some((h) => /cast/i.test(t.text(h))), "Add an `<h2>` that says Main cast.");
+const lists = t.$$("article ul");
+t.expect(lists.length >= 2, "Add a second `<ul>` list for the cast, under the heading Main cast.");
+const cast = lists.find((u) => u.querySelectorAll("li").length >= 3 && !/comedy/i.test(t.text(u)));
+t.expect(cast, "Your cast list needs at least three `<li>` items, one actor each.");
+t.expect(t.$$("article li").every((li) => /^(UL|OL)$/.test(li.parentElement.tagName)), "Every `<li>` must be inside a list (`<ul>`).");
+--- learned
+Same pattern, longer list. Indenting the `<li>` lines makes it easy to see what's inside what, which matters more as pages grow.
+--- summary
+Long lists: one `<li>` per line, indented inside the `<ul>`.
+--- mistakes
+- Putting all actors in one `<li>` separated by commas.
+- Forgetting the new `<h2>`.
+
+
+=== step top3
+title: A numbered list
+minutes: 10
+slot: article
+--- explain
+When the **order** matters, use `<ol>` (*ordered list*) instead of `<ul>`. The browser numbers the items for you:
+
+```html
+<h2>How to make toast</h2>
+<ol>
+  <li>Put bread in the toaster</li>
+  <li>Wait</li>
+  <li>Eat</li>
+</ol>
+```
+
+You don't type the numbers. If you move an item up, the numbers update by themselves.
+--- task
+Add an `<h2>` that says **My favourite characters** and an ordered list of your top three. Your opinion, your order.
+--- hint
+Same as before, but `<ol>` and `</ol>` instead of `<ul>` and `</ul>`.
+--- hint
+```html
+<h2>My favourite characters</h2>
+<ol>
+  <li>Phoebe</li>
+  <li>Chandler</li>
+  <li>Joey</li>
+</ol>
+```
+--- solution
+<h1>Friends</h1>
+<p class="meta">NBC · 1994–2004 · about 22 minutes per episode</p>
+
+<img class="poster" src="poster.svg" alt="Poster for Friends">
+
+<p>
+  Six friends in their twenties and thirties share apartments, jobs,
+  break-ups and <em>a lot of coffee</em> in <strong>New York City</strong>.
+</p>
+
+<h2>Genres</h2>
+<ul>
+  <li>Comedy</li>
+  <li>Romance</li>
+</ul>
+
+<h2>Main cast</h2>
+<ul>
+  <li>Jennifer Aniston as Rachel Green</li>
+  <li>Courteney Cox as Monica Geller</li>
+  <li>Lisa Kudrow as Phoebe Buffay</li>
+  <li>Matt LeBlanc as Joey Tribbiani</li>
+  <li>Matthew Perry as Chandler Bing</li>
+  <li>David Schwimmer as Ross Geller</li>
+</ul>
+
+<h2>My favourite characters</h2>
+<ol>
+  <li>Phoebe</li>
+  <li>Chandler</li>
+  <li>Joey</li>
+</ol>
+--- check
+const ol = t.$("article ol");
+t.expect(ol, "I can't find an `<ol>` yet. It works like `<ul>`, but with numbers.");
+t.expect(ol.querySelectorAll("li").length >= 3, "Your numbered list needs three `<li>` items.");
+t.expect(!/^\s*\d/.test(t.text(ol.querySelector("li"))), "No need to type the numbers yourself: `<ol>` adds them. Remove the numbers from your items.");
+t.expect(t.$$("article h2").length >= 3, "Add an `<h2>` heading above the numbered list, like \"My favourite characters\".");
+--- learned
+`<ol>` numbers the items for you. Choosing `<ul>` or `<ol>` is about meaning: does the order matter?
+--- summary
+`<ol>` is a numbered list, for when the order matters.
+--- mistakes
+- Typing "1." inside each item (you get numbers twice).
+
+
+=== step link
+title: A link to another website
+minutes: 15
+slot: article
+--- explain
+Links are what make the web a *web*. A link uses the `<a>` element (*anchor*):
+
+```html
+<a href="https://www.wikipedia.org">Read more on Wikipedia</a>
+```
+
+- `href` is the address the link goes to.
+- The content ("Read more on Wikipedia") is the text you click.
+
+A full web address starts with `https://`. Without it, the browser looks for a file with that name on *your* website.
+
+Links are **inline**: they sit inside text, so we put this one inside a paragraph.
+--- task
+At the bottom, add a paragraph with a link to the show's page on TVmaze, a free website about TV shows:
+
+`https://www.tvmaze.com/shows/431/friends`
+
+Use any link text you like, for example "Read more on TVmaze". Click the link in the preview when you're done: it opens in a new tab.
+--- hint
+A `<p>` with an `<a>` inside it. The address goes in `href="..."`, and the text you click goes between `<a ...>` and `</a>`.
+--- hint
+```html
+<p>
+  Want more? <a href="https://www.tvmaze.com/shows/431/friends">Read about it on TVmaze</a>.
+</p>
+```
+--- solution
+<h1>Friends</h1>
+<p class="meta">NBC · 1994–2004 · about 22 minutes per episode</p>
+
+<img class="poster" src="poster.svg" alt="Poster for Friends">
+
+<p>
+  Six friends in their twenties and thirties share apartments, jobs,
+  break-ups and <em>a lot of coffee</em> in <strong>New York City</strong>.
+</p>
+
+<h2>Genres</h2>
+<ul>
+  <li>Comedy</li>
+  <li>Romance</li>
+</ul>
+
+<h2>Main cast</h2>
+<ul>
+  <li>Jennifer Aniston as Rachel Green</li>
+  <li>Courteney Cox as Monica Geller</li>
+  <li>Lisa Kudrow as Phoebe Buffay</li>
+  <li>Matt LeBlanc as Joey Tribbiani</li>
+  <li>Matthew Perry as Chandler Bing</li>
+  <li>David Schwimmer as Ross Geller</li>
+</ul>
+
+<h2>My favourite characters</h2>
+<ol>
+  <li>Phoebe</li>
+  <li>Chandler</li>
+  <li>Joey</li>
+</ol>
+
+<p>
+  Want more? <a href="https://www.tvmaze.com/shows/431/friends">Read about it on TVmaze</a>.
+</p>
+--- check
+const a = t.$("article a");
+t.expect(a, "I can't find a link yet. Add `<a href=\"...\">link text</a>` inside a paragraph.");
+const href = a.getAttribute("href") || "";
+t.expect(href, "Your link needs an `href` attribute with the address: `href=\"https://www.tvmaze.com/shows/431/friends\"`.");
+t.expect(/tvmaze\.com/i.test(href), `Your link goes to "${href}". Point it at the TVmaze page for Friends.`);
+t.expect(/^https?:\/\//i.test(href), "The address must start with `https://`. Without it, the browser looks for a file on your own site.");
+t.expect(t.text(a).length > 1, "Your link has no text to click. Put some text between `<a ...>` and `</a>`.");
+t.expect(a.parentElement.tagName === "P", "Put the link inside a paragraph: `<p>` ... `<a ...>...</a>` ... `</p>`.");
+--- learned
+`<a href="...">` makes a link. The `href` is where it goes; the content is what people click. Full addresses start with `https://`.
+--- summary
+`<a href="https://...">text</a>` is a link to another page.
+--- mistakes
+- Leaving out `https://`, so the link points to a missing file.
+- Putting the address as the link text but forgetting `href`.
+
+
+=== step table
+title: A table of seasons
+minutes: 20
+slot: article
+--- explain
+Some information is best shown in rows and columns, like a spreadsheet. HTML has a **table** for that:
+
+- `<table>` is the whole table.
+- `<tr>` (*table row*) is one row.
+- `<th>` (*table heading*) is a heading cell. It's bold.
+- `<td>` (*table data*) is a normal cell.
+
+Every row has the same number of cells, in the same order as the headings.
+
+We've added the start of a seasons table to your code: the headings and season 1.
+--- task
+Add two more rows to the table:
+
+- season **2**: **24** episodes, **1995**
+- season **3**: **25** episodes, **1996**
+
+Each new row is a `<tr>` with three `<td>` cells, just like the season 1 row.
+--- starter-append
+<h2>Seasons</h2>
+<table>
+  <tr>
+    <th>Season</th>
+    <th>Episodes</th>
+    <th>Year</th>
+  </tr>
+  <tr>
+    <td>1</td>
+    <td>24</td>
+    <td>1994</td>
+  </tr>
+</table>
+--- hint
+Copy the whole season 1 row, from `<tr>` to `</tr>`, paste it before `</table>`, and change the three numbers.
+--- hint
+```html
+  <tr>
+    <td>2</td>
+    <td>24</td>
+    <td>1995</td>
+  </tr>
+```
+Then one more row like it for season 3.
+--- solution
+<h1>Friends</h1>
+<p class="meta">NBC · 1994–2004 · about 22 minutes per episode</p>
+
+<img class="poster" src="poster.svg" alt="Poster for Friends">
+
+<p>
+  Six friends in their twenties and thirties share apartments, jobs,
+  break-ups and <em>a lot of coffee</em> in <strong>New York City</strong>.
+</p>
+
+<h2>Genres</h2>
+<ul>
+  <li>Comedy</li>
+  <li>Romance</li>
+</ul>
+
+<h2>Main cast</h2>
+<ul>
+  <li>Jennifer Aniston as Rachel Green</li>
+  <li>Courteney Cox as Monica Geller</li>
+  <li>Lisa Kudrow as Phoebe Buffay</li>
+  <li>Matt LeBlanc as Joey Tribbiani</li>
+  <li>Matthew Perry as Chandler Bing</li>
+  <li>David Schwimmer as Ross Geller</li>
+</ul>
+
+<h2>My favourite characters</h2>
+<ol>
+  <li>Phoebe</li>
+  <li>Chandler</li>
+  <li>Joey</li>
+</ol>
+
+<h2>Seasons</h2>
+<table>
+  <tr>
+    <th>Season</th>
+    <th>Episodes</th>
+    <th>Year</th>
+  </tr>
+  <tr>
+    <td>1</td>
+    <td>24</td>
+    <td>1994</td>
+  </tr>
+  <tr>
+    <td>2</td>
+    <td>24</td>
+    <td>1995</td>
+  </tr>
+  <tr>
+    <td>3</td>
+    <td>25</td>
+    <td>1996</td>
+  </tr>
+</table>
+
+<p>
+  Want more? <a href="https://www.tvmaze.com/shows/431/friends">Read about it on TVmaze</a>.
+</p>
+--- check
+const table = t.$("article table");
+t.expect(table, "The table has gone. Press **Start again** to get it back.");
+const rows = [...table.querySelectorAll("tr")];
+const data = rows.filter((r) => r.querySelector("td"));
+t.expect(data.length >= 3, `Your table has ${data.length} season row${data.length === 1 ? "" : "s"}. Add rows for seasons 2 and 3, each a \`<tr>\` with three \`<td>\`.`);
+t.expect(data.every((r) => r.querySelectorAll("td").length === 3), "Each season row needs exactly three `<td>` cells: season, episodes, year.");
+const cells = data.map((r) => [...r.querySelectorAll("td")].map((c) => t.text(c)));
+t.expect(cells.some((c) => c[0] === "2" && c[2] === "1995"), "I can't find the row for season 2 (24 episodes, 1995).");
+t.expect(cells.some((c) => c[0] === "3" && c[1] === "25" && c[2] === "1996"), "I can't find the row for season 3 (25 episodes, 1996).");
+t.expect((t.code.match(/<tr/gi) || []).length === (t.code.match(/<\/tr>/gi) || []).length, "Each `<tr>` needs its own closing `</tr>`. Count them: the numbers should match.");
+--- learned
+A table is rows (`<tr>`) of cells (`<th>` for headings, `<td>` for data). The copy-paste-change trick you just used is how most developers write repeated HTML.
+--- summary
+Tables: `<table>`, rows `<tr>`, heading cells `<th>`, data cells `<td>`.
+--- mistakes
+- Pasting the new row after `</table>` instead of before it.
+- A row with only two `<td>`: the columns shift.
+- Missing `</tr>` between rows.
+
+
+=== step sections
+title: Group it with sections
+minutes: 15
+slot: article
+--- explain
+Look at the **show.html (whole page)** tab. The page is split into big parts with elements that say what each part is:
+
+- `<header>`: the top of the page (logo and menu)
+- `<main>`: the main content
+- `<article>`: one complete thing, here one show
+- `<footer>`: the bottom of the page
+
+These are called **semantic** elements: their names describe their meaning. They don't change how the page looks, but they help screen readers, search engines and other developers understand your page.
+
+Inside the article, `<section>` groups a heading with the content that belongs to it:
+
+```html
+<section>
+  <h2>Characters</h2>
+  <ul>
+    <li>Homer</li>
+  </ul>
+</section>
+```
+--- task
+Wrap **Genres** (the `<h2>` and its list) in a `<section>`. Then do the same for **Main cast**.
+
+If you like, wrap the other two parts as well. Indent the lines inside each section by two spaces.
+--- hint
+Type `<section>` on a new line just above `<h2>Genres</h2>`, and `</section>` on a new line just below the `</ul>` of that list.
+--- hint
+```html
+<section>
+  <h2>Genres</h2>
+  <ul>
+    <li>Comedy</li>
+    <li>Romance</li>
+  </ul>
+</section>
+```
+To indent many lines at once, select them and press Tab.
+--- solution
+<h1>Friends</h1>
+<p class="meta">NBC · 1994–2004 · about 22 minutes per episode</p>
+
+<img class="poster" src="poster.svg" alt="Poster for Friends">
+
+<p>
+  Six friends in their twenties and thirties share apartments, jobs,
+  break-ups and <em>a lot of coffee</em> in <strong>New York City</strong>.
+</p>
+
+<section>
+  <h2>Genres</h2>
+  <ul>
+    <li>Comedy</li>
+    <li>Romance</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Main cast</h2>
+  <ul>
+    <li>Jennifer Aniston as Rachel Green</li>
+    <li>Courteney Cox as Monica Geller</li>
+    <li>Lisa Kudrow as Phoebe Buffay</li>
+    <li>Matt LeBlanc as Joey Tribbiani</li>
+    <li>Matthew Perry as Chandler Bing</li>
+    <li>David Schwimmer as Ross Geller</li>
+  </ul>
+</section>
+
+<section>
+  <h2>My favourite characters</h2>
+  <ol>
+    <li>Phoebe</li>
+    <li>Chandler</li>
+    <li>Joey</li>
+  </ol>
+</section>
+
+<section>
+  <h2>Seasons</h2>
+  <table>
+    <tr>
+      <th>Season</th>
+      <th>Episodes</th>
+      <th>Year</th>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>24</td>
+      <td>1994</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>24</td>
+      <td>1995</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>25</td>
+      <td>1996</td>
+    </tr>
+  </table>
+</section>
+
+<p>
+  Want more? <a href="https://www.tvmaze.com/shows/431/friends">Read about it on TVmaze</a>.
+</p>
+--- check
+const secs = t.$$("article section");
+t.expect(secs.length >= 2, secs.length ? "Good start. Now wrap the Main cast part in a `<section>` too." : "I can't find a `<section>` yet. Put `<section>` above `<h2>Genres</h2>` and `</section>` after its list.");
+t.expect(secs.every((s) => s.querySelector("h2")), "Each section should start with its `<h2>` heading, inside the section.");
+const genre = secs.find((s) => /genre/i.test(t.text(s.querySelector("h2"))));
+t.expect(genre && genre.querySelector("ul"), "The Genres section should hold both the heading and its list: `</section>` goes after `</ul>`.");
+const cast = secs.find((s) => /cast/i.test(t.text(s.querySelector("h2"))));
+t.expect(cast && cast.querySelectorAll("li").length >= 3, "Wrap Main cast (heading and list) in a `<section>` as well.");
+t.expect(!secs.some((s) => s.querySelectorAll("h2").length > 1), "Each section should hold one part only. Check where each `</section>` is.");
+t.expect((t.code.match(/<section/gi) || []).length === (t.code.match(/<\/section>/gi) || []).length, "Each `<section>` needs its own `</section>`. Count them: the numbers should match.");
+--- learned
+Semantic elements (`header`, `main`, `article`, `section`, `footer`) describe the **structure** of the page. Nothing changed on screen, but the page is now much easier to understand for machines and for people reading your code.
+--- summary
+Semantic elements (`header`, `main`, `article`, `section`, `footer`) describe the parts of a page.
+--- mistakes
+- One big section around everything.
+- `</section>` placed between the heading and its list.
+
+
+=== step comments
+title: Notes for humans
+minutes: 10
+slot: article
+--- explain
+Sometimes you want to leave a note in your code for yourself or another developer. HTML **comments** are ignored by the browser:
+
+```html
+<!-- The seasons table: one row per season -->
+```
+
+A comment starts with `<!--` and ends with `-->`. It can be one line or many.
+
+Comments are also handy to hide something temporarily without deleting it: put `<!--` before it and `-->` after it.
+--- task
+1. Add a comment above the seasons section that says what it is.
+2. Try hiding the "My favourite characters" section with a comment, look at the preview, then remove the comment marks again so it comes back.
+--- hint
+A comment looks like this: `<!-- your note here -->`. Put it on its own line, above `<section>`.
+--- hint
+```html
+<!-- Seasons: one row per season -->
+<section>
+  <h2>Seasons</h2>
+```
+--- solution
+<h1>Friends</h1>
+<p class="meta">NBC · 1994–2004 · about 22 minutes per episode</p>
+
+<img class="poster" src="poster.svg" alt="Poster for Friends">
+
+<p>
+  Six friends in their twenties and thirties share apartments, jobs,
+  break-ups and <em>a lot of coffee</em> in <strong>New York City</strong>.
+</p>
+
+<section>
+  <h2>Genres</h2>
+  <ul>
+    <li>Comedy</li>
+    <li>Romance</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Main cast</h2>
+  <ul>
+    <li>Jennifer Aniston as Rachel Green</li>
+    <li>Courteney Cox as Monica Geller</li>
+    <li>Lisa Kudrow as Phoebe Buffay</li>
+    <li>Matt LeBlanc as Joey Tribbiani</li>
+    <li>Matthew Perry as Chandler Bing</li>
+    <li>David Schwimmer as Ross Geller</li>
+  </ul>
+</section>
+
+<section>
+  <h2>My favourite characters</h2>
+  <ol>
+    <li>Phoebe</li>
+    <li>Chandler</li>
+    <li>Joey</li>
+  </ol>
+</section>
+
+<!-- Seasons: one row per season -->
+<section>
+  <h2>Seasons</h2>
+  <table>
+    <tr>
+      <th>Season</th>
+      <th>Episodes</th>
+      <th>Year</th>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>24</td>
+      <td>1994</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>24</td>
+      <td>1995</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>25</td>
+      <td>1996</td>
+    </tr>
+  </table>
+</section>
+
+<p>
+  Want more? <a href="https://www.tvmaze.com/shows/431/friends">Read about it on TVmaze</a>.
+</p>
+--- check
+const comments = t.code.match(/<!--([\s\S]*?)-->/g) || [];
+t.expect(comments.length, "I can't find a comment yet. Write `<!-- a note -->` above the seasons section.");
+t.expect(comments.some((c) => c.replace(/<!--|-->/g, "").trim().length > 2), "Write a few words inside your comment, between `<!--` and `-->`.");
+t.expect(t.$("article table"), "The seasons table is hidden. Make sure your comment is closed with `-->` straight after your note.");
+t.expect(t.$$("article ol li").length >= 3, "Your favourite characters are still hidden. Remove the `<!--` and `-->` around that section.");
+--- learned
+Comments `<!-- -->` are notes for humans. The browser skips them, which also makes them a quick way to switch a piece of HTML off and on again.
+--- summary
+`<!-- comments -->` are notes the browser ignores.
+--- mistakes
+- A comment that never closes (no `-->`): everything after it disappears.
+
+
+=== step spoiler
+title: A spoiler you have to click
+minutes: 10
+slot: article
+bonus: yes
+--- explain
+HTML has an element that can open and close without any programming: `<details>`. The `<summary>` inside it is the part you always see and click; the rest is hidden until then.
+
+```html
+<details>
+  <summary>Who shot Mr Burns?</summary>
+  <p>Maggie!</p>
+</details>
+```
+--- task
+Add a `<details>` element with a `<summary>` like "Spoiler: how does the show end?" and a paragraph inside with your answer (or "Watch it and find out!").
+
+Click it in the preview to open and close it.
+--- hint
+The `<summary>` must be the first thing inside `<details>`. The paragraph goes after it, still inside `<details>`.
+--- hint
+```html
+<details>
+  <summary>Spoiler: how does the show end?</summary>
+  <p>Watch it and find out!</p>
+</details>
+```
+--- solution-append
+<details>
+  <summary>Spoiler: how does the show end?</summary>
+  <p>Watch it and find out!</p>
+</details>
+--- check
+const d = t.$("article details");
+t.expect(d, "I can't find a `<details>` element yet.");
+const s = d.querySelector("summary");
+t.expect(s && t.text(s).length > 2, "Put a `<summary>` with some text inside your `<details>`.");
+t.expect(d.querySelector("p"), "Add a paragraph inside `<details>`, after the summary. That's the hidden part.");
+--- learned
+`<details>` and `<summary>` make a click-to-open box, with no JavaScript at all. HTML can do more than you'd think.
+--- summary
+`<details>` with `<summary>` makes a box that opens on click.
+
+
+=== step figure
+title: A poster with a caption
+minutes: 10
+slot: article
+bonus: yes
+--- explain
+A picture with a caption belongs in a `<figure>`. The caption goes in `<figcaption>`:
+
+```html
+<figure>
+  <img src="homer.png" alt="Homer Simpson">
+  <figcaption>Homer in season 1</figcaption>
+</figure>
+```
+--- task
+Wrap your poster `<img>` in a `<figure>` and add a `<figcaption>` under it, for example "The official poster".
+--- hint
+`<figure>` goes on the line before the `<img>`; the `<figcaption>` and `</figure>` go after it.
+--- hint
+```html
+<figure>
+  <img class="poster" src="poster.svg" alt="Poster for Friends">
+  <figcaption>The official poster</figcaption>
+</figure>
+```
+--- solution-replace
+<img class="poster" src="poster.svg" alt="Poster for Friends">
+=>
+<figure>
+  <img class="poster" src="poster.svg" alt="Poster for Friends">
+  <figcaption>The official poster</figcaption>
+</figure>
+--- check
+const f = t.$("article figure");
+t.expect(f, "I can't find a `<figure>` yet.");
+t.expect(f.querySelector("img"), "Put the poster `<img>` inside the `<figure>`.");
+const c = f.querySelector("figcaption");
+t.expect(c && t.text(c).length > 2, "Add a `<figcaption>` with some text inside the `<figure>`.");
+--- learned
+`<figure>` and `<figcaption>` connect a picture with its caption, another semantic pair.
+--- summary
+`<figure>` + `<figcaption>`: a picture with a caption.
+
+
+=== step another
+title: Add a second show
+minutes: 20
+slot: article
+bonus: yes
+--- explain
+Now use everything from today on your own. Pick a show you like and add a short part about it at the bottom of the page.
+
+A horizontal line `<hr>` is a good way to separate it. Like `<img>`, `<hr>` has no closing tag.
+--- task
+At the bottom, add:
+
+1. an `<hr>`
+2. an `<h2>` with the name of a show you like
+3. a paragraph about it
+4. a list of at least two things (genres, characters, anything)
+5. optional: a link to its page on TVmaze (search for it on tvmaze.com)
+--- hint
+Use the Friends part of your page as a pattern: heading, paragraph, list.
+--- hint
+```html
+<hr>
+<h2>The Office</h2>
+<p>A camera crew follows the everyday chaos of a small paper company office.</p>
+<ul>
+  <li>Comedy</li>
+  <li>Michael Scott is the boss</li>
+</ul>
+```
+--- solution-append
+<hr>
+<h2>The Office</h2>
+<p>A camera crew follows the everyday chaos of a small paper company office.</p>
+<ul>
+  <li>Comedy</li>
+  <li>Michael Scott is the boss</li>
+</ul>
+--- check
+const hr = t.$("article hr");
+t.expect(hr, "Start with an `<hr>` line to separate the new show.");
+let el = hr.nextElementSibling, h2 = null, p = null, list = null;
+while (el) {
+  if (el.tagName === "H2" && !h2) h2 = el;
+  if (el.tagName === "P" && !p) p = el;
+  if (/^(UL|OL)$/.test(el.tagName) && !list) list = el;
+  if (el.tagName === "SECTION") { h2 = h2 || el.querySelector("h2"); p = p || el.querySelector("p"); list = list || el.querySelector("ul,ol"); }
+  el = el.nextElementSibling;
+}
+t.expect(h2, "After the `<hr>`, add an `<h2>` with the name of a show.");
+t.expect(p && t.text(p).length > 10, "Add a paragraph that says something about the show.");
+t.expect(list && list.querySelectorAll("li").length >= 2, "Add a list with at least two items about the show.");
+--- learned
+You built a part of a page on your own, from memory. That's exactly what the first day is for.
+--- summary
+You can build a page section from scratch: heading, text, list, link.

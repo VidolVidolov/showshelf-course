@@ -1,0 +1,933 @@
+=== day
+n: 4
+title: JavaScript: first steps
+subtitle: Values, variables, maths
+hours: 3 hours
+page: show.html
+slot: js | js | app.js
+file: app.js = js
+refs: @page
+
+--- intro
+Today you write your first **JavaScript**, the language that makes a page *do* things. HTML says what things are, CSS says how they look, and JavaScript gives the browser instructions.
+
+You work on the Friends page again. It's styled with the ShowShelf look (and your colours from Day 2), but some parts are empty: grey notes say what's missing. By the end of the day your JavaScript fills them in: the title, the facts, how long it takes to watch every episode, and a message that changes depending on the numbers.
+
+Your code goes in a file called **app.js**. Keep an eye on the **Console** under the preview: it's where JavaScript talks back to you.
+
+Go slowly. Every step is small on purpose, and every step saves automatically.
+
+--- template
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Friends · ShowShelf</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* An empty element shows a grey note until your JavaScript fills it */
+    [data-hint]:empty::before {
+      content: attr(data-hint);
+      color: var(--color-muted);
+      font-size: 0.95rem;
+      font-weight: 400;
+      font-style: italic;
+      text-transform: none;
+      letter-spacing: 0;
+    }
+    #verdict { font-weight: 600; }
+    /* A small poster next to the text, so everything fits in the Lab preview */
+    .show { margin: 16px auto; }
+    .show-header { grid-template-columns: 96px 1fr; gap: 16px; align-items: start; }
+    .show-header .poster { max-width: 96px; }
+    .show-header h1 { font-size: 1.7rem; margin: 4px 0 6px; }
+    .show-header p { margin: 0 0 8px; }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo">ShowShelf</a>
+      <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="about.html">About me</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <article class="show">
+      <div class="show-header">
+        <img class="poster" src="poster.svg" alt="Poster for Friends">
+        <div>
+          <span class="badge" id="network" data-hint="(network)"></span>
+          <h1 id="title" data-hint="(the show's name goes here)"></h1>
+          <p class="meta" id="meta" data-hint="(episodes and minutes go here)"></p>
+          <p class="rating" id="rating"></p>
+          <p class="intro" id="watch-time" data-hint="(how long it takes to watch it all)"></p>
+          <p id="verdict" data-hint="(a message chosen by if / else)"></p>
+          <p class="meta" id="random"></p>
+        </div>
+      </div>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <p>ShowShelf · Web Dev in 11 Days</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
+
+--- file style.css
+{{asset:appCss}}
+
+--- default js
+// app.js: the JavaScript for the Friends page.
+// Lines that start with // are comments. JavaScript skips them.
+
+
+=== step hello
+title: Hello, Console
+minutes: 10
+slot: js
+--- explain
+**JavaScript** is a list of instructions for the browser. It runs them one at a time, from the top of the file to the bottom.
+
+Your first instruction writes a message:
+
+```js
+console.log("Good morning, Springfield!");
+```
+
+- `console.log( )` means "write this in the Console".
+- The message goes inside the brackets, in quotes.
+- The semicolon `;` ends the instruction, like a full stop ends a sentence.
+
+The **Console** is a message panel for developers. Visitors never see it, but you'll use it all day to look inside your code. In the Lab it's **under the preview, on the right**. In a normal browser you open it with the **F12** key.
+
+> Every time you stop typing, the Lab runs your code again, and the Console starts fresh.
+--- task
+1. Under the comments in the code box, write a `console.log` that says **Hello, ShowShelf!**
+2. On the next line, write a second `console.log` with a sentence about a show you like, for example "My favourite show is Dark."
+
+Look at the Console: two lines, in the same order as your code.
+--- hint
+Copy the example above and change the text between the quotes. Keep the quotes and the brackets.
+--- hint
+```js
+console.log("Hello, ShowShelf!");
+console.log("My favourite show is Dark.");
+```
+--- solution-append
+console.log("Hello, ShowShelf!");
+console.log("My favourite show is Dark.");
+--- check
+if (t.errors.length) {
+  t.expect(!/Console is not defined/.test(t.errors[0]), "JavaScript cares about capital letters: write `console` with a small c.");
+  t.expect(!/is not defined/.test(t.errors[0]) || /["'`]/.test(t.clean), "Put your message in quotes: `console.log(\"Hello, ShowShelf!\");`. Without quotes, JavaScript thinks the words are names of things.");
+  t.fail(`There's an error in the Console: "${t.errors[0]}". Read the grey help under it, fix that line, then check again.`);
+}
+const lines = t.logs.filter((l) => l.level === "log" && l.text.trim());
+if (!lines.length) {
+  t.expect(!/console\s*\.\s*log\s*\(\s*\)/.test(t.clean), "Your `console.log()` is empty. Put a message in quotes between the brackets.");
+  t.expect(!/console\s*\.\s*log\b/i.test(t.code) || /console\s*\.\s*log/.test(t.clean), "Your `console.log` is on a comment line (it starts with `//`), so JavaScript skips it. Write it on a new line without `//`.");
+  t.fail("Nothing appeared in the Console yet. Write `console.log(\"Hello, ShowShelf!\");` in the code box.");
+}
+t.expect(lines.some((l) => /hello/i.test(l.text)), `The Console says "${lines[0].text}". Make your first message say **Hello, ShowShelf!**`);
+t.expect(lines.length >= 2, "The hello message is there. Now add a second `console.log` line with a sentence about a show you like.");
+--- learned
+You gave the browser its first instructions. `console.log` is your window into the code: whenever you wonder what's going on, log it.
+--- summary
+`console.log("...")` writes a message in the Console. Code runs from top to bottom.
+--- mistakes
+- `Console.log` with a capital C, or `console.Log`.
+- Forgetting the quotes: `console.log(Hello)`.
+- Looking for the message on the page instead of in the Console.
+--- teacher
+If the Console panel is hidden, click its title bar under the preview. Show students that the order of the lines in the Console follows the order in the code.
+
+
+=== step types
+title: Text and numbers
+minutes: 15
+slot: js
+--- explain
+Every piece of data in JavaScript is a **value**, and values have **types**. Today you meet the two most common ones:
+
+- A **string** is text. It always goes in quotes: `"Dark"`. Double or single quotes both work: `'Dark'`.
+- A **number** has no quotes: `26`, `8.7`. Decimals use a dot, not a comma.
+
+JavaScript can do maths with numbers, so `console.log(2 + 3)` prints `5`. But the `+` sign does something different with strings: it **joins** them.
+
+```js
+console.log(201 + 1);      // 202
+console.log("201" + 1);    // 2011
+console.log("The" + " Office");   // The Office
+```
+
+In the second line the quotes turned `201` into text, and text plus anything makes longer text. This surprises everyone once. It's also why the difference between strings and numbers matters.
+
+> The grey `// 202` at the end of a line is a comment: a note for you, skipped by JavaScript.
+--- task
+Under your two hello lines:
+
+1. Log `236 + 62` (the episodes of Friends plus the episodes of Breaking Bad). No quotes.
+2. Log `"236" + 62`, with quotes around the first number only. What do you get, and why?
+--- hint
+Each one is its own `console.log( )` line. In the first, the numbers have no quotes at all.
+--- hint
+```js
+console.log(236 + 62);
+console.log("236" + 62);
+```
+--- solution-append
+console.log(236 + 62);
+console.log("236" + 62);
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it, fix that line, then check again.`);
+const lines = t.logs.map((l) => l.text.trim());
+if (!lines.includes("298")) {
+  t.expect(!lines.some((x) => /236\s*\+\s*62/.test(x)), "The Console shows `236 + 62` as text, because it's inside quotes. Remove the quotes so JavaScript does the maths: `console.log(236 + 62);`.");
+  t.fail("I can't see **298** in the Console. Add `console.log(236 + 62);` with no quotes.");
+}
+t.expect(lines.includes("23662"), "Now log `\"236\" + 62`: quotes around 236 only. Look at what the Console shows.");
+--- learned
+Numbers add up, strings join together. `"236" + 62` gives `23662` because the first value is text. Keep this in mind: numbers that come from web pages often arrive as text.
+--- summary
+Strings are text in quotes, numbers have no quotes. `+` adds numbers but joins strings.
+--- mistakes
+- Quotes around the whole sum: `console.log("236 + 62")` prints the text itself.
+- A comma in decimals: `8,7` instead of `8.7`.
+
+
+=== step const
+title: Variables with const
+minutes: 15
+slot: js
+--- explain
+A **variable** is a name for a value, like a label on a box. You create one with `const`:
+
+```js
+const drink = "coffee";
+const cups = 3;
+
+console.log(drink);   // coffee
+console.log(cups);    // 3
+```
+
+Read the first line as: "create a box called `drink` and put `"coffee"` in it". The `=` means *put into*, not *is equal to*.
+
+Rules for names:
+
+- no spaces, and no quotes around the name
+- start with a letter
+- for names with several words, start each new word with a capital: `showName`, `episodesWatched`. This is called **camelCase**.
+- capitals matter: `showName` and `showname` are two different names
+
+When you use a variable, write its name **without quotes**. `console.log(cups)` prints `3`; `console.log("cups")` prints the word *cups*.
+--- task
+Under your other lines, create three variables about Friends:
+
+1. `showName` with the text `"Friends"`
+2. `episodes` with the number `236`
+3. `runtime` with the number `30` (minutes per episode)
+
+Then log `showName` and log `episodes`.
+--- hint
+Each variable is one line: `const`, the name, `=`, the value, `;`. Strings in quotes, numbers without.
+--- hint
+```js
+const showName = "Friends";
+const episodes = 236;
+const runtime = 30;
+
+console.log(showName);
+console.log(episodes);
+```
+--- solution-append
+const showName = "Friends";
+const episodes = 236;
+const runtime = 30;
+
+console.log(showName);
+console.log(episodes);
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it, fix that line, then check again.`);
+const name = t.get("showName"), ep = t.get("episodes"), rt = t.get("runtime");
+if (name === undefined) {
+  t.expect(!/const\s+showname\b/i.test(t.clean), "Check the capitals: the name is `showName`, with a capital N.");
+  t.fail("I can't find a variable called `showName`. Create it with `const showName = \"Friends\";`.");
+}
+t.expect(typeof name === "string", "`showName` should be text, in quotes: `\"Friends\"`.");
+t.expect(name.trim().toLowerCase() === "friends", `\`showName\` contains "${name}". It should be "Friends".`);
+t.expect(ep !== undefined, "Now create `episodes`: `const episodes = 236;`.");
+t.expect(typeof ep === "number", "`episodes` is text because of the quotes. Numbers have no quotes: `const episodes = 236;`.");
+t.expect(ep === 236, `\`episodes\` is ${ep}. Friends has 236 episodes.`);
+t.expect(rt !== undefined, "Now create `runtime`: `const runtime = 30;`.");
+t.expect(typeof rt === "number", "`runtime` should be a number, without quotes: `const runtime = 30;`.");
+t.expect(rt === 30, `\`runtime\` is ${rt}. Use 30 (minutes per episode).`);
+const lines = t.logs.map((l) => l.text.trim());
+if (!lines.some((x) => x.toLowerCase() === "friends")) {
+  t.expect(!lines.includes("showName"), "The Console shows the word *showName*. Remove the quotes: `console.log(showName);` prints what's inside the variable.");
+  t.fail("Log the variable: `console.log(showName);`, with no quotes around the name.");
+}
+t.expect(lines.includes("236"), "Now log the number of episodes: `console.log(episodes);`.");
+--- learned
+Variables give values a name, so you can use them again and again. From now on you'll almost always work with names like `episodes` instead of typing the numbers.
+--- summary
+`const name = value;` creates a variable. Use its name without quotes.
+--- mistakes
+- Quotes around the variable when using it: `console.log("showName")`.
+- Quotes around numbers: `const episodes = "236";`.
+- A space in the name: `const show name`.
+
+
+=== step let
+title: Values that change: let
+minutes: 15
+slot: js
+--- explain
+A `const` can never get a new value. That's useful: you know it stays the same. But some values *should* change, like how many episodes you've watched. For those, use `let`:
+
+```js
+let cupsToday = 1;
+console.log(cupsToday);   // 1
+
+cupsToday = cupsToday + 1;
+console.log(cupsToday);   // 2
+```
+
+To give a `let` variable a new value, write its name, `=` and the new value. Don't write `let` again: that would try to create a second box with the same name.
+
+Read `cupsToday = cupsToday + 1;` from right to left: take what's in `cupsToday` (1), add 1, and put the result (2) back into `cupsToday`.
+
+> Shorter ways to add 1, which you'll see in other people's code: `cupsToday += 1;` and `cupsToday++;`.
+
+A good habit: use `const` unless you know the value will change.
+--- task
+1. Create `episodesWatched` with `let`, starting at `10`, and log it.
+2. On a new line, add 1 to it. Then log it again. The Console should show 10, then 11.
+3. Try this: change `let` to `const` and read the red error. Then change it back.
+--- hint
+Adding 1 is a line that starts with the name (no `let`): `episodesWatched = episodesWatched + 1;`.
+--- hint
+```js
+let episodesWatched = 10;
+console.log(episodesWatched);
+
+episodesWatched = episodesWatched + 1;
+console.log(episodesWatched);
+```
+--- solution-append
+let episodesWatched = 10;
+console.log(episodesWatched);
+
+episodesWatched = episodesWatched + 1;
+console.log(episodesWatched);
+--- check
+if (t.errors.length) {
+  t.expect(!/constant/i.test(t.errors[0]), "That's the error you get when you change a `const`. Well spotted! Now change `const episodesWatched` back to `let episodesWatched`.");
+  t.expect(!/already been declared/.test(t.errors[0]), "`episodesWatched` is created twice. Write `let` only the first time. To change it, write only the name: `episodesWatched = episodesWatched + 1;`.");
+  t.fail(`There's an error in the Console: "${t.errors[0]}". Read the help under it, fix that line, then check again.`);
+}
+const w = t.get("episodesWatched");
+t.expect(w !== undefined, "I can't find `episodesWatched`. Create it with `let episodesWatched = 10;` (capital W).");
+t.expect(/\blet\s+episodesWatched\b/.test(t.clean), "Create `episodesWatched` with `let`, because its value will change.");
+t.expect(typeof w === "number", "`episodesWatched` should be a number, without quotes.");
+t.expect(/^\s*episodesWatched\s*(\+\+|\+=|=[^=])/m.test(t.clean), "Now add 1 on a new line that starts with the name: `episodesWatched = episodesWatched + 1;`.");
+t.expect(w === 11, `After adding 1, \`episodesWatched\` is ${w}. Start at 10 and add 1, so it ends at 11.`);
+const lines = t.logs.map((l) => l.text.trim());
+t.expect(lines.includes("10") && lines.includes("11"), "Log `episodesWatched` twice: once before you add 1 and once after. The Console should show 10 and then 11.");
+--- learned
+`let` makes a variable you can change; `const` makes one you can't. The same name printed twice gave two different values, because the code between the two logs changed it.
+--- summary
+`let` for values that change. Change them with `name = new value;`.
+--- mistakes
+- Writing `let` again on the second line: "has already been declared".
+- Writing `episodesWatched + 1;` alone (it calculates 11 but doesn't store it).
+- Using `const` and getting "Assignment to constant variable".
+
+
+=== step maths
+title: Maths with variables
+minutes: 20
+slot: js
+--- explain
+JavaScript is a good calculator. The **operators** are `+` and `-`, `*` for times, and `/` for divided by. The order is the same as at school: `*` and `/` before `+` and `-`, and brackets first.
+
+The best part: you can calculate with variables, and store the result in a new variable.
+
+```js
+const bbEpisodes = 62;
+const bbRuntime = 60;
+const bbMinutes = bbEpisodes * bbRuntime;
+console.log(bbMinutes);        // 3720
+console.log(bbMinutes / 60);   // 62
+```
+
+Division often gives long decimals. **Math.round** rounds to the nearest whole number:
+
+```js
+console.log(Math.round(4.6));  // 5
+console.log(Math.round(4.4));  // 4
+```
+
+`Math` is a toolbox that comes with JavaScript. You'll meet more of its tools later.
+
+> Why variables and not numbers? If you change `runtime` one day, every result that uses it updates by itself.
+--- task
+Under your code, using your variables `episodes` and `runtime`:
+
+1. Create `totalMinutes`: episodes times runtime. Log it.
+2. Create `hours`: totalMinutes divided by 60. Log it.
+3. Create `days`: hours divided by 24. Log it. (Lots of decimals!)
+4. Log `Math.round(days)`.
+--- hint
+Each result is a new `const`. For example `const totalMinutes = episodes * runtime;`, then `console.log(totalMinutes);`.
+--- hint
+```js
+const totalMinutes = episodes * runtime;
+console.log(totalMinutes);
+
+const hours = totalMinutes / 60;
+console.log(hours);
+
+const days = hours / 24;
+console.log(days);
+console.log(Math.round(days));
+```
+--- solution-append
+const totalMinutes = episodes * runtime;
+console.log(totalMinutes);
+
+const hours = totalMinutes / 60;
+console.log(hours);
+
+const days = hours / 24;
+console.log(days);
+console.log(Math.round(days));
+--- check
+t.expect(!/math is not defined/.test(t.errors[0] || ""), "JavaScript's toolbox is called `Math`, with a capital M: `Math.round(days)`.");
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it, fix that line, then check again.`);
+const tm = t.get("totalMinutes"), h = t.get("hours"), d = t.get("days");
+t.expect(tm !== undefined, "I can't find `totalMinutes`. Create it with `const totalMinutes = episodes * runtime;`.");
+t.expect(tm === 7080, `\`totalMinutes\` is ${JSON.stringify(tm)}. It should be episodes times runtime (236 × 30 = 7080). Use \`*\` for times.`);
+t.expect(h !== undefined, "Now create `hours`: `const hours = totalMinutes / 60;`.");
+t.expect(h === 118, `\`hours\` is ${JSON.stringify(h)}. It should be totalMinutes divided by 60 (118).`);
+t.expect(d !== undefined, "Now create `days`: `const days = hours / 24;`.");
+t.expect(typeof d === "number" && Math.abs(d - 118 / 24) < 0.01, `\`days\` is ${JSON.stringify(d)}. It should be hours divided by 24 (about 4.9).`);
+const lines = t.logs.map((l) => l.text.trim());
+t.expect(lines.includes("7080") && lines.includes("118"), "Log each result: `console.log(totalMinutes);` and `console.log(hours);`.");
+t.expect(/Math\.round\s*\(/.test(t.clean), "Last one: log the rounded number of days with `console.log(Math.round(days));`. Capital M.");
+t.expect(lines.includes("5"), "Log the result of `Math.round(days)`: `console.log(Math.round(days));`. The Console should show 5.");
+--- learned
+You calculated with variables and stored the results in new ones. Watching all of Friends takes 118 hours: almost five whole days without sleep.
+--- summary
+Maths: `+ - * /`, results in variables. `Math.round()` rounds to a whole number.
+--- mistakes
+- `math.round` with a small m.
+- `x` instead of `*` for times.
+- Typing the numbers (`236 * 30`) instead of the variable names.
+
+
+=== step template
+title: Sentences with backticks
+minutes: 15
+slot: js
+--- explain
+You can build a sentence by joining strings and variables with `+`, but it gets messy fast:
+
+```js
+console.log("I'd like " + cups + " cups of " + drink + ", please.");
+```
+
+A **template literal** is easier to read. It uses **backticks** instead of quotes (look closely at the first and last character inside the brackets below), and puts each variable inside `${ }`:
+
+```js
+console.log(`I'd like ${cups} cups of ${drink}, please.`);
+// I'd like 3 cups of coffee, please.
+```
+
+Everything inside `${ }` is replaced by its value. Everything else stays as you typed it, spaces included.
+
+> **Where's the backtick key?** On most keyboards it's at the top left, under Esc, next to the 1. On some keyboards you press it and then the space bar.
+--- task
+Create a variable `sentence` with a template literal that makes this text from your variables:
+
+**Watching all 236 episodes of Friends takes 118 hours.**
+
+Use `${episodes}`, `${showName}` and `${hours}` for the parts that come from variables. Then log `sentence`.
+--- hint
+Start with `const sentence =`, then a backtick, the sentence, another backtick and `;`. In the sentence, replace each number and the name with `${...}`.
+--- hint
+```js
+const sentence = `Watching all ${episodes} episodes of ${showName} takes ${hours} hours.`;
+console.log(sentence);
+```
+--- solution-append
+const sentence = `Watching all ${episodes} episodes of ${showName} takes ${hours} hours.`;
+console.log(sentence);
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it, fix that line, then check again.`);
+const s = t.get("sentence");
+t.expect(s !== undefined, "I can't find a variable called `sentence`. Create it with `const sentence =` and your text between backticks.");
+t.expect(typeof s === "string", "`sentence` should be text, made with backticks.");
+t.expect(!/\$\{/.test(s), `Your sentence shows "${s}" with the \`\${ }\` still in it. Use backticks around the text, not quotes: only backticks fill in \`\${ }\`. The backtick key is usually at the top left, under Esc.`);
+t.expect(/friends/i.test(s), "Your sentence doesn't mention Friends. Put `${showName}` where the name goes.");
+t.expect(/\b118\b/.test(s), "Your sentence doesn't show 118. Put `${hours}` where the number of hours goes.");
+t.expect(/\b236\b/.test(s), "Your sentence doesn't show 236. Put `${episodes}` where the number of episodes goes.");
+t.expect(/\$\{\s*\w+\s*\}/.test(t.clean), "Use `${ }` with your variables, instead of typing the numbers yourself.");
+t.expect(t.logs.some((l) => l.text === s), "Log it: `console.log(sentence);`.");
+--- learned
+Template literals put values into text: backticks around it all, `${ }` around each variable. You'll use them every day from now on.
+--- summary
+Template literals: text between backticks, with `${variable}` for the values.
+--- mistakes
+- Normal quotes instead of backticks: the `${ }` is printed as it is.
+- `$(hours)` or `{hours}` instead of `${hours}`.
+- Forgetting spaces around the `${ }` parts, so words stick together.
+
+
+=== step page
+title: Put text on the page
+minutes: 20
+slot: js
+--- explain
+The Console is for you. Now let's show something to your visitors. Two pieces of JavaScript do it:
+
+```js
+document.querySelector("#greeting").textContent = "Welcome back!";
+```
+
+Read it from left to right:
+
+- `document` is the web page.
+- `.querySelector("#greeting")` **finds** the element with `id="greeting"`. The `#` works just like in CSS.
+- `.textContent = ...` **changes its text** to the value on the right.
+
+So: *in the page, find #greeting, and set its text to "Welcome back!"*
+
+Open the **show.html (whole page)** tab. The grey notes in the preview are empty elements with ids: `title`, `meta`, `watch-time`. Your JavaScript can fill them.
+
+> On Day 7 you'll learn much more about finding and changing elements. Today, this one pattern is enough.
+--- task
+At the bottom of your code, fill three elements:
+
+1. `#title` gets `showName`
+2. `#meta` gets a template literal: **236 episodes · 30 minutes each** (use `${episodes}` and `${runtime}`)
+3. `#watch-time` gets your `sentence`
+
+Watch the grey notes disappear.
+--- hint
+Each one is a line like the example: `document.querySelector("#title").textContent = showName;`. Change the id and the value on the right.
+--- hint
+```js
+document.querySelector("#title").textContent = showName;
+document.querySelector("#meta").textContent = `${episodes} episodes · ${runtime} minutes each`;
+document.querySelector("#watch-time").textContent = sentence;
+```
+--- solution-append
+document.querySelector("#title").textContent = showName;
+document.querySelector("#meta").textContent = `${episodes} episodes · ${runtime} minutes each`;
+document.querySelector("#watch-time").textContent = sentence;
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it, fix that line, then check again.`);
+t.expect(!/\.(?!textContent\b)[tT]ext[cC]ontent\b/.test(t.clean), "Check the capitals: it's `textContent`, with a capital C. With other spelling, nothing happens and there's no error.");
+const title = t.text("#title");
+if (!title) {
+  t.expect(!/querySelector\(\s*["']title["']\s*\)/.test(t.clean), "`querySelector(\"title\")` without `#` finds the page's `<title>` tag (the text on the browser tab). Add the `#`: `querySelector(\"#title\")`.");
+  t.fail("The title is still empty. Add `document.querySelector(\"#title\").textContent = showName;`.");
+}
+t.expect(title.toLowerCase() === "friends", `The title says "${title}". Set it to the variable \`showName\`, without quotes.`);
+const meta = t.text("#meta");
+t.expect(meta, "Now fill `#meta` with a template literal that uses `${episodes}` and `${runtime}`.");
+t.expect(!/\$\{/.test(meta), "The facts line shows `${ }`. Use backticks around the text, not quotes.");
+t.expect(/236/.test(meta) && /30/.test(meta), `The facts line says "${meta}". It should show 236 episodes and 30 minutes.`);
+const wt = t.text("#watch-time");
+t.expect(wt, "Last one: fill `#watch-time` with your `sentence`.");
+t.expect(/118/.test(wt), `\`#watch-time\` says "${wt}". Set it to your variable \`sentence\`.`);
+--- learned
+Your JavaScript changed the page! `document.querySelector` finds an element, and `.textContent` replaces its text. That's the bridge between your code and what visitors see.
+--- summary
+`document.querySelector("#id").textContent = value;` puts text on the page.
+--- mistakes
+- Forgetting the `#` in the selector: `querySelector("title")` changes the browser tab's title instead.
+- `textcontent` with a small c: no error, but nothing happens.
+- Quotes around the variable: the page shows the word *showName*.
+
+
+=== step booleans
+title: True or false
+minutes: 15
+slot: js
+--- explain
+A third type of value has only two possible values: `true` and `false`. It's called a **boolean**, and it's the answer to a yes-or-no question.
+
+You get booleans by **comparing**:
+
+- `>` and `<`: greater than, less than
+- `>=` and `<=`: greater than or equal to, less than or equal to
+- `===`: is equal to
+- `!==`: is not equal to
+
+```js
+const cups = 3;
+console.log(cups > 2);      // true
+console.log(cups === 4);    // false
+```
+
+Careful with the equals signs: one `=` *puts a value into* a variable; three `===` *ask* whether two values are the same.
+
+`===` is strict: the type must match too. The number `30` and the string `"30"` are **not** equal.
+--- task
+1. Create `isLong`: whether `episodes` is greater than 100. Log it.
+2. Log `showName === "Friends"`.
+3. Log `runtime === "30"`. Why is the answer `false`?
+--- hint
+`const isLong = episodes > 100;` stores the answer to the question "is episodes more than 100?". The other two go straight into `console.log( )`.
+--- hint
+```js
+const isLong = episodes > 100;
+console.log(isLong);
+console.log(showName === "Friends");
+console.log(runtime === "30");
+```
+--- solution-append
+const isLong = episodes > 100;
+console.log(isLong);
+console.log(showName === "Friends");
+console.log(runtime === "30");
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it, fix that line, then check again.`);
+const long = t.get("isLong");
+t.expect(long !== undefined, "I can't find `isLong`. Create it with `const isLong = episodes > 100;`.");
+t.expect(typeof long === "boolean", `\`isLong\` is ${JSON.stringify(long)}. It should be the answer to a comparison, without quotes: \`episodes > 100\`.`);
+t.expect(long === true, "`isLong` is false, but 236 is more than 100. Check the comparison: `episodes > 100`.");
+const lines = t.logs.map((l) => l.text.trim());
+t.expect(lines.includes("true"), "Log `isLong`: `console.log(isLong);`.");
+t.expect(lines.filter((x) => x === "true").length >= 2, "Log the comparison `showName === \"Friends\"`. It should print `true`.");
+t.expect(lines.includes("false"), "Log `runtime === \"30\"` too. It prints `false`: `runtime` holds the number 30, not the text \"30\".");
+--- learned
+Comparisons answer with `true` or `false`. And `===` checks the type too: the number 30 and the text "30" are different values.
+--- summary
+Booleans are `true` or `false`. Compare with `> < >= <= === !==`.
+--- mistakes
+- One `=` in a comparison: `showName = "Friends"` tries to change the variable.
+- Quotes around `true`: `"true"` is a string, not a boolean.
+
+
+=== step if-else
+title: Choose with if and else
+minutes: 20
+slot: js
+--- explain
+Now your code can make decisions. `if` runs a block of code only when a condition is `true`. `else` runs the other block when it's `false`:
+
+```js
+if (cups > 2) {
+  console.log("That's a lot of coffee.");
+} else {
+  console.log("Room for one more cup.");
+}
+```
+
+- The **condition** goes in round brackets `( )`.
+- Each **block** of code goes in curly brackets `{ }`.
+- Exactly one of the two blocks runs, never both.
+
+Indent the lines inside each block with two spaces (press Tab). It doesn't change what the code does, but it shows at a glance which lines belong to which block.
+
+You already have a boolean ready to use: `isLong`. A condition can be a comparison like `episodes > 100`, or a variable that holds `true` or `false`.
+--- task
+At the bottom of your code, write an `if / else`:
+
+- If the show is long (`isLong`), put **A long one: get comfortable on the sofa!** in `#verdict`.
+- Else, put **A short one: perfect for a weekend.** in `#verdict`.
+
+Then change `episodes` to `10` at the top and watch the message change. Change it back to `236` when you're done.
+--- hint
+Inside each pair of `{ }`, write one line that changes `#verdict`, like you did in step 7: `document.querySelector("#verdict").textContent = "...";`.
+--- hint
+```js
+if (isLong) {
+  document.querySelector("#verdict").textContent = "A long one: get comfortable on the sofa!";
+} else {
+  document.querySelector("#verdict").textContent = "A short one: perfect for a weekend.";
+}
+```
+--- solution-append
+if (isLong) {
+  document.querySelector("#verdict").textContent = "A long one: get comfortable on the sofa!";
+} else {
+  document.querySelector("#verdict").textContent = "A short one: perfect for a weekend.";
+}
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Look for a missing bracket \`)\` or \`}\` near the line it names.`);
+t.expect(/\bif\s*\(/.test(t.clean), "Start with `if (isLong) {`: the word `if`, then the condition in round brackets.");
+t.expect(/\}\s*else\s*\{/.test(t.clean), "Add the `else { ... }` part after the closing `}` of the `if` block: what should the page say when the show is short?");
+const v = t.text("#verdict");
+t.expect(v, "`#verdict` is still empty. Inside the `if` block, put a line that sets the text of `#verdict`.");
+t.expect(t.get("episodes") === 236, "Change `episodes` back to 236 before you check.");
+t.expect(!/short/i.test(v) || /long/i.test(v), `\`#verdict\` says "${v}", but Friends is a long show. The long message belongs in the \`if\` block, the short one in the \`else\` block.`);
+// try the same code with a short show, to test the else block
+const m = t.code.match(/\b(const|let)\s+episodes\s*=\s*[^;\n]+/);
+let other = null;
+if (m) {
+  try {
+    new t.win.Function(t.code.replace(m[0], m[1] + " episodes = 5"))();
+    other = t.text("#verdict");
+  } catch (e) { other = null; }
+  await t.rerun();
+}
+t.expect(other === null || other !== v, `With a short show (5 episodes), \`#verdict\` still says "${other}". Check that your \`if\` uses \`isLong\` (or \`episodes > 100\`) and that the \`else\` block sets a different message.`);
+--- learned
+Your page now makes a decision: the same code shows a different message when the numbers change. That's what makes programs more than a list of fixed sentences.
+--- summary
+`if (condition) { ... } else { ... }` runs one of two blocks.
+--- mistakes
+- A semicolon after the condition: `if (isLong); {` (the block then always runs).
+- Missing `}` before `else`.
+- Putting both messages outside the blocks, so the second one always wins.
+--- teacher
+The check runs the student's code once more with `episodes` set to 5 to test the `else` block, so a hard-coded condition like `if (true)` won't pass.
+
+
+=== step errors
+title: Read the error, fix the code
+minutes: 15
+slot: js
+--- explain
+Every developer makes typos, every day. The skill is not avoiding them: it's reading the error and fixing it quickly.
+
+When something goes wrong, the Console shows a **red message** with:
+
+- what went wrong, in JavaScript's words
+- the **line number** where it happened
+- in the Lab, a grey note that explains it in plain English
+
+There are two kinds of error:
+
+- JavaScript **can't read** the code at all, for example because a quote is missing. This is a **syntax error**, and *none* of the file runs.
+- JavaScript can read it, but something fails **while running**, like a name it doesn't know. The lines above it still ran.
+
+```js
+console.log(shwoName);
+// ReferenceError: shwoName is not defined
+```
+
+> The line number is where JavaScript *noticed* the problem. Sometimes the real mistake is on the line just above.
+--- task
+We added two broken lines at the bottom of your code. Look at the page: the grey notes are back, because one mistake stopped the whole file.
+
+1. Read the red error and its line number. Fix that mistake.
+2. A different error appears. Read it, and fix that one too.
+
+When both are fixed, the badge above the title says **NBC**.
+--- starter-append
+// Step 10: two mistakes are hiding below. The Console will help you find them.
+const network = "NBC;
+document.querySelector("#network").textContent = netwrok;
+--- hint
+The first error is about a line JavaScript can't read. Count the quotes on that line: every string needs one quote at the start and one at the end.
+--- hint
+The first line needs a closing quote: `const network = "NBC";`. In the second line, check the spelling of the variable at the end: it should be `network`.
+--- solution-append
+// Step 10: two mistakes are hiding below. The Console will help you find them.
+const network = "NBC";
+document.querySelector("#network").textContent = network;
+--- check
+if (t.errors.length) {
+  t.expect(!/netwrok/.test(t.errors[0]), "One fixed! Now the Console says `netwrok is not defined`: JavaScript doesn't know that name. Look at how the variable is spelled where it was created.");
+  t.fail(`There's still an error in the Console: "${t.errors[0]}". Look at the line number it gives, and the line just above it.`);
+}
+const n = t.get("network");
+t.expect(typeof n === "string", "I can't find the variable `network`. Keep the line `const network = \"NBC\";`, with both quotes.");
+t.expect(n === "NBC", `\`network\` contains "${n}". It should be "NBC".`);
+t.expect(t.text("#network") === "NBC", "The badge should say NBC. Keep the line that sets the text of `#network`.");
+t.expect(t.text("#title"), "The title is empty. Keep your line from step 7 that fills `#title`.");
+--- learned
+You fixed two errors by reading the Console. Remember the difference: a syntax error stops the whole file, while other errors stop the code from that line on.
+--- summary
+Red errors name the problem and the line. A syntax error stops the whole file.
+--- mistakes
+- Fixing the line number in the message but not looking at the line above.
+- Deleting the broken lines instead of fixing them.
+--- teacher
+Encourage students to read the error out loud. The grey explanation under each error is written for beginners.
+
+
+=== step text-methods
+title: Text that knows tricks
+minutes: 10
+slot: js
+bonus: yes
+--- explain
+Strings come with built-in tools. Some are **properties**, facts about the string, written after a dot:
+
+```js
+const drink = "coffee";
+console.log(drink.length);   // 6 (the number of characters)
+```
+
+Others are **methods**: actions the string can do. A method has brackets `( )` after its name:
+
+```js
+console.log(drink.toUpperCase());   // COFFEE
+console.log(drink.toLowerCase());   // coffee
+```
+
+Methods don't change the variable itself. They give you a new value, and `drink` is still `"coffee"`.
+--- task
+1. Log the number of characters in `showName`.
+2. At the very bottom, set `#title` to `showName` in capital letters.
+--- hint
+`.length` has no brackets, `.toUpperCase()` does. Both go straight after `showName`.
+--- hint
+```js
+console.log(showName.length);
+document.querySelector("#title").textContent = showName.toUpperCase();
+```
+--- solution-append
+console.log(showName.length);
+document.querySelector("#title").textContent = showName.toUpperCase();
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it and fix that line.`);
+t.expect(t.logs.some((l) => l.text.trim() === "7"), "Log the length of the name: `console.log(showName.length);`. It should print 7.");
+const title = t.text("#title");
+t.expect(title !== "function toUpperCase() { [native code] }" && !/native code/.test(title), "Add the brackets: `showName.toUpperCase()`.");
+t.expect(title === "FRIENDS", `The title says "${title}". Set it to \`showName.toUpperCase()\`, at the bottom of your code.`);
+--- learned
+Strings have properties like `.length` and methods like `.toUpperCase()`. You'll use `.toLowerCase()` on Day 6 to search for shows.
+--- summary
+`.length` counts characters; `.toUpperCase()` and `.toLowerCase()` change the case.
+
+
+=== step random
+title: A random episode
+minutes: 15
+slot: js
+bonus: yes
+--- explain
+`Math.random()` gives a random number between 0 and 1, like `0.7281`. It's different every time the code runs.
+
+To get a random whole number from 1 to 6, like a dice:
+
+```js
+const dice = Math.floor(Math.random() * 6) + 1;
+```
+
+Step by step:
+
+- `Math.random() * 6` gives a number between 0 and 5.999...
+- `Math.floor( )` rounds **down**, so it becomes 0, 1, 2, 3, 4 or 5.
+- `+ 1` makes it 1 to 6.
+--- task
+1. Create `randomEpisode`: a random whole number from 1 to `episodes`.
+2. Put **Tonight's random pick: episode 137** (with your random number) in `#random`.
+
+Press **Run again** above the preview a few times: the number changes.
+--- hint
+Use the dice example, with `episodes` instead of 6. Then a template literal for the text.
+--- hint
+```js
+const randomEpisode = Math.floor(Math.random() * episodes) + 1;
+document.querySelector("#random").textContent = `Tonight's random pick: episode ${randomEpisode}`;
+```
+--- solution-append
+const randomEpisode = Math.floor(Math.random() * episodes) + 1;
+document.querySelector("#random").textContent = `Tonight's random pick: episode ${randomEpisode}`;
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it and fix that line.`);
+const seen = [];
+for (let i = 0; i < 5; i++) {
+  if (i > 0) await t.rerun();
+  const txt = t.text("#random");
+  t.expect(txt, "`#random` is empty. Put your sentence in it with `document.querySelector(\"#random\").textContent = ...`.");
+  const m = txt.match(/\d+(\.\d+)?/g);
+  t.expect(m, `\`#random\` says "${txt}". Put the number in it with \`\${randomEpisode}\`.`);
+  const n = Number(m[m.length - 1]);
+  t.expect(Number.isInteger(n), `I found ${n}: that's not a whole number. Round it down with \`Math.floor( )\`.`);
+  t.expect(n >= 1 && n <= 236, `I found episode ${n}. The number should be from 1 to 236: multiply by \`episodes\` and add 1.`);
+  seen.push(n);
+}
+t.expect(new Set(seen).size > 1, `I ran your page five times and always got ${seen[0]}. Use \`Math.random()\` so the number changes.`);
+--- learned
+`Math.random()` plus `Math.floor()` gives random whole numbers. Games, shuffles and "surprise me" buttons all start like this.
+--- summary
+`Math.floor(Math.random() * n) + 1` is a random whole number from 1 to n.
+
+
+=== step else-if
+title: Three choices with else if
+minutes: 15
+slot: js
+bonus: yes
+--- explain
+With `else if` you can check more than two cases. JavaScript tries the conditions from top to bottom and runs the **first** block whose condition is true:
+
+```js
+if (cups >= 4) {
+  console.log("Too much coffee!");
+} else if (cups >= 2) {
+  console.log("A normal day.");
+} else {
+  console.log("Time for a cup.");
+}
+```
+
+With 5 cups, only the first message appears, even though 5 is also `>= 2`. Order matters: start with the strictest condition.
+--- task
+1. Create `const rating = 8.8;`.
+2. Show a label in `#rating`: **★ Excellent** if rating is 9 or more, **★ Very good** if it's 8 or more, and **★ Worth a try** otherwise.
+
+Try changing the rating to 9.5 and to 7 to see all three labels.
+--- hint
+Three blocks: `if (rating >= 9) { }`, then `else if (rating >= 8) { }`, then `else { }`. Each block sets the text of `#rating`.
+--- hint
+```js
+const rating = 8.8;
+
+if (rating >= 9) {
+  document.querySelector("#rating").textContent = "★ Excellent";
+} else if (rating >= 8) {
+  document.querySelector("#rating").textContent = "★ Very good";
+} else {
+  document.querySelector("#rating").textContent = "★ Worth a try";
+}
+```
+--- solution-append
+const rating = 8.8;
+
+if (rating >= 9) {
+  document.querySelector("#rating").textContent = "★ Excellent";
+} else if (rating >= 8) {
+  document.querySelector("#rating").textContent = "★ Very good";
+} else {
+  document.querySelector("#rating").textContent = "★ Worth a try";
+}
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Look for a missing bracket near the line it names.`);
+t.expect(typeof t.get("rating") === "number", "Create the variable first: `const rating = 8.8;`.");
+t.expect(/else\s+if\s*\(/.test(t.clean), "Use `else if (...)` for the middle case.");
+const m = t.code.match(/\b(const|let)\s+rating\s*=\s*[^;\n]+/);
+t.expect(m, "Create `rating` with `const rating = 8.8;`.");
+const labels = {};
+for (const r of [9.5, 8.8, 7]) {
+  try {
+    t.doc.querySelector("#rating").textContent = "";
+    new t.win.Function(t.code.replace(m[0], m[1] + " rating = " + r))();
+  } catch (e) { /* reported below */ }
+  labels[r] = t.text("#rating");
+}
+await t.rerun();
+t.expect(labels[8.8], "`#rating` is empty. Each block should set the text of `#rating`.");
+t.expect(/very good/i.test(labels[8.8]), `With a rating of 8.8, \`#rating\` says "${labels[8.8]}". It should say Very good.`);
+t.expect(/excellent/i.test(labels[9.5]), `With a rating of 9.5, \`#rating\` says "${labels[9.5]}". It should say Excellent: check the order, the \`>= 9\` test goes first.`);
+t.expect(/worth a try/i.test(labels[7]), `With a rating of 7, \`#rating\` says "${labels[7]}". It should say Worth a try: that's the \`else\` block.`);
+--- learned
+`else if` adds as many cases as you need. JavaScript stops at the first true condition, so put the strictest one first. Tomorrow you'll wrap this in a function.
+--- summary
+`if / else if / else` chooses between several cases, top to bottom.

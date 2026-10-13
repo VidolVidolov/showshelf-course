@@ -1,0 +1,1128 @@
+=== day
+n: 6
+title: Lists of shows
+subtitle: Arrays, objects, loops
+hours: 3 hours
+page: index.html
+slot: js | js | app.js
+file: app.js = js
+refs: data.js, @page, page.js
+
+--- intro
+A real app doesn't show one show: it shows lists. Today you learn how JavaScript keeps many values together (**arrays**), how it describes one thing with named values (**objects**), and how to go through a whole list with a **loop**.
+
+The file **data.js** (a read-only tab above the code box) holds twelve shows, each one an object with a name, genres, a rating and more. You start in the Console, exploring the data. Then you write small functions that pick shows from the list: the best ones, one by its id, the ones that match a search, the ones in a genre.
+
+As before, a helper file, **page.js**, uses your functions to fill in the page. It also scrolls the preview to the newest part you've made.
+
+--- template
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lists of shows · ShowShelf</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Compact sections, so the lists fit in the Lab preview */
+    .hero { padding: 16px 0 4px; }
+    .hero h1 { font-size: 1.5rem; }
+    .hero p { margin: 0; }
+    .block { margin: 16px 0 28px; }
+    .block h2 { font-size: 1.15rem; margin: 0 0 10px; }
+    .block .grid { margin-bottom: 0; gap: 10px; }
+    .card h3 { margin: 6px 0 2px; }
+    .search { margin: 0 0 12px; max-width: none; }
+    .genres { margin-bottom: 12px; }
+    .ranking { margin: 0; padding-left: 24px; }
+    .todo { color: var(--color-muted); font-style: italic; margin: 0; }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo">ShowShelf</a>
+      <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="about.html">About me</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <h1>Lists of shows</h1>
+      <p>Twelve shows from data.js. Your functions decide what appears below.</p>
+    </section>
+
+    <section class="block" data-fn="topRated">
+      <h2>Top rated</h2>
+      <div id="top-rated"></div>
+    </section>
+
+    <section class="block" data-fn="names">
+      <h2>All show names</h2>
+      <div id="all-names"></div>
+    </section>
+
+    <section class="block" data-fn="getById">
+      <h2>Pick of the day</h2>
+      <div id="pick-of-day"></div>
+    </section>
+
+    <section class="block" data-fn="searchByName">
+      <h2>Search</h2>
+      <form class="search" id="search-form">
+        <input type="search" id="search" placeholder="Search shows, e.g. office" aria-label="Search shows">
+        <button type="submit">Search</button>
+      </form>
+      <div id="search-results"></div>
+    </section>
+
+    <section class="block" data-fn="getByGenre">
+      <h2>Browse by genre</h2>
+      <div class="genres" id="genre-buttons"></div>
+      <div id="genre-results"></div>
+    </section>
+
+    <section class="block" data-fn="sortByRating" hidden>
+      <h2>Best first</h2>
+      <div id="best-first"></div>
+    </section>
+
+    <section class="block" data-fn="totalWatchTime" hidden>
+      <h2>Watch everything</h2>
+      <div id="watch-all"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>ShowShelf · Web Dev in 11 Days</p>
+  </footer>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+  <script src="page.js"></script>
+</body>
+</html>
+
+--- file style.css
+{{asset:appCss}}
+
+--- file data.js
+// data.js: the twelve shows ShowShelf knows about.
+// `shows` is an array. Each item is an object describing one show.
+const shows = {{data:shows}};
+
+--- file page.js
+// page.js: shows the answers of YOUR functions from app.js on the page.
+// It runs after data.js and app.js. You don't need to change it.
+(function () {
+  // Finds one of your functions by its name. Gives null if it isn't there yet.
+  function yours(name) {
+    try {
+      const found = eval(name);
+      return typeof found === "function" ? found : null;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function note(text) {
+    return `<p class="todo">${text}</p>`;
+  }
+
+  // One small card for one show
+  function card(show) {
+    if (!show || typeof show !== "object") return `<span class="chip">${show}</span>`;
+    const genres = Array.isArray(show.genres) ? show.genres.join(", ") : "";
+    return `
+      <article class="card">
+        <div class="card-body">
+          <span class="badge">${show.network || ""}</span>
+          <h3>${show.name}</h3>
+          <p class="rating">★ ${show.rating}</p>
+          <p class="meta">${genres}</p>
+        </div>
+      </article>`;
+  }
+
+  // A grid of cards for a list of shows, or a note if it isn't a list
+  function cards(list, name) {
+    if (!Array.isArray(list)) return note(`${name} gave back ${list}, not a list. Did you forget return?`);
+    if (list.length === 0) return note("No shows here.");
+    return `<div class="grid">${list.map(card).join("")}</div>`;
+  }
+
+  // Runs your function and puts what it makes in a box on the page
+  function render(box, name, makeHtml) {
+    const el = document.querySelector(box);
+    const yourFunction = yours(name);
+    if (!yourFunction) {
+      el.innerHTML = note(`(write ${name} to see this)`);
+      return;
+    }
+    try {
+      el.innerHTML = makeHtml(yourFunction);
+    } catch (error) {
+      el.innerHTML = note(`(${name} crashed: see the Console)`);
+      console.error(`${name} crashed: ${error.message}`);
+    }
+  }
+
+  render("#top-rated", "topRated", (f) => cards(f(shows), "topRated"));
+
+  render("#all-names", "names", (f) => {
+    const list = f(shows);
+    return Array.isArray(list) ? `<p>${list.join(" · ")}</p>` : note(`names gave back ${list}, not a list. Did you forget return?`);
+  });
+
+  render("#pick-of-day", "getById", (f) => {
+    const show = f(shows, 7);
+    return show ? cards([show], "getById") : note("getById(shows, 7) found nothing.");
+  });
+
+  // Search: runs again every time you type in the box
+  const input = document.querySelector("#search");
+  function search() {
+    render("#search-results", "searchByName", (f) => {
+      if (input.value.trim() === "") return note("Type a name in the box, for example office.");
+      return cards(f(shows, input.value), "searchByName");
+    });
+  }
+  input.addEventListener("input", search);
+  document.querySelector("#search-form").addEventListener("submit", (event) => {
+    event.preventDefault();
+    search();
+  });
+  search();
+
+  // Genres: one button per genre (plus Western, which no show has)
+  let current = "Comedy";
+  const allGenres = [];
+  for (const show of shows) {
+    for (const genre of show.genres) {
+      if (!allGenres.includes(genre)) allGenres.push(genre);
+    }
+  }
+  allGenres.push("Western");
+  function genres() {
+    let counts = null;
+    const countByGenre = yours("countByGenre");
+    if (countByGenre) {
+      try { counts = countByGenre(shows); } catch (error) { console.error(`countByGenre crashed: ${error.message}`); }
+    }
+    document.querySelector("#genre-buttons").innerHTML = allGenres
+      .map((genre) => {
+        const count = counts ? ` ${counts[genre] || 0}` : "";
+        return `<button type="button" class="chip ${genre === current ? "active" : ""}" data-genre="${genre}">${genre}${count}</button>`;
+      })
+      .join("");
+    render("#genre-results", "getByGenre", (f) => cards(f(shows, current), "getByGenre"));
+  }
+  document.querySelector("#genre-buttons").addEventListener("click", (event) => {
+    const button = event.target.closest("[data-genre]");
+    if (!button) return;
+    current = button.dataset.genre;
+    genres();
+  });
+  genres();
+
+  // Extra challenges: these sections appear when the function exists
+  if (yours("sortByRating")) {
+    document.querySelector("#best-first").closest("section").hidden = false;
+    render("#best-first", "sortByRating", (f) => {
+      const list = f(shows);
+      if (!Array.isArray(list)) return note(`sortByRating gave back ${list}, not a list.`);
+      return `<ol class="ranking">${list.map((show) => `<li>${show.name} <span class="rating">★ ${show.rating}</span></li>`).join("")}</ol>`;
+    });
+  }
+  if (yours("totalWatchTime")) {
+    document.querySelector("#watch-all").closest("section").hidden = false;
+    render("#watch-all", "totalWatchTime", (f) => {
+      const minutes = f(shows);
+      return `<p>Watching all ${shows.length} shows takes <b>${minutes} minutes</b>: about ${Math.round(minutes / 60)} hours, or ${Math.round(minutes / 60 / 24)} days without sleep.</p>`;
+    });
+  }
+
+  // Scroll to the newest part you've made, so you can see it straight away
+  const made = [...document.querySelectorAll("section[data-fn]")].filter((section) => yours(section.dataset.fn));
+  if (made.length) window.scrollTo(0, made[made.length - 1].offsetTop - 12);
+})();
+
+--- default js
+// app.js: lists of shows.
+// data.js (a read-only tab) gives you `shows`: an array of 12 show objects.
+
+
+=== step array
+title: A list: arrays
+minutes: 15
+slot: js
+--- explain
+An **array** is a list of values. You write it in square brackets `[ ]`, with commas between the items:
+
+```js
+const snacks = ["crisps", "popcorn", "grapes"];
+
+console.log(snacks[0]);       // crisps
+console.log(snacks[2]);       // grapes
+console.log(snacks.length);   // 3
+
+snacks.push("chocolate");
+console.log(snacks);          // ["crisps","popcorn","grapes","chocolate"]
+```
+
+- Each item has a position number called its **index**. Counting starts at **0**, so the first item is `snacks[0]`.
+- `.length` is how many items there are.
+- `.push(...)` adds an item to the end.
+
+Wait: `snacks` is a `const`, and it changed? A `const` can't be *replaced* by another value, but the list inside it can still grow and shrink.
+--- task
+1. Create `favourites`: an array with the names of three shows you like.
+2. Log the first one, and log how many there are.
+3. Add a fourth show with `push`. Then log the whole array.
+--- hint
+Strings in quotes, separated by commas, all inside `[ ]`. The first item is `favourites[0]`.
+--- hint
+```js
+const favourites = ["Dark", "Fleabag", "The Wire"];
+console.log(favourites[0]);
+console.log(favourites.length);
+
+favourites.push("Chernobyl");
+console.log(favourites);
+```
+--- solution-append
+const favourites = ["Dark", "Fleabag", "The Wire"];
+console.log(favourites[0]);
+console.log(favourites.length);
+
+favourites.push("Chernobyl");
+console.log(favourites);
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it, fix that line, then check again.`);
+const fav = t.get("favourites");
+if (fav === undefined) {
+  t.expect(!/favorites/.test(t.clean), "We spell it the British way here: `favourites`, with a u.");
+  t.fail("I can't find `favourites`. Create it with `const favourites = [\"Dark\", \"Fleabag\", \"The Wire\"];`.");
+}
+t.expect(Array.isArray(fav), "`favourites` should be an array: values in square brackets `[ ]`, separated by commas.");
+t.expect(fav.length >= 3, `\`favourites\` has ${fav.length} item${fav.length === 1 ? "" : "s"}. Start with three show names, separated by commas.`);
+t.expect(fav.every((x) => typeof x === "string"), "Put each show name in quotes.");
+t.expect(/favourites\s*\.\s*push\s*\(/.test(t.clean), "Now add a fourth show with `favourites.push(\"...\");`.");
+t.expect(fav.length >= 4, "Your `push` didn't add anything. Put a show name in quotes between its brackets.");
+const lines = t.logs.map((l) => l.text.trim());
+t.expect(lines.includes(fav[0]), `Log the first show: \`console.log(favourites[0]);\`. The index of the first item is 0.`);
+t.expect(lines.some((x) => /^\d+$/.test(x)), "Log how many shows there are: `console.log(favourites.length);`.");
+t.expect(lines.some((x) => x.startsWith("[") && x.includes(fav[fav.length - 1])), "After the push, log the whole array: `console.log(favourites);`.");
+--- learned
+Arrays keep many values in order. You read an item by its index (starting at 0), count them with `.length`, and add one with `.push`.
+--- summary
+Arrays: `[a, b, c]`, `list[0]` is the first item, `.length`, `.push()`.
+--- mistakes
+- `favourites[1]` for the first item (counting starts at 0).
+- Forgetting the commas between items.
+- Round brackets instead of square ones: `("Dark", "Fleabag")`.
+
+
+=== step object
+title: One show: objects
+minutes: 15
+slot: js
+--- explain
+An array is a list of many things. An **object** describes *one* thing with several named values, called **properties**:
+
+```js
+const snack = {
+  name: "popcorn",
+  salty: true,
+  price: 3.5,
+};
+
+console.log(snack.name);   // popcorn
+
+snack.price = 4;
+console.log(snack);        // {"name":"popcorn","salty":true,"price":4}
+```
+
+- Curly brackets `{ }` around it all.
+- Each property is a **key** (its name), a colon, and a **value**, with commas between the properties.
+- A dot reads a property: `snack.name`. A dot and `=` change it.
+
+Values can be any type: strings, numbers, booleans, even arrays.
+--- task
+1. Create an object `myShow` for a show you like, with three properties: `name` (text), `year` (the year it started, a number) and `rating` (a number).
+2. Log its name.
+3. Change the rating to your own score, with a dot and `=`.
+4. Log the whole object.
+--- hint
+Keys have no quotes; text values do. Commas go between the properties, not after the last `}`.
+--- hint
+```js
+const myShow = {
+  name: "Fleabag",
+  year: 2016,
+  rating: 8.4,
+};
+console.log(myShow.name);
+
+myShow.rating = 10;
+console.log(myShow);
+```
+--- solution-append
+const myShow = {
+  name: "Fleabag",
+  year: 2016,
+  rating: 8.4,
+};
+console.log(myShow.name);
+
+myShow.rating = 10;
+console.log(myShow);
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Check the commas between the properties and the colons after each key.`);
+const s = t.get("myShow");
+t.expect(s !== undefined, "I can't find `myShow`. Create it with `const myShow = { ... };` (capital S).");
+t.expect(s && typeof s === "object" && !Array.isArray(s), "`myShow` should be an object: curly brackets `{ }` with `key: value` pairs inside.");
+t.expect(typeof s.name === "string" && s.name.trim(), "Give `myShow` a `name` property with text: `name: \"Fleabag\",`.");
+t.expect(s.year !== undefined, "Add a `year` property: `year: 2016,`.");
+t.expect(typeof s.year === "number", "`year` should be a number, without quotes.");
+t.expect(s.rating !== undefined, "Add a `rating` property: `rating: 8.4,`.");
+t.expect(typeof s.rating === "number", "`rating` should be a number, without quotes.");
+const lines = t.logs.map((l) => l.text.trim());
+t.expect(lines.includes(s.name.trim()), "Log the name: `console.log(myShow.name);`.");
+t.expect(/myShow\s*\.\s*rating\s*=[^=]/.test(t.clean), "Now change the rating on a new line: `myShow.rating = 10;`.");
+t.expect(lines.some((x) => x.startsWith("{") && x.includes(s.name)), "Last one: log the whole object with `console.log(myShow);`.");
+--- learned
+Objects group the facts about one thing under names. Dot to read, dot and `=` to change. Every show in ShowShelf is an object like this one.
+--- summary
+Objects: `{ key: value, ... }`. Read with `obj.key`, change with `obj.key = value`.
+--- mistakes
+- `=` instead of `:` inside the object: `name = "Fleabag"`.
+- A missing comma between properties.
+- Quotes around numbers: `year: "2016"`.
+
+
+=== step data
+title: The twelve shows
+minutes: 15
+slot: js
+--- explain
+Open the **data.js** tab. It creates one variable, `shows`: an **array of objects**. Each object is one show, with the same keys: `id`, `name`, `genres`, `rating` and more.
+
+To reach a value, combine what you know. First pick the item by its index, then the property with a dot:
+
+```js
+const people = [
+  { name: "Ana", age: 31 },
+  { name: "Ben", age: 25 },
+];
+
+console.log(people.length);        // 2
+console.log(people[1].name);       // Ben
+console.log(people[people.length - 1].age);   // 25
+```
+
+The last line shows a handy trick: the **last** item's index is always `length - 1`, because counting starts at 0. With 2 people, the last one is `people[1]`.
+
+> data.js runs before app.js, so you can use `shows` straight away.
+--- task
+Log four things about the data:
+
+1. how many shows there are
+2. the name of the first show
+3. the rating of the second show
+4. the name of the last show, using `shows.length - 1`
+--- hint
+`shows.length`, `shows[0].name`, `shows[1].rating`. For the last one, put `shows.length - 1` inside the square brackets.
+--- hint
+```js
+console.log(shows.length);
+console.log(shows[0].name);
+console.log(shows[1].rating);
+console.log(shows[shows.length - 1].name);
+```
+--- solution-append
+console.log(shows.length);
+console.log(shows[0].name);
+console.log(shows[1].rating);
+console.log(shows[shows.length - 1].name);
+--- check
+if (t.errors.length) {
+  t.expect(!/reading 'name'/.test(t.errors[0]), "One of your indexes points past the end of the list. The last show is `shows[shows.length - 1]`, because counting starts at 0.");
+  t.fail(`There's an error in the Console: "${t.errors[0]}". Read the help under it, fix that line, then check again.`);
+}
+const lines = t.logs.map((l) => l.text.trim());
+t.expect(lines.includes("12"), "Log how many shows there are: `console.log(shows.length);`.");
+t.expect(lines.includes("Friends"), "Log the name of the first show: `console.log(shows[0].name);`. Its index is 0.");
+t.expect(lines.includes("9.2"), "Log the rating of the second show: `console.log(shows[1].rating);`. Its index is 1.");
+t.expect(lines.includes("Avatar: The Last Airbender"), "Log the name of the last show with `shows[shows.length - 1].name`.");
+--- learned
+`shows[1].rating` reads from the outside in: the list, the second item, its rating. That's how you'll reach any piece of data from now on.
+--- summary
+Arrays of objects: `shows[0].name`. The last item is `list[list.length - 1]`.
+--- mistakes
+- `shows[12]` for the last show (it's `shows[11]`).
+- `shows.name` (the array has no name; each show has).
+--- teacher
+Encourage students to open the data.js tab and read one show object in full before they start.
+
+
+=== step loop
+title: Go through every show
+minutes: 15
+slot: js
+--- explain
+Typing `shows[0]`, `shows[1]`, `shows[2]`... for twelve shows would be tiring. A **loop** repeats code once for every item in a list:
+
+```js
+for (const snack of snacks) {
+  console.log(`I like ${snack}`);
+}
+// I like crisps
+// I like popcorn
+// I like grapes
+```
+
+Read it as: *for each snack of the snacks list, run the block*.
+
+- `snack` is a new variable. On each round it holds the next item.
+- You choose its name. The singular of the list's name is a good habit: `snack` of `snacks`, `show` of `shows`.
+- The block in `{ }` runs once per item, top to bottom.
+--- task
+Write a `for...of` loop through `shows` that logs the name of every show. You'll see twelve new lines in the Console.
+
+If you like, log the rating too: `console.log(show.name, show.rating);`.
+--- hint
+Inside the loop, `show` is one show object. Its name is `show.name`.
+--- hint
+```js
+for (const show of shows) {
+  console.log(show.name);
+}
+```
+--- solution-append
+for (const show of shows) {
+  console.log(show.name);
+}
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it, fix that line, then check again.`);
+t.expect(/for\s*\(\s*(const|let)\s+\w+\s+of\s+shows\s*\)/.test(t.clean), "Start the loop with `for (const show of shows) {`.");
+const shows = t.get("shows");
+const lines = t.logs.map((l) => l.text.trim());
+const missing = shows.filter((s) => !lines.some((x) => x === s.name || x.startsWith(s.name + " ")));
+if (missing.length) {
+  t.expect(!lines.some((x) => x.startsWith("{") && x.includes('"id"')), "Your loop logs whole show objects. Log only the name: `console.log(show.name);`.");
+  t.expect(!lines.includes("undefined"), "Your loop logs `undefined`. Inside the loop, use the loop variable: `show.name`, not `shows.name`.");
+  t.fail(`I can't find ${missing[0].name} in the Console. Inside the loop, log \`show.name\`.`);
+}
+--- learned
+Three lines of code, twelve lines in the Console. Loops are how programs deal with lists of any length, 12 shows or 12,000.
+--- summary
+`for (const item of list) { ... }` runs the block once per item.
+--- mistakes
+- `shows.name` inside the loop instead of `show.name`.
+- `for (const show in shows)`: `in` gives the index numbers, not the shows.
+
+
+=== step loop-if
+title: Keep only the best
+minutes: 20
+slot: js
+--- explain
+A loop and an `if` together can **pick** items from a list. Start with an empty array, go through the list, and `push` only the items you want:
+
+```js
+const cheap = [];
+
+for (const snack of snackList) {
+  if (snack.price < 3) {
+    cheap.push(snack);
+  }
+}
+
+console.log(cheap.length);
+```
+
+After the loop, `cheap` holds only the snacks under 3. The original `snackList` hasn't changed.
+
+We added the start of this pattern at the bottom of your code. The `if` goes *inside* the loop's `{ }`, and the `push` goes *inside* the if's `{ }`: blocks inside blocks. Indent each level by two more spaces, so you can see where each block starts and ends.
+--- task
+Replace the `TODO` comment: if a show's rating is **9 or more**, push the show into `best`.
+
+The Console shows `best.length`. How many shows are rated 9 or more?
+
+Then try it with `8.8` instead of `9`, and change it back.
+--- starter-append
+const best = [];
+for (const show of shows) {
+  // TODO: if the show's rating is 9 or more, push the show into best
+}
+console.log(best.length);
+--- hint
+Inside the loop: `if (show.rating >= 9) {`, and inside that block, `best.push(show);`.
+--- hint
+```js
+const best = [];
+for (const show of shows) {
+  if (show.rating >= 9) {
+    best.push(show);
+  }
+}
+console.log(best.length);
+```
+--- solution-append
+const best = [];
+for (const show of shows) {
+  if (show.rating >= 9) {
+    best.push(show);
+  }
+}
+console.log(best.length);
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Check that every \`{\` has its \`}\`.`);
+const best = t.get("best");
+t.expect(Array.isArray(best), "I can't find the array `best`. Press **Start again** to get the starting code back.");
+t.expect(best.length, "`best` is still empty. Inside the loop, add `if (show.rating >= 9) { best.push(show); }`.");
+t.expect(best.length !== 12, "All 12 shows ended up in `best`. The `push` must be inside the `if` block, so it only runs when the rating is 9 or more.");
+const names = best.map((s) => (s && typeof s === "object" ? s.name : s));
+t.expect(best.length !== 3, `\`best\` has 3 shows (${names.join(", ")}). Shows rated exactly 9.0 count too: use \`>=\`.`);
+t.expect(best.length === 5, `\`best\` has ${best.length} shows (${names.join(", ")}). It should hold the 5 shows with a rating of 9 or more.`);
+t.expect(t.logs.some((l) => l.text.trim() === "5"), "Log the result after the loop: `console.log(best.length);`.");
+--- learned
+Empty list, loop, `if`, `push`: that's the pattern for picking items from a list. Five shows are rated 9 or more.
+--- summary
+Pick items: start with `[]`, loop, and `push` the ones that pass an `if`.
+--- mistakes
+- The `push` outside the `if` (every show is added).
+- `const best = [];` inside the loop (it starts empty every round).
+- `>` instead of `>=` (the 9.0 shows are left out).
+
+
+=== step filter
+title: filter: the short way
+minutes: 20
+slot: js
+--- explain
+Picking items from a list is so common that arrays have a method for it: **filter**. You give it a function that looks at one item and answers `true` (keep it) or `false` (leave it out). `filter` calls it for every item, and gives back a **new array** with the kept ones.
+
+```js
+const cheap = snackList.filter((snack) => snack.price < 3);
+```
+
+That one line does everything the loop in the last step did. The arrow function from yesterday fits perfectly here: `(snack) => snack.price < 3` means "given a snack, is its price under 3?".
+
+Now put it in a function, so page.js can use it for the **Top rated** section. page.js will call `topRated(shows)`, and the checks call it with other lists. So inside your function, always use the parameter, `list`, never `shows` directly.
+--- task
+Under your code, write `topRated(list)`. It returns the shows in `list` with a rating of **9 or more**, using `filter`.
+
+The Top rated section on the page fills with five cards.
+--- hint
+The body is one line: `return list.filter((show) => ...);`, with the rating test after the arrow.
+--- hint
+```js
+function topRated(list) {
+  return list.filter((show) => show.rating >= 9);
+}
+```
+--- solution-append
+function topRated(list) {
+  return list.filter((show) => show.rating >= 9);
+}
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Check the brackets: \`list.filter((show) => ...)\` has two pairs of round brackets.`);
+const f = t.get("topRated");
+t.expect(f !== undefined, "I can't find a function called `topRated`. Start with `function topRated(list) {`.");
+t.expect(typeof f === "function", "`topRated` should be a function.");
+const shows = t.get("shows");
+let r;
+try { r = f(shows); } catch (e) { t.fail("Your function crashed: " + e.message); }
+t.expect(r !== undefined, "`topRated(shows)` gives back `undefined`. Add `return` before `list.filter(...)`.");
+t.expect(Array.isArray(r), `\`topRated(shows)\` gives back ${JSON.stringify(r)}, not a list. Return what \`filter\` gives you.`);
+const names = r.map((s) => (s && typeof s === "object" ? s.name : s));
+t.expect(r.every((s) => s && typeof s === "object"), "`topRated` should give back whole show objects. Inside `filter`, the arrow function only answers true or false: `(show) => show.rating >= 9`.");
+t.expect(r.length === 5 && r.every((s) => s.rating >= 9), `\`topRated(shows)\` gives ${r.length} shows (${names.join(", ")}). It should give the 5 shows with a rating of 9 or more. Use \`>=\`.`);
+let r2;
+try { r2 = f([{ name: "Test A", rating: 9.5 }, { name: "Test B", rating: 7 }]); } catch (e) { t.fail("Your function crashed with another list: " + e.message); }
+t.expect(Array.isArray(r2) && r2.length === 1 && r2[0].name === "Test A", "Your function always uses `shows`. Use the parameter instead: `list.filter(...)`. page.js and the checks call it with different lists.");
+t.expect(t.$$("#top-rated .card").length === 5, "The Top rated section should show 5 cards. Press **Run again** above the preview.");
+--- learned
+`filter` does in one line what the loop did in six. It never changes the original list: it gives you a new one. The page now shows your top rated shows.
+--- summary
+`list.filter((item) => test)` gives a new array with the items that pass the test.
+--- mistakes
+- Forgetting `return` before `list.filter`.
+- Using `shows` inside the function instead of the parameter `list`.
+- Curly brackets after the arrow without a `return`: `(show) => { show.rating >= 9 }` keeps nothing.
+
+
+=== step map
+title: map: one thing from each
+minutes: 15
+slot: js
+--- explain
+`filter` keeps some items as they are. **map** keeps all items, but turns each one into something else. You give it a function that takes one item and returns its new value:
+
+```js
+const prices = snackList.map((snack) => snack.price);
+// [2.5, 4, 1]
+
+const labels = snackList.map((snack) => `${snack.name}: ${snack.price}`);
+// ["crisps: 2.5", "popcorn: 4", "grapes: 1"]
+```
+
+The new array always has the **same length** as the original: one result per item.
+
+The page has a section **All show names** that wants a plain list of names, without ratings or genres.
+--- task
+1. Write `names(list)` that returns an array with the name of every show in `list`, using `map`.
+2. Log `names(shows)` to see the result in the Console.
+--- hint
+Same shape as `topRated`, with `map` instead of `filter`. After the arrow, give back the show's name.
+--- hint
+```js
+function names(list) {
+  return list.map((show) => show.name);
+}
+
+console.log(names(shows));
+```
+--- solution-append
+function names(list) {
+  return list.map((show) => show.name);
+}
+
+console.log(names(shows));
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it, fix that line, then check again.`);
+const f = t.get("names");
+t.expect(f !== undefined, "I can't find a function called `names`. Start with `function names(list) {`.");
+t.expect(typeof f === "function", "`names` should be a function.");
+const shows = t.get("shows");
+let r;
+try { r = f(shows); } catch (e) { t.fail("Your function crashed: " + e.message); }
+t.expect(r !== undefined, "`names(shows)` gives back `undefined`. Add `return` before `list.map(...)`.");
+t.expect(Array.isArray(r), `\`names(shows)\` gives back ${JSON.stringify(r)}, not a list. Return what \`map\` gives you.`);
+t.expect(r.length === 12, `\`names(shows)\` gives ${r.length} items. \`map\` should give one name per show: 12. Use \`map\`, not \`filter\`.`);
+t.expect(r.every((x) => typeof x === "string"), /\.filter\s*\(/.test(String(f)) ? "You get whole shows back, because `filter` keeps items as they are. Use `map`: it gives back what the arrow gives, `list.map((show) => show.name)`." : "Each item should be a name, not a whole show. After the arrow, write `show.name`.");
+t.expect(r.join("|") === shows.map((s) => s.name).join("|"), `\`names(shows)\` starts with "${r[0]}". It should give each show's \`name\`.`);
+let r2;
+try { r2 = f([{ name: "Test A" }, { name: "Test B" }]); } catch (e) { t.fail("Your function crashed with another list: " + e.message); }
+t.expect(Array.isArray(r2) && r2.join("|") === "Test A|Test B", "Your function always uses `shows`. Use the parameter instead: `list.map(...)`.");
+t.expect(t.logs.some((l) => l.text.includes('"Avatar: The Last Airbender"')), "Log the result: `console.log(names(shows));`.");
+t.expect(/Breaking Bad/.test(t.text("#all-names")), "The All show names section should list the names. Press **Run again** above the preview.");
+--- learned
+`map` turns a list of shows into a list of names, one for one. Together, `filter` and `map` answer most questions you'll ask a list.
+--- summary
+`list.map((item) => newValue)` gives a new array with one result per item.
+--- mistakes
+- Using `filter` instead of `map` (you get whole shows back).
+- `shows.name` instead of `show.name` inside the arrow function.
+
+
+=== step find
+title: find: one show by its id
+minutes: 15
+slot: js
+--- explain
+Sometimes you want exactly **one** item. **find** goes through the list and gives back the **first** item for which your function says `true`. Not an array: the item itself. If nothing matches, it gives back `undefined`.
+
+```js
+const popcorn = snackList.find((snack) => snack.name === "popcorn");
+console.log(popcorn.price);   // 4
+```
+
+Every show in data.js has an `id`: a number that belongs to that show only. Names can change or repeat; ids don't. That's why apps look things up by id. On Day 9, the show page will use an id from the web address.
+
+> In the test, `===` (three equals) compares. A single `=` would *change* the id, and `find` would always give back the first show.
+--- task
+1. Write `getById(list, id)` that returns the show in `list` with that `id`, using `find`.
+2. Test it: `console.log(getById(shows, 2).name);` should print Breaking Bad. (Without `.name`, you'd see the whole show object.)
+
+page.js uses it for **Pick of the day**: `getById(shows, 7)`.
+--- hint
+Two parameters this time. After the arrow, compare the show's id with the parameter: `show.id === id`.
+--- hint
+```js
+function getById(list, id) {
+  return list.find((show) => show.id === id);
+}
+
+console.log(getById(shows, 2).name);
+```
+--- solution-append
+function getById(list, id) {
+  return list.find((show) => show.id === id);
+}
+
+console.log(getById(shows, 2).name);
+--- check
+t.expect(!t.errors.length || /reading 'name'/.test(t.errors[0]), `There's an error in the Console: "${t.errors[0]}". Read the help under it, fix that line, then check again.`);
+const f = t.get("getById");
+t.expect(f !== undefined, "I can't find a function called `getById`. Start with `function getById(list, id) {`.");
+t.expect(typeof f === "function" && f.length === 2, "`getById` needs two parameters: `function getById(list, id) {`.");
+const shows = t.get("shows");
+let r;
+try { r = f(shows, 2); } catch (e) { t.fail("Your function crashed: " + e.message); }
+t.expect(r !== undefined, "`getById(shows, 2)` gives back `undefined`. Add `return` before `list.find(...)`, and compare with `show.id === id`.");
+t.expect(!Array.isArray(r), "`getById` gives back a list. Use `find` instead of `filter`: it gives back the show itself.");
+t.expect(r && typeof r === "object", `\`getById(shows, 2)\` gives back ${JSON.stringify(r)}. It should give back the whole show object.`);
+t.expect(r.name !== "Friends", "`getById(shows, 2)` gives Friends. Compare with three equals signs: `show.id === id`. One `=` changes the id.");
+t.expect(r.name === "Breaking Bad", `\`getById(shows, 2)\` gives ${r.name}. It should give Breaking Bad, the show with id 2.`);
+t.expect(f(shows, 12) && f(shows, 12).name === "Avatar: The Last Airbender", "`getById(shows, 12)` should give Avatar: The Last Airbender. Use the parameter `id`, not a fixed number.");
+t.expect(f(shows, 99) === undefined, "`getById(shows, 99)` should give `undefined`: no show has id 99.");
+const r2 = f([{ id: 5, name: "Test A" }], 5);
+t.expect(r2 && r2.name === "Test A", "Your function always uses `shows`. Use the parameter instead: `list.find(...)`.");
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Check your test line: \`console.log(getById(shows, 2).name);\`.`);
+t.expect(/Chernobyl/.test(t.text("#pick-of-day")), "Pick of the day should show Chernobyl (id 7). Press **Run again** above the preview.");
+--- learned
+`find` gives back one item, or `undefined` when nothing matches. Looking things up by id is something every app does, all the time.
+--- summary
+`list.find((item) => test)` gives back the first matching item, or `undefined`.
+--- mistakes
+- `show.id = id` (one equals sign) always gives the first show.
+- Using `filter` and getting a list with one show in it.
+- `getById(shows, "2")`: the id in data.js is a number, and `===` checks the type.
+
+
+=== step search
+title: Search by name
+minutes: 20
+slot: js
+--- explain
+A search should find **The Office** whether you type `office`, `Office` or ` OFFICE `. Three string methods make that work:
+
+- `.toLowerCase()` gives the text in small letters.
+- `.trim()` removes spaces at the start and the end.
+- `.includes(text)` answers `true` if the text appears anywhere inside.
+
+```js
+const typed = "  Iced COFFEE ";
+const clean = typed.trim().toLowerCase();    // "iced coffee"
+
+console.log("Coffee and cake".toLowerCase().includes(clean));   // false
+console.log("Iced coffee to go".toLowerCase().includes(clean)); // true
+```
+
+Methods can be **chained**: each one works on the result of the one before. `typed.trim().toLowerCase()` first trims, then makes it lower case.
+
+The trick is to make **both** sides lower case: the search word and the show's name. Then capital letters don't matter any more.
+--- task
+We added the start of `searchByName(list, term)`. Replace the two `TODO` comments:
+
+1. Make `needle`: the `term`, trimmed and in lower case.
+2. Return the shows in `list` whose name, in lower case, includes `needle`.
+
+Then type in the search box on the page. Try `office`, `bad` and `THE`. Why does How I Met Your Mother appear for `THE`?
+--- starter-append
+function searchByName(list, term) {
+  // TODO 1: const needle = the term, trimmed and in lower case
+  // TODO 2: return the shows whose lower-case name includes needle
+}
+--- hint
+`const needle = term.trim().toLowerCase();`. Then `return list.filter((show) => ...)`, with the name test after the arrow.
+--- hint
+```js
+function searchByName(list, term) {
+  const needle = term.trim().toLowerCase();
+  return list.filter((show) => show.name.toLowerCase().includes(needle));
+}
+```
+--- solution-append
+function searchByName(list, term) {
+  const needle = term.trim().toLowerCase();
+  return list.filter((show) => show.name.toLowerCase().includes(needle));
+}
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it, fix that line, then check again.`);
+const f = t.get("searchByName");
+t.expect(typeof f === "function", "I can't find `searchByName`. Press **Start again** to get the starting code back.");
+const shows = t.get("shows");
+const call = (term) => { try { return f(shows, term); } catch (e) { t.fail(`\`searchByName(shows, "${term}")\` crashed: ${e.message}`); } };
+const nm = (r) => r.map((s) => (s && typeof s === "object" ? s.name : s)).join(", ");
+let r = call("office");
+t.expect(r !== undefined, "`searchByName(shows, \"office\")` gives back `undefined`. Add `return` before `list.filter(...)`.");
+t.expect(Array.isArray(r), `\`searchByName(shows, "office")\` gives back ${JSON.stringify(r)}, not a list. Return what \`filter\` gives you.`);
+t.expect(r.length, "`searchByName(shows, \"office\")` finds nothing. Make the show's name lower case too: `show.name.toLowerCase().includes(needle)`.");
+t.expect(r.length === 1 && r[0].name === "The Office", `\`searchByName(shows, "office")\` gives [${nm(r)}]. It should give only The Office.`);
+r = call("OFFICE");
+t.expect(r.length === 1 && r[0].name === "The Office", `\`searchByName(shows, "OFFICE")\` gives [${nm(r)}]. Make the search word lower case: \`term.toLowerCase()\`.`);
+r = call("  OFFICE ");
+t.expect(r.length === 1 && r[0].name === "The Office", `\`searchByName(shows, "  OFFICE ")\` gives [${nm(r)}]. Remove the spaces around the search word with \`.trim()\`.`);
+r = call("the");
+const withThe = shows.filter((s) => s.name.toLowerCase().includes("the")).length;
+t.expect(r.length === withThe, `\`searchByName(shows, "the")\` gives [${nm(r)}]. It should give ${withThe} shows: every name with "the" anywhere in it, even inside a word like Mother. Use \`includes\`.`);
+t.expect(call("zzz").length === 0, "`searchByName(shows, \"zzz\")` should give an empty list: no show has zzz in its name.");
+let r2;
+try { r2 = f([{ name: "Test Show" }], "test"); } catch (e) { t.fail("Your function crashed with another list: " + e.message); }
+t.expect(Array.isArray(r2) && r2.length === 1, "Your function always uses `shows`. Use the parameter instead: `list.filter(...)`.");
+await t.type("#search", "bad");
+const ok = await t.waitFor(() => t.$$("#search-results .card").length === 1 && /Breaking Bad/.test(t.text("#search-results")), 1500);
+t.expect(ok, "When I type bad in the search box, the results should show Breaking Bad. Press **Run again** and try it yourself.");
+--- learned
+Your search ignores capital letters and extra spaces, and finds words in the middle of a name. Type in the box: the results change as you type, because page.js calls your function on every key.
+--- summary
+Search: `trim()`, `toLowerCase()` on both sides, then `includes()`.
+--- mistakes
+- Making only the search word lower case, not the show's name.
+- `show.name === needle` instead of `includes` (only exact names match).
+- `toLowerCase` without brackets.
+--- teacher
+On Day 7 students write the event code that page.js does here (listening to the search box). Today, the point is the function.
+
+
+=== step genre
+title: Browse by genre
+minutes: 15
+slot: js
+--- explain
+Arrays have an `includes` method too. It answers `true` if the value is one of the items:
+
+```js
+const tags = ["salty", "crunchy"];
+console.log(tags.includes("salty"));   // true
+console.log(tags.includes("sweet"));   // false
+```
+
+Every show has a `genres` array, like `["Comedy", "Romance"]`. So the test "is this show a comedy?" is `show.genres.includes("Comedy")`.
+
+Put that test inside a `filter` and you have a genre browser:
+
+```js
+const salty = snackList.filter((snack) => snack.tags.includes("salty"));
+```
+
+Array `includes` compares whole items exactly, capital letters included: `"comedy"` won't match `"Comedy"`. The genre buttons on the page use the exact names from data.js.
+--- task
+Write `getByGenre(list, genre)`. It returns the shows in `list` whose `genres` include `genre`.
+
+Then click the genre buttons on the page. What happens with **Western**?
+--- hint
+Same shape as `topRated`, with two parameters. After the arrow: `show.genres.includes(genre)`.
+--- hint
+```js
+function getByGenre(list, genre) {
+  return list.filter((show) => show.genres.includes(genre));
+}
+```
+--- solution-append
+function getByGenre(list, genre) {
+  return list.filter((show) => show.genres.includes(genre));
+}
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it, fix that line, then check again.`);
+const f = t.get("getByGenre");
+t.expect(f !== undefined, "I can't find a function called `getByGenre`. Start with `function getByGenre(list, genre) {`.");
+t.expect(typeof f === "function" && f.length === 2, "`getByGenre` needs two parameters: `function getByGenre(list, genre) {`.");
+const shows = t.get("shows");
+const call = (g) => { try { return f(shows, g); } catch (e) { t.fail(`\`getByGenre(shows, "${g}")\` crashed: ${e.message}`); } };
+const nm = (r) => r.map((s) => (s && typeof s === "object" ? s.name : s)).join(", ");
+let r = call("Comedy");
+t.expect(r !== undefined, "`getByGenre(shows, \"Comedy\")` gives back `undefined`. Add `return` before `list.filter(...)`.");
+t.expect(Array.isArray(r), `\`getByGenre(shows, "Comedy")\` gives back ${JSON.stringify(r)}, not a list. Return what \`filter\` gives you.`);
+t.expect(r.length === 4, `\`getByGenre(shows, "Comedy")\` gives [${nm(r)}]. It should give the 4 comedies. Test each show with \`show.genres.includes(genre)\`.`);
+r = call("Drama");
+t.expect(r.length === 8, `\`getByGenre(shows, "Drama")\` gives ${r.length} shows. It should give 8. Use the parameter \`genre\`, not a fixed genre.`);
+r = call("Western");
+t.expect(Array.isArray(r) && r.length === 0, `\`getByGenre(shows, "Western")\` gives [${nm(r || [])}]. No show is a Western, so it should give an empty list.`);
+let r2;
+try { r2 = f([{ name: "Test Show", genres: ["Drama"] }], "Drama"); } catch (e) { t.fail("Your function crashed with another list: " + e.message); }
+t.expect(Array.isArray(r2) && r2.length === 1, "Your function always uses `shows`. Use the parameter instead: `list.filter(...)`.");
+await t.click('[data-genre="Drama"]');
+const ok = await t.waitFor(() => t.$$("#genre-results .card").length === 8, 1500);
+t.expect(ok, "When I click Drama on the page, it should show 8 cards. Press **Run again** and try it yourself.");
+--- learned
+`filter` plus `includes` answers "which shows have this genre?". With `filter`, `map`, `find` and `includes` you can ask almost anything of a list. Tomorrow you'll build the clicks and typing yourself.
+--- summary
+`array.includes(value)` checks whether a list contains a value.
+--- mistakes
+- `show.genre` instead of `show.genres` (the key has an s).
+- `show.genres === genre` (an array is never equal to one string).
+
+
+=== step sort
+title: Best first
+minutes: 20
+slot: js
+bonus: yes
+--- explain
+`sort` puts a list in order. To sort by a number, give it a function that compares two items, `a` and `b`:
+
+```js
+const byPrice = [...snackList].sort((a, b) => a.price - b.price);
+```
+
+- If the answer is negative, `a` comes first; if it's positive, `b` comes first. `a.price - b.price` gives cheapest first; `b.price - a.price` gives the most expensive first.
+- Careful: unlike `filter` and `map`, `sort` **changes the list you call it on**. `[...snackList]` makes a copy first, so the original stays as it is. The three dots are called **spread**: "take all the items and put them in a new array".
+--- task
+Write `sortByRating(list)` that returns a **copy** of the list, highest rating first. A new section, **Best first**, appears on the page.
+--- hint
+Copy with `[...list]`, then `.sort((a, b) => ...)`. For the highest first, subtract `a.rating` from `b.rating`.
+--- hint
+```js
+function sortByRating(list) {
+  return [...list].sort((a, b) => b.rating - a.rating);
+}
+```
+--- solution-append
+function sortByRating(list) {
+  return [...list].sort((a, b) => b.rating - a.rating);
+}
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it and fix that line.`);
+const f = t.get("sortByRating");
+t.expect(typeof f === "function", "I can't find a function called `sortByRating`. Start with `function sortByRating(list) {`.");
+const input = [{ name: "A", rating: 7 }, { name: "B", rating: 9 }, { name: "C", rating: 8 }];
+let r;
+try { r = f(input); } catch (e) { t.fail("Your function crashed: " + e.message); }
+t.expect(Array.isArray(r), "`sortByRating` should give back a list. Add `return`.");
+const order = r.map((s) => s.name).join("");
+t.expect(order !== "ACB", "That's lowest first. For the highest first, use `b.rating - a.rating`.");
+t.expect(order === "BCA", `Sorting ratings 7, 9, 8 gave ${r.map((s) => s.rating).join(", ")}. It should give 9, 8, 7.`);
+t.expect(input.map((s) => s.name).join("") === "ABC", "Your function changed the original list. Sort a copy: `[...list].sort(...)`.");
+t.expect(t.get("shows")[0].name === "Friends", "The `shows` list itself got sorted. Sort a copy: `[...list].sort(...)`.");
+t.expect(t.$$("#best-first li").length === 12, "The Best first section should list all 12 shows. Press **Run again** above the preview.");
+--- learned
+`sort` with a compare function orders a list by any number. Copying first with `[...list]` keeps the original safe.
+--- summary
+`[...list].sort((a, b) => b.x - a.x)` sorts a copy, biggest first.
+
+
+=== step count
+title: Count the genres
+minutes: 20
+slot: js
+bonus: yes
+--- explain
+An object can also work as a set of counters. When the key is in a variable, use square brackets instead of a dot:
+
+```js
+const counts = {};
+const word = "tea";
+counts[word] = 1;           // same as counts.tea = 1
+counts[word] = counts[word] + 1;
+console.log(counts);        // {"tea":2}
+```
+
+A key that doesn't exist yet is `undefined`, and `undefined + 1` is `NaN` (*not a number*). So the first time you see a key, set it to 1; after that, add 1.
+
+Each show has several genres, so you need a loop **inside** a loop: one through the shows, and one through each show's `genres`.
+--- task
+Write `countByGenre(list)` that returns an object like `{ Comedy: 4, Drama: 8, ... }`. Use loops and an object, not a new array method.
+
+When it works, the genre buttons on the page show their counts.
+--- hint
+Start with `const counts = {};`. Loop through the shows; inside, loop through `show.genres`. For each genre: `if (counts[genre])` add 1, `else` set it to 1. Return `counts` after the loops.
+--- hint
+```js
+function countByGenre(list) {
+  const counts = {};
+  for (const show of list) {
+    for (const genre of show.genres) {
+      if (counts[genre]) {
+        counts[genre] = counts[genre] + 1;
+      } else {
+        counts[genre] = 1;
+      }
+    }
+  }
+  return counts;
+}
+```
+--- solution-append
+function countByGenre(list) {
+  const counts = {};
+  for (const show of list) {
+    for (const genre of show.genres) {
+      if (counts[genre]) {
+        counts[genre] = counts[genre] + 1;
+      } else {
+        counts[genre] = 1;
+      }
+    }
+  }
+  return counts;
+}
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Check that every \`{\` has its \`}\`.`);
+const f = t.get("countByGenre");
+t.expect(typeof f === "function", "I can't find a function called `countByGenre`. Start with `function countByGenre(list) {`.");
+let c;
+try { c = f(t.get("shows")); } catch (e) { t.fail("Your function crashed: " + e.message); }
+t.expect(c && typeof c === "object" && !Array.isArray(c), `\`countByGenre(shows)\` gives back ${JSON.stringify(c)}. Return the \`counts\` object after the loops.`);
+t.expect(!Object.values(c).some((v) => Number.isNaN(v)), "Some counts are `NaN`. The first time you see a genre, set its count to 1 instead of adding 1 to `undefined`.");
+t.expect(c.Comedy === 4 && c.Drama === 8, `\`countByGenre(shows)\` gives Comedy: ${c.Comedy}, Drama: ${c.Drama}. It should give Comedy: 4, Drama: 8. Loop through every genre of every show.`);
+t.expect(c.Fantasy === 2 && Object.keys(c).length === 12, "Count every genre: there are 12 different ones in data.js.");
+let e;
+try { e = f([]); } catch (err) { t.fail("Your function crashed with an empty list: " + err.message); }
+t.expect(e && Object.keys(e).length === 0, "`countByGenre([])` should give an empty object `{}`. Use the parameter `list`, not `shows`.");
+t.expect(/Drama 8/.test(t.text("#genre-buttons")), "The genre buttons should show their counts, like Drama 8. Press **Run again** above the preview.");
+--- learned
+An object with keys you add as you go is a flexible counter. `counts[genre]` uses the value of `genre` as the key.
+--- summary
+`obj[key]` reads or sets a property whose name is in a variable.
+
+
+=== step total
+title: Watch everything
+minutes: 15
+slot: js
+bonus: yes
+--- explain
+A loop can also add things up. Start a total at 0 with `let`, and add to it on every round:
+
+```js
+let total = 0;
+for (const snack of snackList) {
+  total = total + snack.price;
+}
+console.log(total);   // 7.5
+```
+
+It has to be `let`, because the total changes on every round. And it must be created **before** the loop: inside, it would start again at 0 each time.
+--- task
+Write `totalWatchTime(list)` that returns the total minutes needed to watch every episode of every show in the list (each show: episodes times runtime).
+
+A new section, **Watch everything**, appears on the page.
+--- hint
+`let total = 0;`, then a loop that adds `show.episodes * show.runtime` to `total`. Return `total` after the loop.
+--- hint
+```js
+function totalWatchTime(list) {
+  let total = 0;
+  for (const show of list) {
+    total = total + show.episodes * show.runtime;
+  }
+  return total;
+}
+```
+--- solution-append
+function totalWatchTime(list) {
+  let total = 0;
+  for (const show of list) {
+    total = total + show.episodes * show.runtime;
+  }
+  return total;
+}
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it and fix that line.`);
+const f = t.get("totalWatchTime");
+t.expect(typeof f === "function", "I can't find a function called `totalWatchTime`. Start with `function totalWatchTime(list) {`.");
+const shows = t.get("shows");
+const want = shows.reduce((sum, s) => sum + s.episodes * s.runtime, 0);
+let r;
+try { r = f(shows); } catch (e) {
+  t.expect(!/total is not defined/.test(e.message), "Your function crashed: `total` doesn't exist after the loop. Create it with `let total = 0;` before the loop, not inside it.");
+  t.fail("Your function crashed: " + e.message);
+}
+t.expect(r !== undefined, "`totalWatchTime(shows)` gives back `undefined`. Return `total` after the loop.");
+t.expect(r !== shows[shows.length - 1].episodes * shows[shows.length - 1].runtime, "You get only the last show's minutes. Create `total` with `let` before the loop, and add to it inside.");
+t.expect(r === want, `\`totalWatchTime(shows)\` gives ${r}. It should give ${want} minutes: for each show, add episodes times runtime.`);
+t.expect(f([]) === 0, "`totalWatchTime([])` should give 0. Start the total at 0.");
+t.expect(f([{ episodes: 2, runtime: 30 }]) === 60, "Use the parameter `list` in your loop, not `shows`.");
+t.expect(/655 hours/.test(t.text("#watch-all")), "The Watch everything section should appear. Press **Run again** above the preview.");
+--- learned
+A running total with `let` and a loop can add up anything. All twelve shows take 655 hours: more than 27 days without sleep.
+--- summary
+Add up a list: `let total = 0;` before the loop, `total = total + ...` inside.

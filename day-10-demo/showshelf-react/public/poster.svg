@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 300" role="img" aria-label="ShowShelf placeholder poster: a TV set with a play button">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0.4" y2="1">
+      <stop offset="0" stop-color="#7a5cf0"/>
+      <stop offset="1" stop-color="#2b1d73"/>
+    </linearGradient>
+  </defs>
+  <rect width="200" height="300" fill="url(#bg)"/>
+  <circle cx="100" cy="130" r="92" fill="#ffffff" opacity="0.06"/>
+  <!-- antenna -->
+  <line x1="100" y1="92" x2="72" y2="62" stroke="#e7e1ff" stroke-width="4" stroke-linecap="round"/>
+  <line x1="100" y1="92" x2="128" y2="62" stroke="#e7e1ff" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="100" cy="93" r="5" fill="#e7e1ff"/>
+  <!-- TV body -->
+  <rect x="38" y="96" width="124" height="92" rx="16" fill="#1c1540"/>
+  <rect x="48" y="106" width="104" height="72" rx="10" fill="#a18bff"/>
+  <rect x="48" y="106" width="104" height="36" rx="10" fill="#ffffff" opacity="0.12"/>
+  <!-- play symbol -->
+  <polygon points="90,126 90,158 116,142" fill="#ffffff"/>
+  <!-- feet -->
+  <rect x="62" y="188" width="10" height="12" rx="3" fill="#1c1540"/>
+  <rect x="128" y="188" width="10" height="12" rx="3" fill="#1c1540"/>
+  <!-- name -->
+  <text x="100" y="272" text-anchor="middle" font-family="system-ui, Arial, sans-serif" font-size="15" font-weight="700" letter-spacing="1" fill="#e7e1ff">ShowShelf</text>
+</svg>
