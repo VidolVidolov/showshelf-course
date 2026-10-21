@@ -190,3 +190,32 @@ python3 test/run.py --lab /tmp/lab-day07.html d7-
 Then **look at it**. Write a short Playwright script (see `test/shots.py` for an example) that opens a few of your steps at 1280×800 (`#/step/d7-<key>`), sets the solution with `Lab.test.setCode(Lab.test.solution(id))`, clicks `#check`, and saves screenshots; also screenshot the day overview (`#/day/7`). Read the images. Check that the preview looks right, that the text is readable, and that nothing looks broken. Also try a couple of **wrong answers a beginner would really type** (`Lab.test.setCode(...)` then `Lab.test.check()`) and read the messages: are they helpful?
 
 Don't edit `src/` (the engine), `lessons/day01.lesson` or `lessons/day02.lesson`. If you really need an engine change, don't make it: describe it in your final report. 
+
+## Practice exercises (P1, P2, ...)
+
+A day can have a third group of steps between the guided steps and the extra challenges: **practice exercises**, marked `practice: yes`. They are short, independent drills on the day's ideas, for students who finish the guided steps early or work without a teacher. The last guided step's Next button leads into P1, and the last practice exercise leads to the day summary.
+
+- **Independent:** every practice step has its own fixed `--- starter` (the build refuses one without it) and uses a separate code box, so it never touches the app code of the guided steps. A student can skip any of them.
+- **Usually on the practice gym page.** Add to the day header:
+  ```
+  slot: gym | js | practice.js
+  file: practice.js = gym
+  ```
+  and a named template:
+  ```
+  --- template gym
+  <!doctype html>
+  <html lang="en"><head><meta charset="utf-8"><title>Practice gym</title>
+  <link rel="stylesheet" href="style.css"></head>
+  <body>
+  <main class="container"><h1>Practice gym</h1><p class="gym-intro">Every try below turns green when your function gives the right answer.</p><div id="gym"></div></main>
+  <script>{{asset:gymJs}}</script>
+  <script src="data.js"></script>      (only if the exercises use `shows`)
+  <script src="practice.js"></script>
+  </body></html>
+  ```
+  Each practice step then has `slot: gym` and `template: gym`.
+- **The gym helper** `tryIt(fn, [arg1, arg2], expected)` calls the function and shows one row on the page: a green tick, or a red cross with what it gave and what it should give (plus "Did you forget return?" when it gave `undefined`). It compares numbers with a tiny tolerance, and arrays and objects by content. Arguments are always in an array: `tryIt(countShows, [shows], 12)`, `tryIt(add, [2, 3], 5)`.
+- **Starter pattern:** a comment with the exercise in one or two lines, the function skeleton with `// your code here`, then 3–5 `tryIt` lines that cover normal and edge cases. Students see the expected answers on the page while they work. The check must still test the function itself with `t.get("name")` and its own inputs (students may delete the `tryIt` lines).
+- **Size:** 5–15 minutes each, 1–8 lines of code. Increase difficulty slowly; mark the hardest ones "(harder)" at the end of the title.
+- Each practice step still needs explain (short: a reminder of the idea with one small example, often 40–100 words), task, two hints, solution, learned, summary, mistakes and check, like any step.

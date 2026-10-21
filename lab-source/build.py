@@ -144,7 +144,7 @@ def build_day(path):
         for k, v in b["fields"]:
             if k in ("minutes", "wait"):
                 s[k] = int(v)
-            elif k == "bonus":
+            elif k in ("bonus", "practice"):
                 s[k] = v.lower() in ("yes", "true", "1")
             elif k == "refs":
                 s[k] = [r.strip() for r in v.split(",") if r.strip()]
@@ -202,6 +202,8 @@ def build_day(path):
             raise LessonError(f"{path.name}: step {key} uses unknown slot {s['slot']}")
         if "template" in s and s["template"] not in day.get("templates", {}):
             raise LessonError(f"{path.name}: step {key} uses unknown template {s['template']}")
+        if s.get("practice") and "starter" not in s:
+            raise LessonError(f"{path.name}: practice step {key} needs a fixed --- starter (practice exercises start fresh)")
         checks.append(check)
         day["steps"].append(s)
 
@@ -238,7 +240,7 @@ def main():
         print(f"{p.name}: day {day['n']}, {len(day['steps'])} steps")
     shell = (SRC / "shell.html").read_text(encoding="utf-8")
     assets = "/* generated: files the preview pages can include with {{asset:name}} */\n"
-    for name, fname in (("react", "react.min.js"), ("expressLite", "express-lite.js"), ("appCss", "app.css")):
+    for name, fname in (("react", "react.min.js"), ("expressLite", "express-lite.js"), ("appCss", "app.css"), ("gymJs", "gym.js")):
         js_str = json.dumps((SRC / fname).read_text(encoding="utf-8")).replace("</", "<\\/")
         assets += f"Lab.assets.{name} = {js_str};\n"
     scripts = [(SRC / f).read_text(encoding="utf-8") for f in ("lab.js", "data.js", "tvmaze-mock.js", "jsx.js")] + [assets] + day_js

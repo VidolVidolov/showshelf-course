@@ -67,20 +67,22 @@
   // ---------- registering days ----------
   function addDay(day) {
     day.steps = day.steps || [];
-    let core = 0, bonus = 0;
+    let core = 0, bonus = 0, practice = 0;
     day.steps.forEach((s, i) => {
       s.day = day;
       s.index = i;
       s.id = `d${day.n}-${s.key}`;
-      s.label = s.bonus ? `B${++bonus}` : String(++core);
+      s.label = s.bonus ? `B${++bonus}` : s.practice ? `P${++practice}` : String(++core);
       STEPS[s.id] = s;
     });
-    day.core = day.steps.filter((s) => !s.bonus);
+    day.core = day.steps.filter((s) => !s.bonus && !s.practice);
+    day.practiceSteps = day.steps.filter((s) => s.practice);
     day.bonusSteps = day.steps.filter((s) => s.bonus);
     DAYS.push(day);
     DAYS.sort((a, b) => a.n - b.n);
   }
   const dayByN = (n) => DAYS.find((d) => d.n === n);
+  const stepName = (s) => (s.bonus ? "Extra " + s.label.slice(1) : s.practice ? "Practice " + s.label.slice(1) : "Step " + s.label);
   const doneCount = (day) => day.core.filter((s) => state.done[s.id]).length;
 
   // =========================================================
@@ -293,7 +295,7 @@ var RF=window.fetch&&window.fetch.bind(window);window.fetch=function(u,o){return
   function lastCodeFor(day, slot, upto, solutionsOnly) {
     for (let j = upto; j >= 0; j--) {
       const s = day.steps[j];
-      if (s.slot !== slot || s.bonus && j !== upto) continue;
+      if (s.slot !== slot || (s.bonus || s.practice) && j !== upto) continue;
       if (!solutionsOnly && state.code[s.id] != null) return state.code[s.id];
       return s.solution;
     }
@@ -313,7 +315,7 @@ var RF=window.fetch&&window.fetch.bind(window);window.fetch=function(u,o){return
     return typeof step.starter === "function" ? step.starter(base) : base;
   }
   function lastCoreIndex(day, slot) {
-    for (let j = day.steps.length - 1; j >= 0; j--) if (!day.steps[j].bonus && day.steps[j].slot === slot) return j;
+    for (let j = day.steps.length - 1; j >= 0; j--) if (!day.steps[j].bonus && !day.steps[j].practice && day.steps[j].slot === slot) return j;
     return -1;
   }
 
@@ -486,7 +488,9 @@ var RF=window.fetch&&window.fetch.bind(window);window.fetch=function(u,o){return
 
   function stepRows(d) {
     const row = (s) => `<li class="${state.done[s.id] ? "done" : ""}"><a href="#/step/${s.id}"><span class="n">${state.done[s.id] ? "&#10003;" : s.label}</span><span class="t">${esc(s.title)}</span><span class="m">${s.minutes ? "~" + s.minutes + " min" : ""}</span></a></li>`;
-    return d.core.map(row).join("") + (d.bonusSteps.length ? `<li class="group">Extra challenges (if you finish early)</li>` + d.bonusSteps.map(row).join("") : "");
+    return d.core.map(row).join("") +
+      (d.practiceSteps.length ? `<li class="group">Practice: more exercises (after the steps above)</li>` + d.practiceSteps.map(row).join("") : "") +
+      (d.bonusSteps.length ? `<li class="group">Extra challenges (if you finish early)</li>` + d.bonusSteps.map(row).join("") : "");
   }
 
   function finalPreviewDoc(d) {
@@ -538,6 +542,7 @@ var RF=window.fetch&&window.fetch.bind(window);window.fetch=function(u,o){return
             ${left.length ? `<p>These steps are not checked yet: ${left.map((s) => `<a href="#/step/${s.id}">${esc(s.label + ". " + s.title)}</a>`).join(", ")}.</p>` : ""}
             <h3>What you learned today</h3>
             <div class="learned"><ul>${d.core.map((s) => `<li>${inline(s.summary || s.title)}</li>`).join("")}</ul></div>
+            ${d.practiceSteps.length ? `<h3>Keep practising: ${d.practiceSteps.filter((s) => state.done[s.id]).length} of ${d.practiceSteps.length} exercises done</h3><ul class="steplist">${d.practiceSteps.map((s) => `<li class="${state.done[s.id] ? "done" : ""}"><a href="#/step/${s.id}"><span class="n">${state.done[s.id] ? "&#10003;" : s.label}</span><span class="t">${esc(s.title)}</span><span class="m">${s.minutes ? "~" + s.minutes + " min" : ""}</span></a></li>`).join("")}</ul>` : ""}
             ${d.bonusSteps.length ? `<h3>Time left? Try the extra challenges</h3><ul class="steplist">${d.bonusSteps.map((s) => `<li class="${state.done[s.id] ? "done" : ""}"><a href="#/step/${s.id}"><span class="n">${state.done[s.id] ? "&#10003;" : s.label}</span><span class="t">${esc(s.title)}</span><span class="m">${s.minutes ? "~" + s.minutes + " min" : ""}</span></a></li>`).join("")}</ul>` : ""}
             <p style="margin-top:20px">${nextDay ? `<a class="btn" href="#/day/${nextDay.n}">Look at Day ${nextDay.n}: ${esc(nextDay.title)} ${ICON.right}</a>` : `<a class="btn" href="#/">Back to all days</a>`}</p>
           </div>
@@ -575,7 +580,7 @@ var RF=window.fetch&&window.fetch.bind(window);window.fetch=function(u,o){return
           <div class="md">${md(d.intro)}</div>
           ${d.steps.map((s) => `
             <article class="guide-step">
-              <h3>${s.bonus ? "Extra " + s.label.slice(1) : "Step " + s.label}. ${esc(s.title)} <span class="sub">${s.minutes ? "~" + s.minutes + " min" : ""}</span></h3>
+              <h3>${stepName(s)}. ${esc(s.title)} <span class="sub">${s.minutes ? "~" + s.minutes + " min" : ""}</span></h3>
               ${s.summary ? `<p class="teaches"><b>Teaches:</b> ${inline(s.summary)}</p>` : ""}
               <div class="cols">
                 <div><h4>Task</h4><div class="md">${md(s.task)}</div>
@@ -590,6 +595,7 @@ var RF=window.fetch&&window.fetch.bind(window);window.fetch=function(u,o){return
   }
   // show only what changed in this step when the answer builds on the previous one
   function answerPart(s) {
+    if (s.practice) return s.solution;
     const prev = lastCodeFor(s.day, s.slot, s.bonus ? lastCoreIndex(s.day, s.slot) : s.index - 1, true);
     if (!prev || !prev.trim()) return s.solution;
     const A = prev.split("\n"), B = s.solution.split("\n");
@@ -634,7 +640,7 @@ var RF=window.fetch&&window.fetch.bind(window);window.fetch=function(u,o){return
     save();
     current = { step, logs: [], errors: [], tab: "code", hintsShown: state.hints[step.id] || 0 };
     document.title = `${step.title} · Day ${d.n} · ShowShelf Lab`;
-    setCrumbs([["All days", "#/"], [`Day ${d.n}: ${d.title}`, `#/day/${d.n}`], [`${step.bonus ? "Extra " : "Step "}${step.label}`, ""]]);
+    setCrumbs([["All days", "#/"], [`Day ${d.n}: ${d.title}`, `#/day/${d.n}`], [stepName(step), ""]]);
     const slot = (d.slots && d.slots[step.slot]) || {};
     const lang = step.lang || slot.lang || "html";
     const fileName = Object.keys(d.files || {}).find((f) => d.files[f].slot === step.slot);
@@ -643,11 +649,11 @@ var RF=window.fetch&&window.fetch.bind(window);window.fetch=function(u,o){return
       lang: refLang(name),
       content: () => refContent(d, name, step),
     }));
-    const pos = step.bonus ? `Extra challenge ${step.label.slice(1)} of ${d.bonusSteps.length}` : `Step ${step.label} of ${d.core.length}`;
+    const pos = step.bonus ? `Extra challenge ${step.label.slice(1)} of ${d.bonusSteps.length}` : step.practice ? `Practice ${step.label.slice(1)} of ${d.practiceSteps.length}` : `Step ${step.label} of ${d.core.length}`;
     app().innerHTML = `
       <div class="workspace">
         <section class="pane lesson" aria-label="Lesson">
-          <div class="meta"><span>Day ${d.n} · ${pos}</span>${step.minutes ? `<span>~${step.minutes} min</span>` : ""}${step.bonus ? '<span class="pill bonus">Extra</span>' : ""}${state.done[step.id] ? '<span class="pill done">Done</span>' : ""}</div>
+          <div class="meta"><span>Day ${d.n} · ${pos}</span>${step.minutes ? `<span>~${step.minutes} min</span>` : ""}${step.bonus ? '<span class="pill bonus">Extra</span>' : ""}${step.practice ? '<span class="pill practice">Practice</span>' : ""}${state.done[step.id] ? '<span class="pill done">Done</span>' : ""}</div>
           <h1>${esc(step.title)}</h1>
           <div class="md">${md(step.explain)}</div>
           <div class="task"><h2>Your task</h2><div class="md">${md(step.task)}</div></div>
@@ -737,12 +743,12 @@ var RF=window.fetch&&window.fetch.bind(window);window.fetch=function(u,o){return
     const i = d.steps.indexOf(step);
     const prev = d.steps[i - 1];
     const next = d.steps[i + 1];
-    const dot = (s) => `<a class="dot ${s.bonus ? "bonus" : ""} ${state.done[s.id] ? "done" : ""} ${s === step ? "current" : ""}" href="#/step/${s.id}" title="${esc(s.label + ". " + s.title)}">${state.done[s.id] && s !== step ? "&#10003;" : s.label}</a>`;
+    const dot = (s) => `<a class="dot ${s.bonus ? "bonus" : ""} ${s.practice ? "practice" : ""} ${state.done[s.id] ? "done" : ""} ${s === step ? "current" : ""}" href="#/step/${s.id}" title="${esc(s.label + ". " + s.title)}">${state.done[s.id] && s !== step ? "&#10003;" : s.label}</a>`;
     const sp = $("#stepper");
     sp.hidden = false;
     sp.innerHTML = `
       ${prev ? `<a class="btn" href="#/step/${prev.id}">${ICON.left} Previous</a>` : `<a class="btn" href="#/day/${d.n}">${ICON.left} Day ${d.n}</a>`}
-      <div class="dots">${d.core.map(dot).join("")}${d.bonusSteps.length ? '<span class="gap"></span>' + d.bonusSteps.map(dot).join("") : ""}</div>
+      <div class="dots">${d.core.map(dot).join("")}${d.practiceSteps.length ? '<span class="gap"></span>' + d.practiceSteps.map(dot).join("") : ""}${d.bonusSteps.length ? '<span class="gap"></span>' + d.bonusSteps.map(dot).join("") : ""}</div>
       ${nextLink(step)}`;
   }
   function nextLink(step, primary) {
@@ -750,6 +756,7 @@ var RF=window.fetch&&window.fetch.bind(window);window.fetch=function(u,o){return
     const i = d.steps.indexOf(step);
     const next = d.steps[i + 1];
     const cls = primary ? "btn primary" : "btn";
+    if (!step.bonus && !step.practice && next && next.practice) return `<a class="${cls}" href="#/step/${next.id}">Practice exercises ${ICON.right}</a>`;
     if (!step.bonus && (!next || next.bonus)) return `<a class="${cls}" href="#/day/${d.n}/done">Finish Day ${d.n} ${ICON.right}</a>`;
     if (next) return `<a class="${cls}" href="#/step/${next.id}">Next ${ICON.right}</a>`;
     return `<a class="${cls}" href="#/day/${d.n}/done">Back to the day summary ${ICON.right}</a>`;

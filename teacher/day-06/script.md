@@ -160,12 +160,12 @@ Show the statement slide. **Say:** "`filter` keeps some, `map` changes each, `fi
 
 ## 1:15 · This afternoon (15 min)
 
-1. Go to the overview (`#/day/6`). Read the intro and the step list together: 10 steps, about 3 hours, then 3 extra challenges.
+1. Go to the overview (`#/day/6`). Read the intro and the step list together: 10 steps, about 3 hours, then 32 short practice exercises (P1–P32, about 5 hours, enough for the whole afternoon) and 3 extra challenges for the very fastest.
 2. **Do step 1 together** on the projector (press Start again first if you demoed there). Let the class choose three favourite shows, log the first one and the length, push a fourth, press **Check**.
 3. Show where everything is: the **data.js** tab, **Hint** (two per step), **Answer**, the **Console** under the preview, and the "Not yet" message after Check.
 4. **Say:** "Your progress saves by itself in this browser. Changing computers? **Help › Save progress to a file**, and on the other computer **Help › Open a progress file**."
 5. Show the *Stuck?* slide: read the message → Console → hint → answer → ask.
-6. Finished early? The extra challenges at the bottom of the step list: **Best first**, **Count the genres** and **Watch everything**.
+6. Finished step 10? The **practice exercises P1–P32**: one small function each in a practice gym, from very easy (how many shows?) to harder (names per network). Each `tryIt` row turns green when the function is right. Nobody is expected to finish all 32. Only the very fastest reach the extra challenges: **Best first**, **Count the genres** and **Watch everything**.
 
 **Milestone:** all five sections on the page are filled by your functions: Top rated, All show names, Pick of the day, Search and Browse by genre.
 
@@ -179,4 +179,6 @@ Show the statement slide. **Say:** "`filter` keeps some, `map` changes each, `fi
 - **Step 8, *find: one show by its id*:** `show.id = id` (one equals sign) always gives the first show; `filter` instead of `find` gives a list with one show.
 - **Step 9, *Search by name* (20 min):** only the search word is made lower case, not the show's name; or `===` instead of `includes`. Ask them to type `THE` in the search box and explain why How I Met Your Mother appears.
 - **Step 10, *Browse by genre*:** `show.genre` instead of `show.genres`, or `show.genres === genre` (an array is never equal to one string).
-- Fast finishers: the extra challenges. **Best first** needs the copy `[...list]` before `sort`.
+- After step 10: **practice exercises P1–P32** (about 5 hours in total, independent, can be skipped), enough for the whole afternoon. P10–P12 introduce counting and adding up with `let` before the loop; P14–P16 "best so far" and `counts[show.network]` with square brackets; P21 objects from `map` (needs round brackets: `({ ... })`); P23–P24 `&&` (watch for `from <= x <= to`); P25 a true/false flag; P28–P32 are marked harder. Pair a fast student with a stuck one.
+- Only the very fastest: the extra challenges. **Best first** needs the copy `[...list]` before `sort`.
+- If the lead can't attend, the assistant teacher runs the whole day from `substitute-plan.md` in this folder.

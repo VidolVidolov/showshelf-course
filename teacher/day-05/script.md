@@ -197,14 +197,14 @@ Show the statement slide. **Say:** "If you remember one thing today: `console.lo
 
 ## 1:15 · This afternoon (15 min)
 
-1. Go to the overview (`#/day/5`). Read the intro and the step list together: 10 steps, about 3 hours, then 2 extra challenges.
+1. Go to the overview (`#/day/5`). Read the intro and the step list together: 10 steps (most students need about an hour), then 36 practice exercises, P1 to P36 (about 5 hours, more than anyone finishes in one afternoon), then 2 extra challenges.
 2. **Do step 1 together** on the projector (press Start again first if you demoed there). Read the explanation aloud, let the class dictate `sayHello`, call it twice, press **Check**.
 3. Show where everything is: **Hint** (two per step, the second nearly the answer), **Answer**, the **Console** under the preview, and the "Not yet" message after Check.
 4. **Say:** "Your progress saves by itself in this browser. Changing computers? **Help › Save progress to a file**, and on the other computer **Help › Open a progress file**."
 5. Show the *Stuck?* slide: read the message → Console → hint → answer → ask.
-6. Finished early? The extra challenges at the bottom of the step list: **Episode codes like S01E05** and **How many days to binge it?**
+6. When the cards are full, press **Practice exercises**: P1 to P36 are small functions on a separate page, the *practice gym*, where each `tryIt` line turns green or red. Do them in order, **before** the extra challenges (**Episode codes like S01E05** and **How many days to binge it?**).
 
-**Milestone:** every grey note on the four cards is filled by your functions.
+**Milestone:** every grey note on the four cards is filled by your functions, then as many practice exercises as you can do.
 
 ---
 
@@ -216,4 +216,5 @@ Show the statement slide. **Say:** "If you remember one thing today: `console.lo
 - **Step 7, *Hours and minutes* (20 min):** `%` confuses people. Use a clock: 90 minutes is 1 hour and 30 left over. Watch for `minutes === 0` instead of `hours === 0`.
 - **Step 9, *Arrow functions*:** students keep the old `function watchTime` block and get "already declared", or put the arrow line below the line that calls it.
 - **Step 10, *A default value*:** `word == "episode"` or `word: "episode"` in the brackets instead of `word = "episode"`.
-- When the grey notes are all gone, they're done with the core: point them to the extra challenges.
+- When the grey notes are all gone, they're done with the core: point them to the **practice exercises P1–P36** (about 5 hours in total, so nobody is expected to finish them all), and only after those to the extra challenges. Each exercise has its own code box and never changes the cards; students can skip any of them. P19–P30 start easy again, so a student stuck on P16–P18 can move on and come back later.
+- **Hardest practice exercises:** P12 *Not started, watching or finished?* (order of four cases: test 0 first), P16 *How many evenings?* (rounding up with `%`), P17 *Time left, from two helpers* (`episodesLeft` wants `(total, watched)`, the opposite order of `timeLeft`'s parameters) and P18 *What's next?* (`${episode + 1}`, not `${episode} + 1`). In the second half, the hardest are P29–P30 (the `- 1 ... + 1` trick for seasons: test the last episode of a season), P34 *When does it end?* (minutes since midnight, `% 24` and a leading zero) and P35 *Premiere, finale or regular?* (five overlapping cases: "Series finale" before "Season finale"). P14 and P15 each introduce one small new tool (`.slice(0, n)` and `&&`), explained in the step.

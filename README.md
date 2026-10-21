@@ -16,7 +16,8 @@ showshelf-course-final/
 │       ├── script.md         your 90-minute morning lecture: timings, what to say, what to type
 │       ├── quiz.md           morning recap questions + an end-of-day check for the afternoon teacher
 │       ├── slides.pptx       the slides, with speaker notes (present from this)
-│       └── slides.pdf        the same slides as a PDF
+│       ├── slides.pdf        the same slides as a PDF
+│       └── substitute-plan.md  (Day 6 only) the whole day for an assistant teacher, without you
 ├── teacher-guide.pdf         for the afternoon teacher: every step's task, an answer, common mistakes
 ├── teacher-guide/
 │   └── day-01-guide.pdf … day-11-guide.pdf   the same, one file per day (print only today's)
@@ -33,8 +34,10 @@ The older, harder version of the course (vanilla JavaScript, then React and Expr
 | When | Who | What |
 |---|---|---|
 | Morning, 90 min | You | `teacher/day-NN/script.md` + `slides.pptx`. Live demos happen in the Lab on the projector. The last 15 minutes hand over to the afternoon: open the day in the Lab and do step 1 together. |
-| Afternoon, 3–4 h | Students, with the other teacher | The day's steps in the Lab. Each step has an explanation, a code box, a live preview, a Check button, two hints and an Answer button. Extra challenges for fast students. |
+| Afternoon, 3–4 h | Students, with the other teacher | The day's steps in the Lab. Each step has an explanation, a code box, a live preview, a Check button, two hints and an Answer button. Then practice exercises (Day 5: P1–P36, Day 6: P1–P32) and extra challenges for fast students. |
 | End of the afternoon | The other teacher | The end-of-day check in `quiz.md` (3 questions and one thing to look at). |
+
+On Day 6 you're away: give the assistant teacher `teacher/day-06/substitute-plan.md` the day before.
 
 Give the afternoon teacher that day's `teacher-guide/day-NN-guide.pdf` and the handover note at the bottom of your `script.md`. In the Lab, **Help › Teacher view** shows the answer and the common mistakes on every step.
 

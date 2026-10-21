@@ -5,7 +5,9 @@ subtitle: Arrays, objects, loops
 hours: 3 hours
 page: index.html
 slot: js | js | app.js
+slot: gym | js | practice.js
 file: app.js = js
+file: practice.js = gym
 refs: data.js, @page, page.js
 
 --- intro
@@ -14,6 +16,8 @@ A real app doesn't show one show: it shows lists. Today you learn how JavaScript
 The file **data.js** (a read-only tab above the code box) holds twelve shows, each one an object with a name, genres, a rating and more. You start in the Console, exploring the data. Then you write small functions that pick shows from the list: the best ones, one by its id, the ones that match a search, the ones in a genre.
 
 As before, a helper file, **page.js**, uses your functions to fill in the page. It also scrolls the preview to the newest part you've made.
+
+After the ten steps come thirty-two short **practice exercises** (P1 to P32) in a practice gym: small functions that use the same ideas again, from very easy to harder.
 
 --- template
 <!doctype html>
@@ -103,6 +107,27 @@ As before, a helper file, **page.js**, uses your functions to fill in the page. 
   <script src="data.js"></script>
   <script src="app.js"></script>
   <script src="page.js"></script>
+</body>
+</html>
+
+--- template gym
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Practice gym</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="container">
+    <h1>Practice gym</h1>
+    <p class="gym-intro">Every try below turns green when your function gives the right answer.</p>
+    <div id="gym"></div>
+  </main>
+  <script>{{asset:gymJs}}</script>
+  <script src="data.js"></script>
+  <script src="practice.js"></script>
 </body>
 </html>
 
@@ -939,6 +964,3497 @@ t.expect(ok, "When I click Drama on the page, it should show 8 cards. Press **Ru
 --- mistakes
 - `show.genre` instead of `show.genres` (the key has an s).
 - `show.genres === genre` (an array is never equal to one string).
+
+
+=== step p-count
+title: How many shows?
+minutes: 5
+slot: gym
+template: gym
+refs: data.js
+practice: yes
+--- explain
+Welcome to the **practice gym**: thirty-two short exercises that use today's ideas again. Each one is a single function in its own code box. Your ShowShelf page from steps 1 to 10 stays as it is.
+
+At the bottom of the code are some `tryIt` lines. Each one calls your function with the values in its square brackets and compares the result with the answer after them:
+
+```js
+tryIt(double, [4], 8);   // calls double(4) and expects 8
+```
+
+The preview shows one row per `tryIt` line: a green tick when your function gives that answer, a red cross with what it gave when it doesn't.
+
+Reminder: `.length` tells you how many items an array has. `shows` from data.js is here too.
+--- task
+Make `countShows(list)` return the number of shows in `list`.
+
+When every row in the preview is green, press **Check**.
+--- hint
+A list knows its own size. Give back `list.length`.
+--- hint
+```js
+function countShows(list) {
+  return list.length;
+}
+```
+--- starter
+// P1. How many shows are in a list?
+// countShows(list) gives back how many shows the list has.
+
+function countShows(list) {
+  // your code here
+}
+
+// Each tryIt line calls your function and shows the result in the preview.
+const two = [{ name: "Dark" }, { name: "Fleabag" }];
+const none = [];
+
+tryIt(countShows, [shows], 12);
+tryIt(countShows, [two], 2);
+tryIt(countShows, [none], 0);
+--- solution
+// P1. How many shows are in a list?
+// countShows(list) gives back how many shows the list has.
+
+function countShows(list) {
+  return list.length;
+}
+
+// Each tryIt line calls your function and shows the result in the preview.
+const two = [{ name: "Dark" }, { name: "Fleabag" }];
+const none = [];
+
+tryIt(countShows, [shows], 12);
+tryIt(countShows, [two], 2);
+tryIt(countShows, [none], 0);
+--- learned
+`list.length` works for any list, even an empty one. The `tryIt` rows let you see every answer at once.
+--- summary
+Practice: `.length` counts the items in any list.
+--- mistakes
+- `return shows.length` instead of `list.length` (right for `shows`, wrong for the other lists).
+- `list.length - 1` (that's the index of the last item, not the count).
+- Forgetting `return`: the rows say "Did you forget return?".
+--- teacher
+Practice exercises are independent: a student can skip one and come back to it later. Each one has its own Hint and Answer buttons, like the steps.
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it, fix that line, then check again.`);
+const f = t.get("countShows");
+t.expect(f !== undefined, "I can't find a function called `countShows`. Press **Start again** to get the starting code back.");
+t.expect(typeof f === "function", "`countShows` should be a function.");
+const call = (label, list) => { try { return f(list); } catch (e) { t.fail(`\`${label}\` crashed: ${e.message}`); } };
+const shows = JSON.parse(JSON.stringify(t.get("shows")));
+const r = call("countShows(shows)", shows);
+t.expect(r !== undefined, "`countShows(shows)` gives back `undefined`. Add `return` before `list.length`.");
+t.expect(r !== 11, "`countShows(shows)` gives 11. `.length` is already the number of items: don't subtract 1.");
+t.expect(r === 12, `\`countShows(shows)\` gives ${JSON.stringify(r)}. It should give 12: \`return list.length;\`.`);
+const r2 = call("countShows(a list of 3 shows)", [{ name: "Show A" }, { name: "Show B" }, { name: "Show C" }]);
+t.expect(r2 === 3, `With a list of 3 shows, \`countShows\` gives ${JSON.stringify(r2)}. Use the parameter \`list\`, not \`shows\`: \`return list.length;\`.`);
+const r3 = call("countShows([])", []);
+t.expect(r3 === 0, `\`countShows([])\` gives ${JSON.stringify(r3)}. It should give 0: an empty list has no shows.`);
+
+
+=== step p-first
+title: The first name
+minutes: 5
+slot: gym
+template: gym
+refs: data.js
+practice: yes
+--- explain
+To reach a value in a list of objects, read from the outside in: first the item, by its index, then the property, with a dot.
+
+```js
+const people = [{ name: "Ana", age: 31 }, { name: "Ben", age: 25 }];
+console.log(people[0].age);    // 31
+```
+
+Counting starts at **0**, so the first item is always `[0]`.
+--- task
+Make `firstName(list)` return the **name** of the first show in `list`.
+--- hint
+The first item is `list[0]`. Its name is one dot further.
+--- hint
+```js
+function firstName(list) {
+  return list[0].name;
+}
+```
+--- starter
+// P2. The name of the first show
+// firstName(list) gives back the name of the first show in the list.
+
+function firstName(list) {
+  // your code here
+}
+
+const trio = [{ name: "Chernobyl" }, { name: "Dark" }, { name: "The Crown" }];
+
+tryIt(firstName, [shows], "Friends");
+tryIt(firstName, [trio], "Chernobyl");
+--- solution
+// P2. The name of the first show
+// firstName(list) gives back the name of the first show in the list.
+
+function firstName(list) {
+  return list[0].name;
+}
+
+const trio = [{ name: "Chernobyl" }, { name: "Dark" }, { name: "The Crown" }];
+
+tryIt(firstName, [shows], "Friends");
+tryIt(firstName, [trio], "Chernobyl");
+--- learned
+`list[0].name`: the list, the first item, its name. Reading from the outside in works for any list of objects.
+--- summary
+Practice: `list[0].name` is the first item's name.
+--- mistakes
+- `list[1]` for the first item (counting starts at 0).
+- `list.name` (the list has no name; each show has).
+- Returning `list[0]`, the whole show, without `.name`.
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it, fix that line, then check again.`);
+const f = t.get("firstName");
+t.expect(f !== undefined, "I can't find a function called `firstName`. Press **Start again** to get the starting code back.");
+t.expect(typeof f === "function", "`firstName` should be a function.");
+const call = (label, list) => { try { return f(list); } catch (e) { t.fail(`\`${label}\` crashed: ${e.message}`); } };
+const shows = JSON.parse(JSON.stringify(t.get("shows")));
+const r = call("firstName(shows)", shows);
+t.expect(r !== undefined, "`firstName(shows)` gives back `undefined`. Return the first item's name: `return list[0].name;`. (The list itself has no name; each show has.)");
+t.expect(!(r && typeof r === "object"), "`firstName(shows)` gives back a whole show. Add `.name` to give back only its name: `list[0].name`.");
+t.expect(r !== "Breaking Bad", "`firstName(shows)` gives Breaking Bad, the second show. Counting starts at 0: the first item is `list[0]`.");
+t.expect(r === "Friends", `\`firstName(shows)\` gives ${JSON.stringify(r)}. It should give "Friends": \`list[0].name\`.`);
+const r2 = call("firstName(a list of 3 shows)", [{ name: "Show A" }, { name: "Show B" }, { name: "Show C" }]);
+t.expect(r2 === "Show A", `With another list, \`firstName\` gives ${JSON.stringify(r2)}. It should give "Show A". Use the parameter \`list\`, not \`shows\`.`);
+
+
+=== step p-last
+title: The last name
+minutes: 8
+slot: gym
+template: gym
+refs: data.js
+practice: yes
+--- explain
+The last item's index is always **one less than the length**, because counting starts at 0. A list of 3 items has the indexes 0, 1 and 2.
+
+```js
+const days = ["Mon", "Tue", "Wed"];
+console.log(days[days.length - 1]);   // Wed
+```
+
+`days[3]` would be `undefined`: there is no fourth item. Using `length - 1` instead of a fixed number makes the code work for lists of any length.
+--- task
+Make `lastName(list)` return the **name** of the last show in `list`. It must work for lists of any length, so don't write a fixed number like 11.
+--- hint
+The last item is `list[list.length - 1]`. Then add `.name`.
+--- hint
+```js
+function lastName(list) {
+  return list[list.length - 1].name;
+}
+```
+--- starter
+// P3. The name of the last show
+// lastName(list) gives back the name of the last show, for a list of any length.
+
+function lastName(list) {
+  // your code here
+}
+
+const trio = [{ name: "Chernobyl" }, { name: "Dark" }, { name: "The Crown" }];
+const one = [{ name: "Fleabag" }];
+
+tryIt(lastName, [shows], "Avatar: The Last Airbender");
+tryIt(lastName, [trio], "The Crown");
+tryIt(lastName, [one], "Fleabag");
+--- solution
+// P3. The name of the last show
+// lastName(list) gives back the name of the last show, for a list of any length.
+
+function lastName(list) {
+  return list[list.length - 1].name;
+}
+
+const trio = [{ name: "Chernobyl" }, { name: "Dark" }, { name: "The Crown" }];
+const one = [{ name: "Fleabag" }];
+
+tryIt(lastName, [shows], "Avatar: The Last Airbender");
+tryIt(lastName, [trio], "The Crown");
+tryIt(lastName, [one], "Fleabag");
+--- learned
+`list[list.length - 1]` is the last item of any list, whether it has 1 item or 12,000.
+--- summary
+Practice: the last item is `list[list.length - 1]`.
+--- mistakes
+- `list[list.length]`: one past the end, so the show is `undefined` and reading `.name` crashes.
+- `list[11]`: right for `shows`, but crashes for the shorter lists.
+- `list.length - 1` without the square brackets around it.
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it, fix that line, then check again.`);
+const f = t.get("lastName");
+t.expect(f !== undefined, "I can't find a function called `lastName`. Press **Start again** to get the starting code back.");
+t.expect(typeof f === "function", "`lastName` should be a function.");
+const call = (label, list) => {
+  try { return f(list); } catch (e) {
+    t.expect(!/reading 'name'/.test(e.message), `\`${label}\` crashed: your index points past the end of the list, so there's no show there to read a name from. The last item is \`list[list.length - 1]\`.`);
+    t.fail(`\`${label}\` crashed: ${e.message}`);
+  }
+};
+const shows = JSON.parse(JSON.stringify(t.get("shows")));
+const r = call("lastName(shows)", shows);
+t.expect(r !== undefined, "`lastName(shows)` gives back `undefined`. Add `return`, then the last item's name: `list[list.length - 1].name`.");
+t.expect(!(r && typeof r === "object"), "`lastName(shows)` gives back a whole show. Add `.name` at the end to give back only its name.");
+t.expect(r !== "Friends", "`lastName(shows)` gives Friends, the first show. The last item's index is `list.length - 1`.");
+t.expect(r === "Avatar: The Last Airbender", `\`lastName(shows)\` gives ${JSON.stringify(r)}. It should give "Avatar: The Last Airbender": \`list[list.length - 1].name\`.`);
+const r2 = call("lastName(a list of 3 shows)", [{ name: "Show A" }, { name: "Show B" }, { name: "Show C" }]);
+t.expect(r2 === "Show C", `With a list of 3 shows, \`lastName\` gives ${JSON.stringify(r2)}. It should give "Show C". Use \`list.length - 1\`, not a fixed number, and the parameter \`list\`, not \`shows\`.`);
+const r3 = call("lastName(a list of 1 show)", [{ name: "Show A" }]);
+t.expect(r3 === "Show A", `With a list of only 1 show, \`lastName\` gives ${JSON.stringify(r3)}. It should give that show's name, "Show A".`);
+
+
+=== step p-sentence
+title: A sentence about one show
+minutes: 8
+slot: gym
+template: gym
+refs: data.js
+practice: yes
+--- explain
+This function gets **one show**, an object, not the whole list. So you read its properties straight away with a dot, and put them in a sentence with a template literal:
+
+```js
+function aboutSnack(snack) {
+  return `${snack.name} costs ${snack.price} euros.`;
+}
+
+aboutSnack({ name: "Popcorn", price: 4 });   // "Popcorn costs 4 euros."
+```
+
+Open the **data.js** tab to see the exact names of the keys. The year a show started is called `premiered`.
+--- task
+Make `aboutShow(show)` return a sentence built from the show's `name`, `premiered` and `network`, like this: **Friends started in 1994 on NBC.**
+--- hint
+Backticks around the whole sentence, and `${show.name}`, `${show.premiered}` and `${show.network}` in the right places. Keep the full stop at the end.
+--- hint
+```js
+function aboutShow(show) {
+  return `${show.name} started in ${show.premiered} on ${show.network}.`;
+}
+```
+--- starter
+// P4. A sentence about one show
+// aboutShow(show) gets ONE show object and gives back a sentence like:
+// "Friends started in 1994 on NBC."
+
+function aboutShow(show) {
+  // your code here
+}
+
+tryIt(aboutShow, [shows[0]], "Friends started in 1994 on NBC.");
+tryIt(aboutShow, [shows[6]], "Chernobyl started in 2019 on HBO.");
+tryIt(aboutShow, [{ name: "Dark", premiered: 2017, network: "Netflix" }], "Dark started in 2017 on Netflix.");
+--- solution
+// P4. A sentence about one show
+// aboutShow(show) gets ONE show object and gives back a sentence like:
+// "Friends started in 1994 on NBC."
+
+function aboutShow(show) {
+  return `${show.name} started in ${show.premiered} on ${show.network}.`;
+}
+
+tryIt(aboutShow, [shows[0]], "Friends started in 1994 on NBC.");
+tryIt(aboutShow, [shows[6]], "Chernobyl started in 2019 on HBO.");
+tryIt(aboutShow, [{ name: "Dark", premiered: 2017, network: "Netflix" }], "Dark started in 2017 on Netflix.");
+--- learned
+A template literal and three dots turned one object into a sentence. Tomorrow you'll build whole show cards this way.
+--- summary
+Practice: `${show.name}` puts a property into a template literal.
+--- mistakes
+- `shows.name` (the list) instead of `show.name` (the parameter): the sentence says *undefined*.
+- Quotes instead of backticks, so `${...}` appears as it is.
+- A wrong key such as `show.year` (the key is `premiered`).
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it, fix that line, then check again.`);
+const f = t.get("aboutShow");
+t.expect(f !== undefined, "I can't find a function called `aboutShow`. Press **Start again** to get the starting code back.");
+t.expect(typeof f === "function", "`aboutShow` should be a function.");
+const norm = (s) => String(s).replace(/\s+/g, " ").trim().replace(/\.$/, "").toLowerCase();
+const call = (label, show) => {
+  try { return f(show); } catch (e) {
+    t.expect(!/reading/.test(e.message), `\`${label}\` crashed: ${e.message.replace(/\.$/, "")}. The parameter is one show, so read its properties directly: \`show.name\`, not \`show[0].name\`.`);
+    t.fail(`\`${label}\` crashed: ${e.message}`);
+  }
+};
+const shows = JSON.parse(JSON.stringify(t.get("shows")));
+const r = call("aboutShow(shows[0])", shows[0]);
+t.expect(r !== undefined, "`aboutShow(shows[0])` gives back `undefined`. Add `return` before your sentence.");
+t.expect(typeof r === "string", `\`aboutShow(shows[0])\` gives back ${JSON.stringify(r)}. Return a sentence: text between backticks.`);
+t.expect(!/\$\{/.test(r), `\`aboutShow(shows[0])\` gives "${r}". Use backticks around the sentence, not quotes, so the \`\${...}\` parts are filled in.`);
+if (/undefined/.test(r)) {
+  t.expect(!/^undefined started in undefined on undefined/i.test(r.trim()), `\`aboutShow(shows[0])\` gives "${r}". Read the properties from the parameter \`show\` (one show), not from \`shows\` (the whole list): \`show.name\`.`);
+  t.fail(`\`aboutShow(shows[0])\` gives "${r}". One of the property names is wrong. Open the data.js tab: the keys are \`name\`, \`premiered\` and \`network\`.`);
+}
+t.expect(norm(r) === "friends started in 1994 on nbc", `\`aboutShow(shows[0])\` gives "${r}". It should give "Friends started in 1994 on NBC."`);
+const r2 = call("aboutShow(shows[6])", shows[6]);
+t.expect(norm(r2) === "chernobyl started in 2019 on hbo", `\`aboutShow(shows[6])\` gives "${r2}". It should give "Chernobyl started in 2019 on HBO." Use the parameter \`show\`, not a fixed show.`);
+const r3 = call("aboutShow(another show)", { name: "Show A", premiered: 2020, network: "Test TV" });
+t.expect(norm(r3) === "show a started in 2020 on test tv", `With another show, \`aboutShow\` gives "${r3}". It should give "Show A started in 2020 on Test TV." Use \`show.name\`, \`show.premiered\` and \`show.network\`.`);
+
+
+=== step p-network
+title: Shows from one network
+minutes: 8
+slot: gym
+template: gym
+refs: data.js
+practice: yes
+--- explain
+`filter` keeps the items for which your arrow function answers `true`, and gives back a new list. The test can compare with a parameter, so one function works for any value:
+
+```js
+function cheaperThan(list, maxPrice) {
+  return list.filter((snack) => snack.price < maxPrice);
+}
+```
+
+`cheaperThan(snackList, 3)` and `cheaperThan(snackList, 5)` use the same code with a different limit.
+
+Remember: three equals signs `===` *ask* whether two values are the same.
+--- task
+Make `fromNetwork(list, network)` return the shows in `list` whose `network` is the same as the parameter `network`. Give back whole shows, not names.
+--- hint
+`return list.filter((show) => ...);`, with a comparison of `show.network` and `network` after the arrow.
+--- hint
+```js
+function fromNetwork(list, network) {
+  return list.filter((show) => show.network === network);
+}
+```
+--- starter
+// P5. Shows from one network
+// fromNetwork(list, network) gives back the shows (whole objects) from that network.
+
+function fromNetwork(list, network) {
+  // your code here
+}
+
+const mini = [
+  { name: "Chernobyl", network: "HBO" },
+  { name: "Friends", network: "NBC" },
+  { name: "The Wire", network: "HBO" },
+];
+const none = [];
+
+tryIt(fromNetwork, [mini, "HBO"], [{ name: "Chernobyl", network: "HBO" }, { name: "The Wire", network: "HBO" }]);
+tryIt(fromNetwork, [mini, "NBC"], [{ name: "Friends", network: "NBC" }]);
+tryIt(fromNetwork, [mini, "AMC"], []);
+tryIt(fromNetwork, [none, "HBO"], []);
+--- solution
+// P5. Shows from one network
+// fromNetwork(list, network) gives back the shows (whole objects) from that network.
+
+function fromNetwork(list, network) {
+  return list.filter((show) => show.network === network);
+}
+
+const mini = [
+  { name: "Chernobyl", network: "HBO" },
+  { name: "Friends", network: "NBC" },
+  { name: "The Wire", network: "HBO" },
+];
+const none = [];
+
+tryIt(fromNetwork, [mini, "HBO"], [{ name: "Chernobyl", network: "HBO" }, { name: "The Wire", network: "HBO" }]);
+tryIt(fromNetwork, [mini, "NBC"], [{ name: "Friends", network: "NBC" }]);
+tryIt(fromNetwork, [mini, "AMC"], []);
+tryIt(fromNetwork, [none, "HBO"], []);
+--- learned
+One `filter` with a parameter answers the question for every network. When nothing matches, you get an empty list `[]`, not an error.
+--- summary
+Practice: `filter` with a parameter in the test, `show.network === network`.
+--- mistakes
+- One equals sign, `show.network = network`: every show is kept.
+- Curly brackets after the arrow without `return`: nothing is kept.
+- `"network"` in quotes, which compares with the word network instead of the parameter.
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it, fix that line, then check again.`);
+const f = t.get("fromNetwork");
+t.expect(f !== undefined, "I can't find a function called `fromNetwork`. Press **Start again** to get the starting code back.");
+t.expect(typeof f === "function" && f.length === 2, "`fromNetwork` needs two parameters: `function fromNetwork(list, network) {`.");
+const call = (label, ...args) => { try { return f(...args); } catch (e) { t.fail(`\`${label}\` crashed: ${e.message}`); } };
+const names = (r) => (Array.isArray(r) ? r.map((s) => (s && typeof s === "object" ? s.name : s)) : []);
+const fmt = (r) => (Array.isArray(r) ? `[${names(r).join(", ")}]` : JSON.stringify(r));
+const shows = JSON.parse(JSON.stringify(t.get("shows")));
+let r = call('fromNetwork(shows, "HBO")', shows, "HBO");
+t.expect(r !== undefined, "`fromNetwork(shows, \"HBO\")` gives back `undefined`. Add `return` before `list.filter(...)`.");
+t.expect(Array.isArray(r), `\`fromNetwork(shows, "HBO")\` gives back ${JSON.stringify(r)}, not a list. Return what \`filter\` gives you.`);
+t.expect(r.length !== 12, "`fromNetwork(shows, \"HBO\")` gives all 12 shows. Compare with three equals signs: `show.network === network`. One `=` changes the network.");
+t.expect(r.length, /\(\s*show\s*\)\s*=>\s*\{/.test(String(f)) ? "`fromNetwork(shows, \"HBO\")` gives an empty list. With curly brackets after the arrow you need `return`. Leave the brackets out: `(show) => show.network === network`." : "`fromNetwork(shows, \"HBO\")` gives an empty list. Compare with the parameter `network`, without quotes: `show.network === network`.");
+t.expect(r.every((s) => s && typeof s === "object"), "`fromNetwork` should give back whole shows. Inside `filter`, the arrow function only answers true or false: `(show) => show.network === network`.");
+t.expect(names(r).join("|") === "Game of Thrones|Chernobyl|The Wire|Band of Brothers", `\`fromNetwork(shows, "HBO")\` gives ${fmt(r)}. It should give the 4 HBO shows: Game of Thrones, Chernobyl, The Wire and Band of Brothers.`);
+r = call('fromNetwork(shows, "Netflix")', shows, "Netflix");
+t.expect(names(r).join("|") === "The Crown|Dark", `\`fromNetwork(shows, "Netflix")\` gives ${fmt(r)}. It should give The Crown and Dark. Compare with the parameter \`network\`, not a fixed name.`);
+r = call('fromNetwork(shows, "ABC")', shows, "ABC");
+t.expect(Array.isArray(r) && r.length === 0, `\`fromNetwork(shows, "ABC")\` gives ${fmt(r)}. It should give an empty list \`[]\`: no show is on ABC.`);
+r = call('fromNetwork(another list, "HBO")', [{ name: "Show A", network: "HBO" }, { name: "Show B", network: "CBS" }], "HBO");
+t.expect(names(r).join("|") === "Show A", `With another list, \`fromNetwork\` gives ${fmt(r)}. Use the parameter \`list\`, not \`shows\`: \`list.filter(...)\`.`);
+r = call('fromNetwork([], "HBO")', [], "HBO");
+t.expect(Array.isArray(r) && r.length === 0, `\`fromNetwork([], "HBO")\` gives ${fmt(r)}. It should give an empty list \`[]\`.`);
+
+
+=== step p-top-names
+title: Names above a rating
+minutes: 8
+slot: gym
+template: gym
+refs: data.js
+practice: yes
+--- explain
+`filter` and `map` work well together. First `filter` keeps the items you want, then `map` turns each kept item into what you need:
+
+```js
+function cheapNames(list, maxPrice) {
+  const cheap = list.filter((snack) => snack.price < maxPrice);
+  return cheap.map((snack) => snack.name);
+}
+```
+
+The order matters. After `map`, only the names are left, and a name has no price to test any more.
+
+You can also chain them on one line: `list.filter(...).map(...)`. Both ways are fine.
+--- task
+Make `topNames(list, minRating)` return the **names** of the shows in `list` with a rating of `minRating` **or more**.
+--- hint
+Filter with `show.rating >= minRating`, then map each kept show to `show.name`.
+--- hint
+```js
+function topNames(list, minRating) {
+  const good = list.filter((show) => show.rating >= minRating);
+  return good.map((show) => show.name);
+}
+```
+--- starter
+// P6. Names of the shows with at least a given rating
+// topNames(list, minRating) gives back the NAMES of the shows rated minRating or more.
+
+function topNames(list, minRating) {
+  // your code here
+}
+
+const mini = [
+  { name: "Fleabag", rating: 8.4 },
+  { name: "Chernobyl", rating: 9.1 },
+  { name: "Dark", rating: 8.7 },
+];
+const none = [];
+
+tryIt(topNames, [mini, 8.5], ["Chernobyl", "Dark"]);
+tryIt(topNames, [mini, 9.1], ["Chernobyl"]);
+tryIt(topNames, [mini, 9.5], []);
+tryIt(topNames, [none, 8], []);
+tryIt(topNames, [shows, 9], ["Breaking Bad", "Chernobyl", "The Wire", "Band of Brothers", "Avatar: The Last Airbender"]);
+--- solution
+// P6. Names of the shows with at least a given rating
+// topNames(list, minRating) gives back the NAMES of the shows rated minRating or more.
+
+function topNames(list, minRating) {
+  const good = list.filter((show) => show.rating >= minRating);
+  return good.map((show) => show.name);
+}
+
+const mini = [
+  { name: "Fleabag", rating: 8.4 },
+  { name: "Chernobyl", rating: 9.1 },
+  { name: "Dark", rating: 8.7 },
+];
+const none = [];
+
+tryIt(topNames, [mini, 8.5], ["Chernobyl", "Dark"]);
+tryIt(topNames, [mini, 9.1], ["Chernobyl"]);
+tryIt(topNames, [mini, 9.5], []);
+tryIt(topNames, [none, 8], []);
+tryIt(topNames, [shows, 9], ["Breaking Bad", "Chernobyl", "The Wire", "Band of Brothers", "Avatar: The Last Airbender"]);
+--- learned
+`filter` first, then `map`: pick the shows, then take what you need from each. You'll use this pair constantly.
+--- summary
+Practice: `filter` to pick, then `map` to take the names.
+--- mistakes
+- `map` before `filter`: the names have no rating, so nothing is kept.
+- `>` instead of `>=`: a show rated exactly `minRating` is left out.
+- Returning the filtered shows without the `map` step.
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it, fix that line, then check again.`);
+const f = t.get("topNames");
+t.expect(f !== undefined, "I can't find a function called `topNames`. Press **Start again** to get the starting code back.");
+t.expect(typeof f === "function" && f.length === 2, "`topNames` needs two parameters: `function topNames(list, minRating) {`.");
+const call = (label, ...args) => { try { return f(...args); } catch (e) { t.fail(`\`${label}\` crashed: ${e.message}`); } };
+const fmt = (r) => (Array.isArray(r) ? `[${r.map((s) => (s && typeof s === "object" ? s.name : s)).join(", ")}]` : JSON.stringify(r));
+const shows = JSON.parse(JSON.stringify(t.get("shows")));
+let r = call("topNames(shows, 9)", shows, 9);
+t.expect(r !== undefined, "`topNames(shows, 9)` gives back `undefined`. Add `return` before the list you give back.");
+t.expect(Array.isArray(r), `\`topNames(shows, 9)\` gives back ${JSON.stringify(r)}, not a list. Return what \`map\` gives you.`);
+t.expect(!r.some((s) => s && typeof s === "object"), "`topNames` gives back whole shows. After the `filter`, add a `map` that keeps only the names: `.map((show) => show.name)`.");
+t.expect(r.length || !/\.map[\s\S]*\.filter/.test(String(f)), "`topNames(shows, 9)` gives an empty list. Filter first, then map: after `map` only the names are left, and a name has no rating.");
+t.expect(r.length !== 12, "`topNames(shows, 9)` gives all 12 names. Use `filter` with `show.rating >= minRating` before the `map`.");
+t.expect(r.join("|") === "Breaking Bad|Chernobyl|The Wire|Band of Brothers|Avatar: The Last Airbender", `\`topNames(shows, 9)\` gives ${fmt(r)}. It should give the 5 names rated 9 or more. Use \`>=\`, so a rating of exactly 9 counts too.`);
+r = call("topNames(shows, 9.1)", shows, 9.1);
+t.expect(fmt(r) === "[Breaking Bad, Chernobyl, Band of Brothers]", `\`topNames(shows, 9.1)\` gives ${fmt(r)}. It should give Breaking Bad, Chernobyl and Band of Brothers. Compare with the parameter \`minRating\`, not a fixed number.`);
+r = call("topNames(shows, 9.5)", shows, 9.5);
+t.expect(Array.isArray(r) && r.length === 0, `\`topNames(shows, 9.5)\` gives ${fmt(r)}. It should give an empty list: no show is rated 9.5 or more.`);
+r = call("topNames(another list, 8)", [{ name: "Show A", rating: 7 }, { name: "Show B", rating: 8.5 }], 8);
+t.expect(fmt(r) === "[Show B]", `With another list, \`topNames\` gives ${fmt(r)}. Use the parameter \`list\`, not \`shows\`.`);
+r = call("topNames([], 8)", [], 8);
+t.expect(Array.isArray(r) && r.length === 0, `\`topNames([], 8)\` gives ${fmt(r)}. It should give an empty list \`[]\`.`);
+
+
+=== step p-comedies
+title: The comedies, by name
+minutes: 8
+slot: gym
+template: gym
+refs: data.js
+practice: yes
+--- explain
+Each show has a `genres` **array**, like `["Comedy", "Romance"]`. To ask whether a value is one of the items, use the array's `includes`:
+
+```js
+const tags = ["salty", "crunchy"];
+tags.includes("salty");   // true
+```
+
+An array is never `===` to one string, so `show.genres === "Comedy"` is always false. `includes` is the right question.
+
+This time the genre is fixed: the function always looks for comedies.
+--- task
+Make `comedyNames(list)` return the **names** of the shows in `list` whose genres include `"Comedy"`.
+--- hint
+Same shape as the last exercise: `filter` with `show.genres.includes("Comedy")`, then `map` to the names.
+--- hint
+```js
+function comedyNames(list) {
+  const comedies = list.filter((show) => show.genres.includes("Comedy"));
+  return comedies.map((show) => show.name);
+}
+```
+--- starter
+// P7. The names of the comedies
+// comedyNames(list) gives back the NAMES of the shows that have "Comedy" in their genres.
+
+function comedyNames(list) {
+  // your code here
+}
+
+const mini = [
+  { name: "Fleabag", genres: ["Comedy", "Drama"] },
+  { name: "Dark", genres: ["Drama", "Mystery", "Science-Fiction"] },
+];
+const none = [];
+
+tryIt(comedyNames, [mini], ["Fleabag"]);
+tryIt(comedyNames, [none], []);
+tryIt(comedyNames, [shows], ["Friends", "The Office", "How I Met Your Mother", "Fleabag"]);
+--- solution
+// P7. The names of the comedies
+// comedyNames(list) gives back the NAMES of the shows that have "Comedy" in their genres.
+
+function comedyNames(list) {
+  const comedies = list.filter((show) => show.genres.includes("Comedy"));
+  return comedies.map((show) => show.name);
+}
+
+const mini = [
+  { name: "Fleabag", genres: ["Comedy", "Drama"] },
+  { name: "Dark", genres: ["Drama", "Mystery", "Science-Fiction"] },
+];
+const none = [];
+
+tryIt(comedyNames, [mini], ["Fleabag"]);
+tryIt(comedyNames, [none], []);
+tryIt(comedyNames, [shows], ["Friends", "The Office", "How I Met Your Mother", "Fleabag"]);
+--- learned
+Array `includes` inside a `filter`, then `map`: four comedies, by name.
+--- summary
+Practice: `show.genres.includes("Comedy")` tests a value inside an array.
+--- mistakes
+- `show.genres === "Comedy"` (an array is never equal to one string).
+- `show.genre` without the s: "Cannot read properties of undefined".
+- `"comedy"` in small letters: array `includes` checks capitals too.
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it, fix that line, then check again.`);
+const f = t.get("comedyNames");
+t.expect(f !== undefined, "I can't find a function called `comedyNames`. Press **Start again** to get the starting code back.");
+t.expect(typeof f === "function", "`comedyNames` should be a function.");
+const call = (label, list) => {
+  try { return f(list); } catch (e) {
+    t.expect(!/reading 'includes'/.test(e.message), `\`${label}\` crashed: ${e.message.replace(/\.$/, "")}. The key is \`genres\`, with an s: \`show.genres.includes("Comedy")\`.`);
+    t.fail(`\`${label}\` crashed: ${e.message}`);
+  }
+};
+const fmt = (r) => (Array.isArray(r) ? `[${r.map((s) => (s && typeof s === "object" ? s.name : s)).join(", ")}]` : JSON.stringify(r));
+const shows = JSON.parse(JSON.stringify(t.get("shows")));
+let r = call("comedyNames(shows)", shows);
+t.expect(r !== undefined, "`comedyNames(shows)` gives back `undefined`. Add `return` before the list you give back.");
+t.expect(Array.isArray(r), `\`comedyNames(shows)\` gives back ${JSON.stringify(r)}, not a list. Return what \`map\` gives you.`);
+t.expect(!r.some((s) => s && typeof s === "object"), "`comedyNames` gives back whole shows. After the `filter`, add `.map((show) => show.name)` to keep only the names.");
+t.expect(r.length, /genres\s*===/.test(String(f)) ? "`comedyNames(shows)` gives an empty list. `genres` is an array, and an array is never equal to one string. Use `show.genres.includes(\"Comedy\")`." : "`comedyNames(shows)` gives an empty list. Test each show with `show.genres.includes(\"Comedy\")`, with a capital C.");
+t.expect(r.length !== 12, "`comedyNames(shows)` gives all 12 names. Use `filter` with `show.genres.includes(\"Comedy\")` before the `map`.");
+t.expect(r.join("|") === "Friends|The Office|How I Met Your Mother|Fleabag", `\`comedyNames(shows)\` gives ${fmt(r)}. It should give the 4 comedies: Friends, The Office, How I Met Your Mother and Fleabag.`);
+r = call("comedyNames(another list)", [{ name: "Show A", genres: ["Drama"] }, { name: "Show B", genres: ["Comedy", "Drama"] }]);
+t.expect(fmt(r) === "[Show B]", `With another list, \`comedyNames\` gives ${fmt(r)}. Use the parameter \`list\`, not \`shows\`.`);
+r = call("comedyNames([])", []);
+t.expect(Array.isArray(r) && r.length === 0, `\`comedyNames([])\` gives ${fmt(r)}. It should give an empty list \`[]\`.`);
+
+
+=== step p-before
+title: Started before a year
+minutes: 10
+slot: gym
+template: gym
+refs: data.js
+practice: yes
+--- explain
+Before `filter`, you picked items with a loop: an empty array, a loop, an `if`, and a `push`. It's longer, but you can do more inside the loop, so it's good to know both ways.
+
+```js
+const cheapNames = [];
+for (const snack of snackList) {
+  if (snack.price < 3) {
+    cheapNames.push(snack.name);
+  }
+}
+```
+
+Here the `push` adds only the name, so you get names straight away, without a `map`.
+
+Inside a function, create the empty array **before** the loop and `return` it **after** the loop's closing `}`.
+--- task
+Make `startedBefore(list, year)` return the **names** of the shows that premiered **before** `year` (a show that started in that year itself doesn't count). Try the loop way this time.
+--- hint
+`const found = [];` before the loop. Inside the loop, `if (show.premiered < year)`, push `show.name`. After the loop, `return found;`.
+--- hint
+```js
+function startedBefore(list, year) {
+  const found = [];
+  for (const show of list) {
+    if (show.premiered < year) {
+      found.push(show.name);
+    }
+  }
+  return found;
+}
+```
+--- starter
+// P8. Shows that started before a year
+// startedBefore(list, year) gives back the NAMES of the shows that premiered before that year.
+// Try it with a loop, an if and push.
+
+function startedBefore(list, year) {
+  // your code here
+}
+
+const mini = [
+  { name: "Band of Brothers", premiered: 2001 },
+  { name: "Dark", premiered: 2017 },
+  { name: "Friends", premiered: 1994 },
+];
+const none = [];
+
+tryIt(startedBefore, [mini, 2010], ["Band of Brothers", "Friends"]);
+tryIt(startedBefore, [mini, 2001], ["Friends"]);
+tryIt(startedBefore, [mini, 1990], []);
+tryIt(startedBefore, [none, 2000], []);
+--- solution
+// P8. Shows that started before a year
+// startedBefore(list, year) gives back the NAMES of the shows that premiered before that year.
+// Try it with a loop, an if and push.
+
+function startedBefore(list, year) {
+  const found = [];
+  for (const show of list) {
+    if (show.premiered < year) {
+      found.push(show.name);
+    }
+  }
+  return found;
+}
+
+const mini = [
+  { name: "Band of Brothers", premiered: 2001 },
+  { name: "Dark", premiered: 2017 },
+  { name: "Friends", premiered: 1994 },
+];
+const none = [];
+
+tryIt(startedBefore, [mini, 2010], ["Band of Brothers", "Friends"]);
+tryIt(startedBefore, [mini, 2001], ["Friends"]);
+tryIt(startedBefore, [mini, 1990], []);
+tryIt(startedBefore, [none, 2000], []);
+--- learned
+Loop, `if`, `push`: the long way to pick from a list. `filter` and `map` together would give the same answer, so use whichever you can read best.
+--- summary
+Practice: pick names with a loop: empty array, `if`, `push(show.name)`, return after the loop.
+--- mistakes
+- `<=` instead of `<`: a show from that very year is included.
+- `const found = [];` inside the loop: "found is not defined" after the loop.
+- `return found;` inside the loop: only the first show is checked.
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it, fix that line, then check again.`);
+const f = t.get("startedBefore");
+t.expect(f !== undefined, "I can't find a function called `startedBefore`. Press **Start again** to get the starting code back.");
+t.expect(typeof f === "function" && f.length === 2, "`startedBefore` needs two parameters: `function startedBefore(list, year) {`.");
+const call = (label, ...args) => {
+  try { return f(...args); } catch (e) {
+    t.expect(!/is not defined/.test(e.message), `\`${label}\` crashed: ${e.message.replace(/\.$/, "")}. Create the empty array before the loop (\`const found = [];\`), not inside it, so it still exists after the loop.`);
+    t.fail(`\`${label}\` crashed: ${e.message}`);
+  }
+};
+const fmt = (r) => (Array.isArray(r) ? `[${r.map((s) => (s && typeof s === "object" ? s.name : s)).join(", ")}]` : JSON.stringify(r));
+const shows = JSON.parse(JSON.stringify(t.get("shows")));
+let r = call("startedBefore(shows, 2005)", shows, 2005);
+t.expect(r !== undefined, "`startedBefore(shows, 2005)` gives back `undefined`. After the loop's closing `}`, add `return found;`.");
+t.expect(Array.isArray(r), `\`startedBefore(shows, 2005)\` gives back ${JSON.stringify(r)}, not a list. Return the array you pushed the names into.`);
+t.expect(!r.some((s) => s && typeof s === "object"), "`startedBefore` gives back whole shows. Push only the name: `found.push(show.name);`.");
+t.expect(r.length !== 12, "`startedBefore(shows, 2005)` gives all 12 names. The `push` must be inside the `if` block, so it only runs when `show.premiered < year`.");
+t.expect(r.length !== 1, `\`startedBefore(shows, 2005)\` gives only ${fmt(r)}. Check that \`return\` comes after the loop's closing \`}\`, not inside the loop.`);
+t.expect(!r.includes("The Office"), "`startedBefore(shows, 2005)` includes The Office, which started in 2005. *Before* 2005 means 2005 itself doesn't count: use `<`, not `<=`.");
+t.expect(r.join("|") === "Friends|The Wire|Band of Brothers", `\`startedBefore(shows, 2005)\` gives ${fmt(r)}. It should give Friends, The Wire and Band of Brothers: the shows that premiered before 2005.`);
+r = call("startedBefore(shows, 2001)", shows, 2001);
+t.expect(fmt(r) !== "[Friends, Band of Brothers]", "`startedBefore(shows, 2001)` includes Band of Brothers, which started in 2001. *Before* 2001 means 2001 itself doesn't count: use `<`, not `<=`.");
+t.expect(fmt(r) === "[Friends]", `\`startedBefore(shows, 2001)\` gives ${fmt(r)}. It should give only Friends. Compare with the parameter \`year\`, not a fixed year.`);
+r = call("startedBefore(another list, 2000)", [{ name: "Show A", premiered: 1999 }, { name: "Show B", premiered: 2010 }], 2000);
+t.expect(fmt(r) === "[Show A]", `With another list, \`startedBefore\` gives ${fmt(r)}. Loop through the parameter \`list\`, not \`shows\`.`);
+r = call("startedBefore([], 2000)", [], 2000);
+t.expect(Array.isArray(r) && r.length === 0, `\`startedBefore([], 2000)\` gives ${fmt(r)}. It should give an empty list \`[]\`.`);
+
+
+=== step p-has-show
+title: Is it on the list?
+minutes: 10
+slot: gym
+template: gym
+refs: data.js
+practice: yes
+--- explain
+`find` gives back the first matching item, or `undefined` when nothing matches. Comparing that with `undefined` turns it into a clear `true` or `false`:
+
+```js
+function hasSnack(list, wanted) {
+  const found = list.find((snack) => snack.name === wanted);
+  return found !== undefined;
+}
+```
+
+`!==` means "is not equal to". So the function answers `true` when something was found.
+
+To ignore capital letters, do what the search step did: make **both** sides lower case with `toLowerCase()` before you compare. Compare whole names with `===`: this time, a piece of a name isn't enough.
+--- task
+Make `hasShow(list, title)` return `true` if `list` has a show whose name is `title`, ignoring capital letters, and `false` otherwise.
+
+`"the office"` should find The Office, but `"Office"` should not: no show is called only Office.
+--- hint
+Make `title` lower case once. Then `find` a show whose lower-case name `===` it, and return whether the result is not `undefined`.
+--- hint
+```js
+function hasShow(list, title) {
+  const wanted = title.toLowerCase();
+  const found = list.find((show) => show.name.toLowerCase() === wanted);
+  return found !== undefined;
+}
+```
+--- starter
+// P9. Is a show on the list?
+// hasShow(list, title) gives back true if a show in the list has exactly that name
+// (capital letters don't matter), and false if not.
+
+function hasShow(list, title) {
+  // your code here
+}
+
+const none = [];
+
+tryIt(hasShow, [shows, "Dark"], true);
+tryIt(hasShow, [shows, "the office"], true);
+tryIt(hasShow, [shows, "BREAKING BAD"], true);
+tryIt(hasShow, [shows, "Office"], false);
+tryIt(hasShow, [shows, "Lost"], false);
+tryIt(hasShow, [none, "Dark"], false);
+--- solution
+// P9. Is a show on the list?
+// hasShow(list, title) gives back true if a show in the list has exactly that name
+// (capital letters don't matter), and false if not.
+
+function hasShow(list, title) {
+  const wanted = title.toLowerCase();
+  const found = list.find((show) => show.name.toLowerCase() === wanted);
+  return found !== undefined;
+}
+
+const none = [];
+
+tryIt(hasShow, [shows, "Dark"], true);
+tryIt(hasShow, [shows, "the office"], true);
+tryIt(hasShow, [shows, "BREAKING BAD"], true);
+tryIt(hasShow, [shows, "Office"], false);
+tryIt(hasShow, [shows, "Lost"], false);
+tryIt(hasShow, [none, "Dark"], false);
+--- learned
+`find` plus `!== undefined` answers a yes-or-no question about a list. Lower case on both sides makes capital letters stop mattering.
+--- summary
+Practice: `list.find(...) !== undefined` is true when something matches.
+--- mistakes
+- Returning the show itself instead of `true` / `false`.
+- Making only one side lower case.
+- Using `includes` on the name, so "Office" finds The Office.
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it, fix that line, then check again.`);
+const f = t.get("hasShow");
+t.expect(f !== undefined, "I can't find a function called `hasShow`. Press **Start again** to get the starting code back.");
+t.expect(typeof f === "function" && f.length === 2, "`hasShow` needs two parameters: `function hasShow(list, title) {`.");
+const call = (label, ...args) => { try { return f(...args); } catch (e) { t.fail(`\`${label}\` crashed: ${e.message}`); } };
+const shows = JSON.parse(JSON.stringify(t.get("shows")));
+let r = call('hasShow(shows, "Dark")', shows, "Dark");
+t.expect(r !== undefined, "`hasShow(shows, \"Dark\")` gives back `undefined`. Return `true` or `false`: `return found !== undefined;`.");
+if (typeof r !== "boolean") {
+  t.expect(!Array.isArray(r), "`hasShow` gives back a list. Use `find` (one show or `undefined`), then return `found !== undefined`.");
+  t.expect(!(r && typeof r === "object"), "`hasShow` gives back the whole show. Return `true` or `false` instead: `return found !== undefined;`.");
+  t.fail(`\`hasShow(shows, "Dark")\` gives ${JSON.stringify(r)}. Return \`true\` or \`false\`, without quotes.`);
+}
+t.expect(r === true, "`hasShow(shows, \"Dark\")` gives false, but Dark is in the list. Compare both names in lower case, `show.name.toLowerCase() === title.toLowerCase()`, and return `found !== undefined`.");
+r = call('hasShow(shows, "Lost")', shows, "Lost");
+t.expect(r === false, `\`hasShow(shows, "Lost")\` gives ${r}, but Lost isn't in the list. \`find\` gives back \`undefined\` when nothing matches: return \`found !== undefined\`.`);
+for (const typed of ["the office", "BREAKING BAD"]) {
+  r = call(`hasShow(shows, "${typed}")`, shows, typed);
+  t.expect(r === true, `\`hasShow(shows, "${typed}")\` gives ${r}. Capital letters shouldn't matter: make both sides lower case, \`show.name.toLowerCase()\` and \`title.toLowerCase()\`.`);
+}
+r = call('hasShow(shows, "Office")', shows, "Office");
+t.expect(r === false, "`hasShow(shows, \"Office\")` gives true, but no show is called exactly Office (The Office is). Compare whole names with `===`, not `includes`.");
+r = call('hasShow(another list, "show a")', [{ name: "Show A" }], "show a");
+t.expect(r === true, `\`hasShow([{ name: "Show A" }], "show a")\` gives ${r}. It should give true. Use the parameter \`list\`, not \`shows\`.`);
+r = call('hasShow(another list, "Dark")', [{ name: "Show A" }], "Dark");
+t.expect(r === false, "`hasShow([{ name: \"Show A\" }], \"Dark\")` gives true. Search the parameter `list`, not `shows`.");
+r = call('hasShow([], "Dark")', [], "Dark");
+t.expect(r === false, `\`hasShow([], "Dark")\` gives ${r}. An empty list has no shows, so it should give false.`);
+
+
+=== step p-short
+title: Count the short shows
+minutes: 10
+slot: gym
+template: gym
+refs: data.js
+practice: yes
+--- explain
+New idea: a **counter**. Start a number at 0 before the loop, and add 1 every time the `if` is true. Like making a tally mark.
+
+```js
+function countCheap(list) {
+  let count = 0;
+  for (const snack of list) {
+    if (snack.price < 3) {
+      count = count + 1;
+    }
+  }
+  return count;
+}
+```
+
+- It must be `let`, because the count changes. A `const` can't be changed and causes an error.
+- Create it **before** the loop. Inside the loop, it would start again at 0 on every round.
+- `return` it **after** the loop's closing `}`, when every item has been counted.
+
+(`list.filter(...).length` gives the same answer. Today, practise the counter: you'll need it in the next exercises.)
+--- task
+Make `countShort(list)` return how many shows in `list` have episodes of **30 minutes or less** (the key is `runtime`). Use a counter.
+--- hint
+`let count = 0;` before the loop. Inside: `if (show.runtime <= 30)`, then `count = count + 1;`. After the loop: `return count;`.
+--- hint
+```js
+function countShort(list) {
+  let count = 0;
+  for (const show of list) {
+    if (show.runtime <= 30) {
+      count = count + 1;
+    }
+  }
+  return count;
+}
+```
+--- starter
+// P10. Count the short shows
+// countShort(list) gives back HOW MANY shows have episodes of 30 minutes or less.
+// Use a counter: let count = 0; before the loop, add 1 inside the if.
+
+function countShort(list) {
+  // your code here
+}
+
+const mini = [
+  { name: "Fleabag", runtime: 30 },
+  { name: "Dark", runtime: 60 },
+  { name: "Quick Show", runtime: 25 },
+];
+const none = [];
+
+tryIt(countShort, [mini], 2);
+tryIt(countShort, [none], 0);
+tryIt(countShort, [shows], 5);
+--- solution
+// P10. Count the short shows
+// countShort(list) gives back HOW MANY shows have episodes of 30 minutes or less.
+// Use a counter: let count = 0; before the loop, add 1 inside the if.
+
+function countShort(list) {
+  let count = 0;
+  for (const show of list) {
+    if (show.runtime <= 30) {
+      count = count + 1;
+    }
+  }
+  return count;
+}
+
+const mini = [
+  { name: "Fleabag", runtime: 30 },
+  { name: "Dark", runtime: 60 },
+  { name: "Quick Show", runtime: 25 },
+];
+const none = [];
+
+tryIt(countShort, [mini], 2);
+tryIt(countShort, [none], 0);
+tryIt(countShort, [shows], 5);
+--- learned
+A counter is a `let` that starts at 0 and grows inside an `if`. Five of the twelve shows have 30-minute episodes.
+--- summary
+Practice: count with `let count = 0;` before the loop and `count = count + 1;` inside the `if`.
+--- mistakes
+- `const count = 0;`: "Assignment to constant variable" on the first `+ 1`.
+- `let count = 0;` inside the loop, or `return count;` inside the loop.
+- `=== 30` instead of `<= 30`: a 25-minute show isn't counted.
+--- teacher
+This is the first exercise with a counter. If a student is lost, act it out: "Start at zero. For each show, if it's short, add one. At the end, say the number."
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it, fix that line, then check again.`);
+const f = t.get("countShort");
+t.expect(f !== undefined, "I can't find a function called `countShort`. Press **Start again** to get the starting code back.");
+t.expect(typeof f === "function", "`countShort` should be a function.");
+const call = (label, list) => {
+  try { return f(list); } catch (e) {
+    t.expect(!/constant/.test(e.message), `\`${label}\` crashed: ${e.message.replace(/\.$/, "")}. The count changes, so create it with \`let\`, not \`const\`: \`let count = 0;\`.`);
+    t.expect(!/is not defined/.test(e.message), `\`${label}\` crashed: ${e.message.replace(/\.$/, "")}. Create the counter before the loop (\`let count = 0;\`), so it still exists after the loop.`);
+    t.fail(`\`${label}\` crashed: ${e.message}`);
+  }
+};
+const shows = JSON.parse(JSON.stringify(t.get("shows")));
+const r = call("countShort(shows)", shows);
+t.expect(r !== undefined, "`countShort(shows)` gives back `undefined`. After the loop's closing `}`, add `return count;`.");
+t.expect(!Array.isArray(r), "`countShort` gives back a list. Count instead: `let count = 0;` before the loop, `count = count + 1;` inside the `if`, and return `count`.");
+t.expect(typeof r === "number", `\`countShort(shows)\` gives ${JSON.stringify(r)}. Return the count, a number.`);
+t.expect(r !== 12, "`countShort(shows)` gives 12: every show was counted. Put `count = count + 1;` inside the `if` block, so it only runs for short shows.");
+t.expect(r > 1, `\`countShort(shows)\` gives ${r}. Create the counter before the loop (inside, it starts again at 0 every round), and \`return\` it after the loop's closing \`}\`.`);
+t.expect(r === 5, `\`countShort(shows)\` gives ${r}. It should give 5: Friends, The Office, How I Met Your Mother, Fleabag and Avatar have 30-minute episodes. Test \`show.runtime <= 30\`.`);
+const r2 = call("countShort(a list with 25, 30 and 60 minutes)", [{ name: "Show A", runtime: 25 }, { name: "Show B", runtime: 30 }, { name: "Show C", runtime: 60 }]);
+t.expect(r2 !== 1, "With episodes of 25, 30 and 60 minutes, `countShort` gives 1. A 25-minute show is short too: use `<= 30`, not `=== 30`.");
+t.expect(r2 === 2, `With episodes of 25, 30 and 60 minutes, \`countShort\` gives ${r2}. It should give 2. Loop through the parameter \`list\`, not \`shows\`.`);
+const r3 = call("countShort([])", []);
+t.expect(r3 === 0, `\`countShort([])\` gives ${JSON.stringify(r3)}. An empty list has no short shows, so it should give 0. Start the count at 0.`);
+
+
+=== step p-episodes
+title: Total episodes
+minutes: 8
+slot: gym
+template: gym
+refs: data.js
+practice: yes
+--- explain
+A **total** works like the counter, but instead of adding 1, you add a number from each item:
+
+```js
+let total = 0;
+for (const snack of snackList) {
+  total = total + snack.price;
+}
+```
+
+Read `total = total + snack.price` from the right: take the old total, add this price, and store the result as the new total.
+
+Same rules as the counter: `let`, created before the loop, returned after it. An empty list gives 0, because the loop never runs.
+--- task
+Make `totalEpisodes(list)` return the total number of episodes of all the shows in `list`.
+--- hint
+`let total = 0;` before the loop. Inside: `total = total + show.episodes;`. After the loop: `return total;`.
+--- hint
+```js
+function totalEpisodes(list) {
+  let total = 0;
+  for (const show of list) {
+    total = total + show.episodes;
+  }
+  return total;
+}
+```
+--- starter
+// P11. Total episodes
+// totalEpisodes(list) gives back the number of episodes of all the shows together.
+
+function totalEpisodes(list) {
+  // your code here
+}
+
+const mini = [
+  { name: "Chernobyl", episodes: 5 },
+  { name: "Band of Brothers", episodes: 10 },
+  { name: "Fleabag", episodes: 12 },
+];
+const none = [];
+
+tryIt(totalEpisodes, [mini], 27);
+tryIt(totalEpisodes, [none], 0);
+tryIt(totalEpisodes, [shows], 1014);
+--- solution
+// P11. Total episodes
+// totalEpisodes(list) gives back the number of episodes of all the shows together.
+
+function totalEpisodes(list) {
+  let total = 0;
+  for (const show of list) {
+    total = total + show.episodes;
+  }
+  return total;
+}
+
+const mini = [
+  { name: "Chernobyl", episodes: 5 },
+  { name: "Band of Brothers", episodes: 10 },
+  { name: "Fleabag", episodes: 12 },
+];
+const none = [];
+
+tryIt(totalEpisodes, [mini], 27);
+tryIt(totalEpisodes, [none], 0);
+tryIt(totalEpisodes, [shows], 1014);
+--- learned
+A running total adds up anything in a list. The twelve shows have 1014 episodes between them.
+--- summary
+Practice: add up with `let total = 0;` before the loop and `total = total + ...` inside.
+--- mistakes
+- `total = show.episodes` without `total +`: only the last show is left.
+- `return total;` inside the loop: only the first show is added.
+- `const total`: "Assignment to constant variable".
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it, fix that line, then check again.`);
+const f = t.get("totalEpisodes");
+t.expect(f !== undefined, "I can't find a function called `totalEpisodes`. Press **Start again** to get the starting code back.");
+t.expect(typeof f === "function", "`totalEpisodes` should be a function.");
+const call = (label, list) => {
+  try { return f(list); } catch (e) {
+    t.expect(!/constant/.test(e.message), `\`${label}\` crashed: ${e.message.replace(/\.$/, "")}. The total changes, so create it with \`let\`, not \`const\`: \`let total = 0;\`.`);
+    t.expect(!/is not defined/.test(e.message), `\`${label}\` crashed: ${e.message.replace(/\.$/, "")}. Create the total before the loop (\`let total = 0;\`), so it still exists after the loop.`);
+    t.fail(`\`${label}\` crashed: ${e.message}`);
+  }
+};
+const shows = JSON.parse(JSON.stringify(t.get("shows")));
+const want = shows.map((s) => s.episodes).reduce((a, b) => a + b, 0);
+const r = call("totalEpisodes(shows)", shows);
+t.expect(r !== undefined, "`totalEpisodes(shows)` gives back `undefined`. After the loop's closing `}`, add `return total;`.");
+t.expect(typeof r === "number", `\`totalEpisodes(shows)\` gives ${JSON.stringify(r)}. Return the total, a number.`);
+t.expect(r !== shows[shows.length - 1].episodes, `\`totalEpisodes(shows)\` gives ${r}: only the last show's episodes. Create \`total\` before the loop, and add to it: \`total = total + show.episodes;\`.`);
+t.expect(r !== shows[0].episodes, `\`totalEpisodes(shows)\` gives ${r}: only the first show's episodes. Put \`return total;\` after the loop's closing \`}\`, not inside the loop.`);
+t.expect(r === want, `\`totalEpisodes(shows)\` gives ${r}. It should give ${want}: add every show's \`episodes\` to the total.`);
+const r2 = call("totalEpisodes(a list with 2 and 3 episodes)", [{ name: "Show A", episodes: 2 }, { name: "Show B", episodes: 3 }]);
+t.expect(r2 === 5, `With shows of 2 and 3 episodes, \`totalEpisodes\` gives ${r2}. It should give 5. Loop through the parameter \`list\`, not \`shows\`.`);
+const r3 = call("totalEpisodes([])", []);
+t.expect(r3 === 0, `\`totalEpisodes([])\` gives ${JSON.stringify(r3)}. It should give 0. Start the total at 0.`);
+
+
+=== step p-average
+title: The average rating
+minutes: 12
+slot: gym
+template: gym
+refs: data.js
+practice: yes
+--- explain
+An **average** is the total divided by how many there are. Ratings like 8.7333333 look messy, so round to **one decimal**. `Math.round` only gives whole numbers, so use a trick: multiply by 10, round, then divide by 10.
+
+```js
+const average = 8.7333;
+Math.round(average * 10) / 10;   // 87.333 becomes 87, then 8.7
+```
+
+One more case: an empty list has a total of 0 and a length of 0, and `0 / 0` is `NaN` (*not a number*). So check for an empty list first, with an `if` at the top of the function, and return 0 straight away.
+--- task
+Make `averageRating(list)`:
+
+1. return `0` if `list` is empty
+2. otherwise, return the average `rating` of the shows, rounded to one decimal
+--- hint
+`if (list.length === 0) { return 0; }` first. Then add up the ratings like the last exercise, and divide `total` by `list.length`.
+--- hint
+```js
+function averageRating(list) {
+  if (list.length === 0) {
+    return 0;
+  }
+  let total = 0;
+  for (const show of list) {
+    total = total + show.rating;
+  }
+  return Math.round(total / list.length * 10) / 10;
+}
+```
+--- starter
+// P12. The average rating
+// averageRating(list) gives back the average rating, rounded to one decimal.
+// An empty list gives 0.
+
+function averageRating(list) {
+  // your code here
+}
+
+const mini = [
+  { name: "Chernobyl", rating: 9.1 },
+  { name: "Friends", rating: 8.8 },
+  { name: "The Crown", rating: 8 },
+];
+const two = [{ name: "Dark", rating: 8.7 }, { name: "Game of Thrones", rating: 8.9 }];
+const none = [];
+
+tryIt(averageRating, [mini], 8.6);
+tryIt(averageRating, [two], 8.8);
+tryIt(averageRating, [none], 0);
+tryIt(averageRating, [shows], 8.7);
+--- solution
+// P12. The average rating
+// averageRating(list) gives back the average rating, rounded to one decimal.
+// An empty list gives 0.
+
+function averageRating(list) {
+  if (list.length === 0) {
+    return 0;
+  }
+  let total = 0;
+  for (const show of list) {
+    total = total + show.rating;
+  }
+  return Math.round(total / list.length * 10) / 10;
+}
+
+const mini = [
+  { name: "Chernobyl", rating: 9.1 },
+  { name: "Friends", rating: 8.8 },
+  { name: "The Crown", rating: 8 },
+];
+const two = [{ name: "Dark", rating: 8.7 }, { name: "Game of Thrones", rating: 8.9 }];
+const none = [];
+
+tryIt(averageRating, [mini], 8.6);
+tryIt(averageRating, [two], 8.8);
+tryIt(averageRating, [none], 0);
+tryIt(averageRating, [shows], 8.7);
+--- learned
+Total, divided by `list.length`, rounded with the times-10 trick. Checking for an empty list first keeps `NaN` away.
+--- summary
+Practice: average = total / `list.length`; `Math.round(x * 10) / 10` keeps one decimal.
+--- mistakes
+- Dividing by 12 instead of `list.length`.
+- `Math.round(average)` without the times-10 trick: 9 instead of 8.7.
+- No check for an empty list: the function gives `NaN`.
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it, fix that line, then check again.`);
+const f = t.get("averageRating");
+t.expect(f !== undefined, "I can't find a function called `averageRating`. Press **Start again** to get the starting code back.");
+t.expect(typeof f === "function", "`averageRating` should be a function.");
+const call = (label, list) => {
+  try { return f(list); } catch (e) {
+    t.expect(!/constant/.test(e.message), `\`${label}\` crashed: ${e.message.replace(/\.$/, "")}. The total changes, so create it with \`let\`, not \`const\`.`);
+    t.fail(`\`${label}\` crashed: ${e.message}`);
+  }
+};
+const near = (a, b) => typeof a === "number" && Math.abs(a - b) < 1e-9;
+const shows = JSON.parse(JSON.stringify(t.get("shows")));
+const r = call("averageRating(shows)", shows);
+t.expect(r !== undefined, "`averageRating(shows)` gives back `undefined`. Add `return` with the rounded average after the loop.");
+t.expect(typeof r !== "string", `\`averageRating(shows)\` gives the text "${r}". Return a number: \`Math.round(total / list.length * 10) / 10\`.`);
+t.expect(typeof r === "number", `\`averageRating(shows)\` gives ${JSON.stringify(r)}. Return a number.`);
+t.expect(Math.abs(r - 104.8) > 0.01, "`averageRating(shows)` gives 104.8: that's the total of all the ratings. Divide it by the number of shows, `list.length`.");
+t.expect(Math.abs(r - 104.8 / 12) > 1e-6, `\`averageRating(shows)\` gives ${r}. Nearly there: round it to one decimal with \`Math.round(average * 10) / 10\`.`);
+t.expect(r !== 9, "`averageRating(shows)` gives 9. `Math.round` alone gives a whole number. Multiply by 10 before rounding and divide by 10 after: `Math.round(average * 10) / 10`.");
+t.expect(near(r, 8.7), `\`averageRating(shows)\` gives ${r}. It should give 8.7: the total of the ratings, divided by \`list.length\`, rounded to one decimal.`);
+const r2 = call("averageRating(a list rated 8 and 9)", [{ name: "Show A", rating: 8 }, { name: "Show B", rating: 9 }]);
+t.expect(near(r2, 8.5), `With ratings 8 and 9, \`averageRating\` gives ${r2}. It should give 8.5. Divide by \`list.length\`, not by 12, and loop through the parameter \`list\`, not \`shows\`.`);
+const r3 = call("averageRating(a list rated 9.1, 8.8 and 8)", [{ name: "Show A", rating: 9.1 }, { name: "Show B", rating: 8.8 }, { name: "Show C", rating: 8 }]);
+t.expect(near(r3, 8.6), `With ratings 9.1, 8.8 and 8, \`averageRating\` gives ${r3}. It should give 8.6 (25.9 divided by 3, rounded to one decimal).`);
+const r4 = call("averageRating([])", []);
+t.expect(!Number.isNaN(r4), "`averageRating([])` gives `NaN`: 0 divided by 0. At the start of the function, add `if (list.length === 0) { return 0; }`.");
+t.expect(r4 === 0, `\`averageRating([])\` gives ${JSON.stringify(r4)}. An empty list should give 0.`);
+
+
+=== step p-unique
+title: Every network once
+minutes: 12
+slot: gym
+template: gym
+refs: data.js
+practice: yes
+--- explain
+Four shows are on HBO, but a list of networks should name HBO only once. The trick: before you `push` a value, ask whether your new list **already includes** it.
+
+```js
+const colours = ["red", "blue", "red", "green", "blue"];
+const once = [];
+for (const colour of colours) {
+  if (once.includes(colour) === false) {
+    once.push(colour);
+  }
+}
+// once is ["red", "blue", "green"]
+```
+
+`once.includes(colour) === false` asks "is this colour **not** in my list yet?". Only then is it pushed. The first red goes in; the second red is skipped.
+
+Look at the list you are building (`once`), not the list you are looping through.
+--- task
+Make `uniqueNetworks(list)` return a list of the networks of the shows in `list`, each network only once, in the order they first appear.
+--- hint
+`const networks = [];` before the loop. Inside: if `networks.includes(show.network) === false`, push `show.network`. Return `networks` after the loop.
+--- hint
+```js
+function uniqueNetworks(list) {
+  const networks = [];
+  for (const show of list) {
+    if (networks.includes(show.network) === false) {
+      networks.push(show.network);
+    }
+  }
+  return networks;
+}
+```
+--- starter
+// P13. Every network once
+// uniqueNetworks(list) gives back the networks of the shows, without duplicates,
+// in the order they first appear.
+
+function uniqueNetworks(list) {
+  // your code here
+}
+
+const mini = [
+  { name: "Chernobyl", network: "HBO" },
+  { name: "Dark", network: "Netflix" },
+  { name: "The Wire", network: "HBO" },
+];
+const none = [];
+
+tryIt(uniqueNetworks, [mini], ["HBO", "Netflix"]);
+tryIt(uniqueNetworks, [none], []);
+tryIt(uniqueNetworks, [shows], ["NBC", "AMC", "HBO", "Netflix", "CBS", "BBC Three", "Nickelodeon"]);
+--- solution
+// P13. Every network once
+// uniqueNetworks(list) gives back the networks of the shows, without duplicates,
+// in the order they first appear.
+
+function uniqueNetworks(list) {
+  const networks = [];
+  for (const show of list) {
+    if (networks.includes(show.network) === false) {
+      networks.push(show.network);
+    }
+  }
+  return networks;
+}
+
+const mini = [
+  { name: "Chernobyl", network: "HBO" },
+  { name: "Dark", network: "Netflix" },
+  { name: "The Wire", network: "HBO" },
+];
+const none = [];
+
+tryIt(uniqueNetworks, [mini], ["HBO", "Netflix"]);
+tryIt(uniqueNetworks, [none], []);
+tryIt(uniqueNetworks, [shows], ["NBC", "AMC", "HBO", "Netflix", "CBS", "BBC Three", "Nickelodeon"]);
+--- learned
+`includes` on the list you are building stops duplicates. The twelve shows come from seven networks.
+--- summary
+Practice: no duplicates: push only when `result.includes(value) === false`.
+--- mistakes
+- Pushing the whole show instead of `show.network`.
+- Asking `list.includes(...)` (the list you loop through) instead of the new list.
+- `=== true` instead of `=== false`: nothing is ever pushed.
+--- teacher
+Students who have seen `!` elsewhere may write `!networks.includes(show.network)`. That's the same as `=== false` and passes.
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it, fix that line, then check again.`);
+const f = t.get("uniqueNetworks");
+t.expect(f !== undefined, "I can't find a function called `uniqueNetworks`. Press **Start again** to get the starting code back.");
+t.expect(typeof f === "function", "`uniqueNetworks` should be a function.");
+const call = (label, list) => {
+  try { return f(list); } catch (e) {
+    t.expect(!/is not defined/.test(e.message), `\`${label}\` crashed: ${e.message.replace(/\.$/, "")}. Create the new list before the loop (\`const networks = [];\`), so it still exists after the loop.`);
+    t.fail(`\`${label}\` crashed: ${e.message}`);
+  }
+};
+const fmt = (r) => (Array.isArray(r) ? `[${r.map((s) => (s && typeof s === "object" ? s.name : s)).join(", ")}]` : JSON.stringify(r));
+const sorted = (r) => (Array.isArray(r) ? [...r].map(String).sort().join("|") : "");
+const shows = JSON.parse(JSON.stringify(t.get("shows")));
+const want = ["NBC", "AMC", "HBO", "Netflix", "CBS", "BBC Three", "Nickelodeon"];
+let r = call("uniqueNetworks(shows)", shows);
+t.expect(r !== undefined, "`uniqueNetworks(shows)` gives back `undefined`. After the loop's closing `}`, add `return networks;`.");
+t.expect(Array.isArray(r), `\`uniqueNetworks(shows)\` gives back ${JSON.stringify(r)}, not a list. Return the array you pushed the networks into.`);
+t.expect(!r.some((s) => s && typeof s === "object"), "`uniqueNetworks` gives back whole shows. Push only the network: `networks.push(show.network);`.");
+t.expect(r.length, "`uniqueNetworks(shows)` gives an empty list. Push when the network is *not* in your list yet: `if (networks.includes(show.network) === false)`.");
+t.expect(r.length !== 12, "`uniqueNetworks(shows)` gives 12 networks, with duplicates like HBO four times. Before you push, check your new list: `if (networks.includes(show.network) === false)`.");
+t.expect(r.length !== 1, `\`uniqueNetworks(shows)\` gives only ${fmt(r)}. Create the new list before the loop and \`return\` it after the loop's closing \`}\`.`);
+t.expect(sorted(r) === sorted(want), `\`uniqueNetworks(shows)\` gives ${fmt(r)}. It should give the 7 networks once each: ${want.join(", ")}.`);
+r = call("uniqueNetworks(another list)", [{ name: "Show A", network: "CBS" }, { name: "Show B", network: "CBS" }, { name: "Show C", network: "Test TV" }]);
+t.expect(sorted(r) === "CBS|Test TV", `With networks CBS, CBS and Test TV, \`uniqueNetworks\` gives ${fmt(r)}. It should give [CBS, Test TV]. Loop through the parameter \`list\`, not \`shows\`.`);
+r = call("uniqueNetworks([])", []);
+t.expect(Array.isArray(r) && r.length === 0, `\`uniqueNetworks([])\` gives ${fmt(r)}. It should give an empty list \`[]\`.`);
+
+
+=== step p-most
+title: The most episodes
+minutes: 12
+slot: gym
+template: gym
+refs: data.js
+practice: yes
+--- explain
+To find the biggest, keep a **best so far**. Start with the first item. Then look at every item: if it beats the best so far, it becomes the new best.
+
+```js
+function priciest(list) {
+  let best = list[0];
+  for (const snack of list) {
+    if (snack.price > best.price) {
+      best = snack;
+    }
+  }
+  return best;
+}
+```
+
+- `best` must be `let`, because it changes.
+- It holds a whole object, so compare its property: `best.price`.
+- With an empty list, `list[0]` is `undefined`, the loop never runs, and the function gives back `undefined`: "nothing found", like `find`.
+--- task
+Make `mostEpisodes(list)` return the **whole show** with the most episodes. For an empty list it gives back `undefined`.
+--- hint
+`let best = list[0];`, then a loop. If `show.episodes > best.episodes`, set `best = show;`. Return `best` after the loop.
+--- hint
+```js
+function mostEpisodes(list) {
+  let best = list[0];
+  for (const show of list) {
+    if (show.episodes > best.episodes) {
+      best = show;
+    }
+  }
+  return best;
+}
+```
+--- starter
+// P14. The show with the most episodes
+// mostEpisodes(list) gives back the WHOLE SHOW with the most episodes.
+// An empty list gives undefined.
+
+function mostEpisodes(list) {
+  // your code here
+}
+
+const mini = [
+  { name: "Chernobyl", episodes: 5 },
+  { name: "The Wire", episodes: 60 },
+  { name: "Fleabag", episodes: 12 },
+];
+const none = [];
+
+tryIt(mostEpisodes, [mini], { name: "The Wire", episodes: 60 });
+tryIt(mostEpisodes, [none], undefined);
+tryIt(mostEpisodes, [shows], shows[0]);
+--- solution
+// P14. The show with the most episodes
+// mostEpisodes(list) gives back the WHOLE SHOW with the most episodes.
+// An empty list gives undefined.
+
+function mostEpisodes(list) {
+  let best = list[0];
+  for (const show of list) {
+    if (show.episodes > best.episodes) {
+      best = show;
+    }
+  }
+  return best;
+}
+
+const mini = [
+  { name: "Chernobyl", episodes: 5 },
+  { name: "The Wire", episodes: 60 },
+  { name: "Fleabag", episodes: 12 },
+];
+const none = [];
+
+tryIt(mostEpisodes, [mini], { name: "The Wire", episodes: 60 });
+tryIt(mostEpisodes, [none], undefined);
+tryIt(mostEpisodes, [shows], shows[0]);
+--- learned
+"Best so far" finds the biggest (or smallest, or longest) item in one pass. Friends wins with 236 episodes.
+--- summary
+Practice: best so far: `let best = list[0];`, replace it inside the loop when an item beats it.
+--- mistakes
+- `best = show.episodes` (a number) instead of `best = show` (the whole show).
+- Comparing `show.episodes > best` instead of `> best.episodes`.
+- `const best`: "Assignment to constant variable".
+--- teacher
+If the last row says `shows[0]`: that's Friends. The starter compares with the first show of data.js because Friends happens to have the most episodes.
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it, fix that line, then check again.`);
+const f = t.get("mostEpisodes");
+t.expect(f !== undefined, "I can't find a function called `mostEpisodes`. Press **Start again** to get the starting code back.");
+t.expect(typeof f === "function", "`mostEpisodes` should be a function.");
+const call = (label, list) => {
+  try { return f(list); } catch (e) {
+    t.expect(!/constant/.test(e.message), `\`${label}\` crashed: ${e.message.replace(/\.$/, "")}. \`best\` changes, so create it with \`let\`, not \`const\`: \`let best = list[0];\`.`);
+    t.fail(`\`${label}\` crashed: ${e.message}`);
+  }
+};
+const what = (r) => (r && typeof r === "object" ? (r.name ? `the show ${r.name}` : JSON.stringify(r)) : JSON.stringify(r));
+const shows = JSON.parse(JSON.stringify(t.get("shows")));
+const r = call("mostEpisodes(shows)", shows);
+t.expect(r !== undefined, "`mostEpisodes(shows)` gives back `undefined`. After the loop's closing `}`, add `return best;`.");
+t.expect(typeof r !== "number", `\`mostEpisodes(shows)\` gives the number ${r}. Keep the whole show in \`best\` (\`best = show;\`) and compare \`show.episodes > best.episodes\`.`);
+t.expect(typeof r !== "string", `\`mostEpisodes(shows)\` gives the text "${r}". Return the whole show: \`return best;\`, not \`best.name\`.`);
+t.expect(!Array.isArray(r), "`mostEpisodes` gives back a list. Keep one show in `best` and return it.");
+t.expect(r && typeof r === "object", `\`mostEpisodes(shows)\` gives ${JSON.stringify(r)}. Return the whole show with the most episodes.`);
+const one = (label, list, want) => {
+  const got = call(label, list);
+  if (got && got.name === want) return;
+  if (typeof got === "number") t.fail(`\`${label}\` gives the number ${got}. Keep the whole show in \`best\` (\`best = show;\`), not only its episodes.`);
+  if (got && got === list[list.length - 1]) t.fail(`\`${label}\` gives ${what(got)}, the last show. Only change \`best\` inside the \`if\`, when \`show.episodes > best.episodes\`.`);
+  if (got && got === list[0]) t.fail(`\`${label}\` gives ${what(got)}, the first show: \`best\` never changes. Inside the loop, if \`show.episodes > best.episodes\`, set \`best = show;\`.`);
+  t.fail(`\`${label}\` gives ${what(got)}. It should give the show ${want}, with the most episodes.`);
+};
+one("mostEpisodes(shows)", shows, "Friends");
+one("mostEpisodes([10, 50, 20 episodes])", [{ name: "Show A", episodes: 10 }, { name: "Show B", episodes: 50 }, { name: "Show C", episodes: 20 }], "Show B");
+one("mostEpisodes([5, 7, 9 episodes])", [{ name: "Show A", episodes: 5 }, { name: "Show B", episodes: 7 }, { name: "Show C", episodes: 9 }], "Show C");
+one("mostEpisodes([9, 7, 5 episodes])", [{ name: "Show A", episodes: 9 }, { name: "Show B", episodes: 7 }, { name: "Show C", episodes: 5 }], "Show A");
+const r5 = call("mostEpisodes([])", []);
+t.expect(r5 === undefined, `\`mostEpisodes([])\` gives ${JSON.stringify(r5)}. An empty list should give \`undefined\`: start with \`let best = list[0];\`.`);
+
+
+=== step p-longest
+title: The longest-running show
+minutes: 12
+slot: gym
+template: gym
+refs: data.js
+practice: yes
+--- explain
+This is "best so far" again, with two changes.
+
+1. You compare a **calculation**, not a property. How long a show ran is `show.ended - show.premiered` (Friends: 2004 - 1994 = 10 years). Work it out for the show *and* for the best so far:
+
+```js
+if (snack.price - snack.discount > best.price - best.discount) {
+  best = snack;
+}
+```
+
+2. You give back only the **name**. With an empty list there is no best show, and `best.name` would crash. So start with an `if`: when the list is empty, return an empty string `""` straight away.
+--- task
+Make `longestRunning(list)` return the **name** of the show that ran the most years (`ended` minus `premiered`). For an empty list, return `""`.
+--- hint
+First `if (list.length === 0) { return ""; }`. Then best so far with `show.ended - show.premiered > best.ended - best.premiered`. Return `best.name` at the end.
+--- hint
+```js
+function longestRunning(list) {
+  if (list.length === 0) {
+    return "";
+  }
+  let best = list[0];
+  for (const show of list) {
+    if (show.ended - show.premiered > best.ended - best.premiered) {
+      best = show;
+    }
+  }
+  return best.name;
+}
+```
+--- starter
+// P15. The longest-running show
+// longestRunning(list) gives back the NAME of the show that ran the most years
+// (ended minus premiered). An empty list gives "".
+
+function longestRunning(list) {
+  // your code here
+}
+
+const mini = [
+  { name: "Band of Brothers", premiered: 2001, ended: 2001 },
+  { name: "The Wire", premiered: 2002, ended: 2008 },
+  { name: "Dark", premiered: 2017, ended: 2020 },
+];
+const none = [];
+
+tryIt(longestRunning, [mini], "The Wire");
+tryIt(longestRunning, [none], "");
+tryIt(longestRunning, [shows], "Friends");
+--- solution
+// P15. The longest-running show
+// longestRunning(list) gives back the NAME of the show that ran the most years
+// (ended minus premiered). An empty list gives "".
+
+function longestRunning(list) {
+  if (list.length === 0) {
+    return "";
+  }
+  let best = list[0];
+  for (const show of list) {
+    if (show.ended - show.premiered > best.ended - best.premiered) {
+      best = show;
+    }
+  }
+  return best.name;
+}
+
+const mini = [
+  { name: "Band of Brothers", premiered: 2001, ended: 2001 },
+  { name: "The Wire", premiered: 2002, ended: 2008 },
+  { name: "Dark", premiered: 2017, ended: 2020 },
+];
+const none = [];
+
+tryIt(longestRunning, [mini], "The Wire");
+tryIt(longestRunning, [none], "");
+tryIt(longestRunning, [shows], "Friends");
+--- learned
+An `if` for the empty list, a loop, an `if` inside it and a calculation on two objects: that's a real function. Friends ran for 10 years.
+--- summary
+Practice: best so far with a calculation, and an early `return` for the empty list.
+--- mistakes
+- Comparing only `show.ended` or only `show.premiered` instead of the difference.
+- No check for an empty list: "Cannot read properties of undefined (reading 'name')".
+- Returning `best` (the whole show) instead of `best.name`.
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it, fix that line, then check again.`);
+const f = t.get("longestRunning");
+t.expect(f !== undefined, "I can't find a function called `longestRunning`. Press **Start again** to get the starting code back.");
+t.expect(typeof f === "function", "`longestRunning` should be a function.");
+const call = (label, list) => {
+  try { return f(list); } catch (e) {
+    t.expect(!/constant/.test(e.message), `\`${label}\` crashed: ${e.message.replace(/\.$/, "")}. \`best\` changes, so create it with \`let\`, not \`const\`.`);
+    t.expect(!(list.length === 0 && /reading/.test(e.message)), `\`${label}\` crashed: ${e.message.replace(/\.$/, "")}. An empty list has no best show. At the start of the function, add \`if (list.length === 0) { return ""; }\`.`);
+    t.fail(`\`${label}\` crashed: ${e.message}`);
+  }
+};
+const shows = JSON.parse(JSON.stringify(t.get("shows")));
+const r = call("longestRunning(shows)", shows);
+t.expect(r !== undefined, "`longestRunning(shows)` gives back `undefined`. After the loop's closing `}`, add `return best.name;`.");
+t.expect(!(r && typeof r === "object"), "`longestRunning(shows)` gives back a whole show. Return only its name: `return best.name;`.");
+t.expect(typeof r === "string", `\`longestRunning(shows)\` gives ${JSON.stringify(r)}. Return the show's name: \`best.name\`.`);
+t.expect(r === "Friends", `\`longestRunning(shows)\` gives "${r}". It should give "Friends", which ran for 10 years (1994 to 2004). Compare \`show.ended - show.premiered\` with \`best.ended - best.premiered\`.`);
+const mix = [{ name: "Show A", premiered: 1990, ended: 1992 }, { name: "Show B", premiered: 2000, ended: 2015 }, { name: "Show C", premiered: 2016, ended: 2020 }];
+const r2 = call("longestRunning([1990–1992, 2000–2015, 2016–2020])", mix);
+t.expect(r2 !== "Show A", "With shows that ran 1990–1992, 2000–2015 and 2016–2020, `longestRunning` gives Show A, the first one. Compare the number of years, `show.ended - show.premiered`, and set `best = show;` when it's bigger.");
+t.expect(r2 !== "Show C", "With shows that ran 1990–1992, 2000–2015 and 2016–2020, `longestRunning` gives Show C, the one that ended last. Compare the number of years: `show.ended - show.premiered > best.ended - best.premiered`.");
+t.expect(r2 === "Show B", `With shows that ran 1990–1992, 2000–2015 and 2016–2020, \`longestRunning\` gives ${JSON.stringify(r2)}. It should give "Show B" (15 years). Loop through the parameter \`list\`, not \`shows\`.`);
+const r3 = call("longestRunning([one show, 2019–2019])", [{ name: "Show A", premiered: 2019, ended: 2019 }]);
+t.expect(r3 === "Show A", `With one show, \`longestRunning\` gives ${JSON.stringify(r3)}. It should give that show's name, "Show A".`);
+const r4 = call("longestRunning([])", []);
+t.expect(r4 === "", `\`longestRunning([])\` gives ${JSON.stringify(r4)}. An empty list should give an empty string: \`if (list.length === 0) { return ""; }\` at the start.`);
+
+
+=== step p-per-network
+title: Shows per network
+minutes: 15
+slot: gym
+template: gym
+refs: data.js
+practice: yes
+--- explain
+An object can hold many counters at once, one per key: `{ HBO: 4, NBC: 2 }`. But here the key comes from a **variable** (`show.network`), so a dot won't work. Use **square brackets**:
+
+```js
+const votes = {};
+const pick = "pizza";
+votes[pick] = 1;                 // same as votes.pizza = 1
+votes[pick] = votes[pick] + 1;   // now 2
+console.log(votes);              // {"pizza":2}
+```
+
+- With a dot, the word after the dot *is* the key: `votes.pick` would use a key called "pick".
+- With square brackets, the **value** inside them is the key: `votes[pick]` uses "pizza".
+
+A key you haven't set yet is `undefined`, and `undefined + 1` is `NaN`. So the first time you meet a network, set its count to 1; after that, add 1.
+--- task
+Make `countByNetwork(list)` return an object with one key per network and the number of shows on it, like `{ HBO: 2, Netflix: 1 }`. An empty list gives `{}`.
+--- hint
+`const counts = {};` before the loop. Inside: `if (counts[show.network] === undefined)`, set it to 1; `else` add 1. Return `counts` after the loop.
+--- hint
+```js
+function countByNetwork(list) {
+  const counts = {};
+  for (const show of list) {
+    if (counts[show.network] === undefined) {
+      counts[show.network] = 1;
+    } else {
+      counts[show.network] = counts[show.network] + 1;
+    }
+  }
+  return counts;
+}
+```
+--- starter
+// P16. How many shows per network?
+// countByNetwork(list) gives back an object like { HBO: 2, Netflix: 1 }:
+// one key per network, and the number of shows on it.
+
+function countByNetwork(list) {
+  // your code here
+}
+
+const mini = [
+  { name: "Chernobyl", network: "HBO" },
+  { name: "Dark", network: "Netflix" },
+  { name: "The Wire", network: "HBO" },
+];
+const none = [];
+
+tryIt(countByNetwork, [mini], { HBO: 2, Netflix: 1 });
+tryIt(countByNetwork, [none], {});
+tryIt(countByNetwork, [shows], { NBC: 2, AMC: 1, HBO: 4, Netflix: 2, CBS: 1, "BBC Three": 1, Nickelodeon: 1 });
+--- solution
+// P16. How many shows per network?
+// countByNetwork(list) gives back an object like { HBO: 2, Netflix: 1 }:
+// one key per network, and the number of shows on it.
+
+function countByNetwork(list) {
+  const counts = {};
+  for (const show of list) {
+    if (counts[show.network] === undefined) {
+      counts[show.network] = 1;
+    } else {
+      counts[show.network] = counts[show.network] + 1;
+    }
+  }
+  return counts;
+}
+
+const mini = [
+  { name: "Chernobyl", network: "HBO" },
+  { name: "Dark", network: "Netflix" },
+  { name: "The Wire", network: "HBO" },
+];
+const none = [];
+
+tryIt(countByNetwork, [mini], { HBO: 2, Netflix: 1 });
+tryIt(countByNetwork, [none], {});
+tryIt(countByNetwork, [shows], { NBC: 2, AMC: 1, HBO: 4, Netflix: 2, CBS: 1, "BBC Three": 1, Nickelodeon: 1 });
+--- learned
+`counts[show.network]` uses the network's name as the key, so one object counts every network at once. HBO has the most shows: four.
+--- summary
+Practice: `obj[key]` reads or sets a property whose name is in a variable.
+--- mistakes
+- `counts.network` or `counts.show.network` instead of `counts[show.network]`.
+- Adding 1 to a key that doesn't exist yet: the count becomes `NaN`.
+- Setting every count to 1, without the `else` that adds 1.
+--- teacher
+Square brackets with a variable (`counts[show.network]`) are new here; the steps only used the dot. The extra challenge *Count the genres* uses the same idea, so students who finish this one are ready for it.
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it, fix that line, then check again.`);
+const f = t.get("countByNetwork");
+t.expect(f !== undefined, "I can't find a function called `countByNetwork`. Press **Start again** to get the starting code back.");
+t.expect(typeof f === "function", "`countByNetwork` should be a function.");
+const call = (label, list) => {
+  try { return f(list); } catch (e) {
+    t.expect(!/is not defined/.test(e.message), `\`${label}\` crashed: ${e.message.replace(/\.$/, "")}. Create \`const counts = {};\` before the loop, so it still exists after the loop.`);
+    t.fail(`\`${label}\` crashed: ${e.message}`);
+  }
+};
+const show = (o) => JSON.stringify(o);
+const sameCounts = (got, want) => got && typeof got === "object" && !Array.isArray(got) && Object.keys(got).length === Object.keys(want).length && Object.keys(want).every((k) => got[k] === want[k]);
+const shows = JSON.parse(JSON.stringify(t.get("shows")));
+const want = { NBC: 2, AMC: 1, HBO: 4, Netflix: 2, CBS: 1, "BBC Three": 1, Nickelodeon: 1 };
+const r = call("countByNetwork(shows)", shows);
+t.expect(r !== undefined, "`countByNetwork(shows)` gives back `undefined`. After the loop's closing `}`, add `return counts;`.");
+t.expect(!Array.isArray(r), "`countByNetwork` gives back a list. Count in an object instead: `const counts = {};`.");
+t.expect(r && typeof r === "object", `\`countByNetwork(shows)\` gives ${show(r)}. Return the \`counts\` object.`);
+t.expect(!("network" in r) && !("show" in r), `\`countByNetwork(shows)\` gives ${show(r)}. With a dot, the key is the word "network". Use square brackets so the value is the key: \`counts[show.network]\`.`);
+t.expect(!Object.values(r).some((v) => Number.isNaN(v)), `Some of your counts are \`NaN\` (*not a number*): the first time you meet a network, set its count to 1 instead of adding 1 to \`undefined\`.`);
+t.expect(!(Object.keys(r).length === 7 && Object.values(r).every((v) => v === 1)), `\`countByNetwork(shows)\` gives ${show(r)}: every count is 1. When the network is already there, add 1: \`counts[show.network] = counts[show.network] + 1;\`.`);
+t.expect(Object.keys(r).length > 1, `\`countByNetwork(shows)\` gives ${show(r)}. Create \`counts\` before the loop, not inside it, and return it after the loop's closing \`}\`.`);
+t.expect(sameCounts(r, want), `\`countByNetwork(shows)\` gives ${show(r)}. It should give ${show(want)}.`);
+const r2 = call("countByNetwork(another list)", [{ name: "Show A", network: "CBS" }, { name: "Show B", network: "Test TV" }, { name: "Show C", network: "CBS" }]);
+t.expect(sameCounts(r2, { CBS: 2, "Test TV": 1 }), `With networks CBS, Test TV and CBS, \`countByNetwork\` gives ${show(r2)}. It should give {"CBS":2,"Test TV":1}. Loop through the parameter \`list\`, not \`shows\`.`);
+const r3 = call("countByNetwork([])", []);
+t.expect(sameCounts(r3, {}), `\`countByNetwork([])\` gives ${show(r3)}. An empty list should give an empty object \`{}\`.`);
+
+
+=== step p-labels
+title: One label per show
+minutes: 8
+slot: gym
+template: gym
+refs: data.js
+practice: yes
+--- explain
+In P4 you built a sentence for **one** show. `map` does that for **every** show in a list: the arrow function makes the text for one show, and `map` collects one result per show.
+
+```js
+const tags = snackList.map((snack) => `${snack.name}: ${snack.price} euros`);
+// ["crisps: 2.5 euros", "popcorn: 4 euros", "grapes: 1 euros"]
+```
+
+The new list always has as many items as the old one.
+--- task
+Make `labels(list)` return a list with one label per show, like **Friends (NBC, 1994)**: the name, then the network and the year it premiered in round brackets.
+--- hint
+`return list.map((show) => ...);`, with a template literal after the arrow: `${show.name}`, a space, a round bracket, and so on.
+--- hint
+```js
+function labels(list) {
+  return list.map((show) => `${show.name} (${show.network}, ${show.premiered})`);
+}
+```
+--- starter
+// P17. One label per show
+// labels(list) gives back a list of labels like "Friends (NBC, 1994)", one per show.
+
+function labels(list) {
+  // your code here
+}
+
+const mini = [
+  { name: "Dark", network: "Netflix", premiered: 2017 },
+  { name: "The Wire", network: "HBO", premiered: 2002 },
+];
+const none = [];
+
+tryIt(labels, [mini], ["Dark (Netflix, 2017)", "The Wire (HBO, 2002)"]);
+tryIt(labels, [none], []);
+--- solution
+// P17. One label per show
+// labels(list) gives back a list of labels like "Friends (NBC, 1994)", one per show.
+
+function labels(list) {
+  return list.map((show) => `${show.name} (${show.network}, ${show.premiered})`);
+}
+
+const mini = [
+  { name: "Dark", network: "Netflix", premiered: 2017 },
+  { name: "The Wire", network: "HBO", premiered: 2002 },
+];
+const none = [];
+
+tryIt(labels, [mini], ["Dark (Netflix, 2017)", "The Wire (HBO, 2002)"]);
+tryIt(labels, [none], []);
+--- learned
+`map` with a template literal turns twelve show objects into twelve readable labels.
+--- summary
+Practice: `map` with a template literal makes one text per item.
+--- mistakes
+- Quotes instead of backticks, so `${...}` appears as it is.
+- `filter` instead of `map`: you get shows back, not labels.
+- `shows.name` inside the arrow instead of `show.name`.
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it, fix that line, then check again.`);
+const f = t.get("labels");
+t.expect(f !== undefined, "I can't find a function called `labels`. Press **Start again** to get the starting code back.");
+t.expect(typeof f === "function", "`labels` should be a function.");
+const call = (label, list) => { try { return f(list); } catch (e) { t.fail(`\`${label}\` crashed: ${e.message.replace(/\.$/, "")}.`); } };
+const norm = (s) => String(s).replace(/\s+/g, " ").trim();
+const shows = JSON.parse(JSON.stringify(t.get("shows")));
+const r = call("labels(shows)", shows);
+t.expect(r !== undefined, "`labels(shows)` gives back `undefined`. Add `return` before `list.map(...)`.");
+t.expect(Array.isArray(r), `\`labels(shows)\` gives back ${JSON.stringify(r)}, not a list. Return what \`map\` gives you.`);
+t.expect(r.length === 12, `\`labels(shows)\` gives ${r.length} items. \`map\` gives one label per show: 12.`);
+t.expect(r.every((x) => typeof x === "string"), "Each item should be a label (text), not a whole show. After the arrow, write a template literal (backticks) with `${show.name}` and the other properties.");
+t.expect(!/\$\{/.test(r[0]), `The first label is "${r[0]}". Use backticks around the text, not quotes, so the \`\${...}\` parts are filled in.`);
+t.expect(!/undefined/.test(r[0]), `The first label is "${r[0]}". Read the properties from \`show\` (the arrow's parameter), and check the keys in data.js: \`name\`, \`network\`, \`premiered\`.`);
+t.expect(norm(r[0]) === "Friends (NBC, 1994)", `The first label is "${r[0]}". It should be "Friends (NBC, 1994)": the name, a space, then the network and the year in round brackets, with a comma and a space between them.`);
+t.expect(norm(r[11]) === "Avatar: The Last Airbender (Nickelodeon, 2005)", `The last label is "${r[11]}". It should be "Avatar: The Last Airbender (Nickelodeon, 2005)".`);
+const r2 = call("labels(another list)", [{ name: "Show A", network: "Test TV", premiered: 2020 }]);
+t.expect(Array.isArray(r2) && r2.length === 1 && norm(r2[0]) === "Show A (Test TV, 2020)", `With another list, \`labels\` gives ${JSON.stringify(r2)}. It should give ["Show A (Test TV, 2020)"]. Use the parameter \`list\`, not \`shows\`.`);
+const r3 = call("labels([])", []);
+t.expect(Array.isArray(r3) && r3.length === 0, `\`labels([])\` gives ${JSON.stringify(r3)}. It should give an empty list \`[]\`.`);
+
+
+=== step p-ended-before
+title: How many ended before?
+minutes: 5
+slot: gym
+template: gym
+refs: data.js
+practice: yes
+--- explain
+`filter` gives back a list, and every list has a `.length`. So "how many" can be one line: filter, then count what's left.
+
+```js
+const cheapCount = snackList.filter((snack) => snack.price < 3).length;
+```
+
+The year a show ended is in its `ended` key.
+--- task
+Make `countEndedBefore(list, year)` return **how many** shows in `list` ended **before** `year` (a show that ended in that year itself doesn't count).
+--- hint
+`return list.filter((show) => ...).length;`, with `show.ended < year` after the arrow.
+--- hint
+```js
+function countEndedBefore(list, year) {
+  return list.filter((show) => show.ended < year).length;
+}
+```
+--- starter
+// P18. How many shows ended before a year?
+// countEndedBefore(list, year) gives back HOW MANY shows ended before that year.
+
+function countEndedBefore(list, year) {
+  // your code here
+}
+
+const mini = [
+  { name: "Friends", ended: 2004 },
+  { name: "Dark", ended: 2020 },
+  { name: "The Wire", ended: 2008 },
+];
+const none = [];
+
+tryIt(countEndedBefore, [mini, 2010], 2);
+tryIt(countEndedBefore, [mini, 2008], 1);
+tryIt(countEndedBefore, [none, 2010], 0);
+tryIt(countEndedBefore, [shows, 2010], 4);
+--- solution
+// P18. How many shows ended before a year?
+// countEndedBefore(list, year) gives back HOW MANY shows ended before that year.
+
+function countEndedBefore(list, year) {
+  return list.filter((show) => show.ended < year).length;
+}
+
+const mini = [
+  { name: "Friends", ended: 2004 },
+  { name: "Dark", ended: 2020 },
+  { name: "The Wire", ended: 2008 },
+];
+const none = [];
+
+tryIt(countEndedBefore, [mini, 2010], 2);
+tryIt(countEndedBefore, [mini, 2008], 1);
+tryIt(countEndedBefore, [none, 2010], 0);
+tryIt(countEndedBefore, [shows, 2010], 4);
+--- learned
+`filter(...).length` counts in one line. A counter with `let` (P10) gives the same answer; use whichever you can read best.
+--- summary
+Practice: `list.filter(...).length` counts the matching items.
+--- mistakes
+- Returning the filtered list without `.length`.
+- `show.premiered` instead of `show.ended`.
+- `<=` instead of `<`.
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it, fix that line, then check again.`);
+const f = t.get("countEndedBefore");
+t.expect(f !== undefined, "I can't find a function called `countEndedBefore`. Press **Start again** to get the starting code back.");
+t.expect(typeof f === "function" && f.length === 2, "`countEndedBefore` needs two parameters: `function countEndedBefore(list, year) {`.");
+const call = (label, ...args) => { try { return f(...args); } catch (e) { t.fail(`\`${label}\` crashed: ${e.message.replace(/\.$/, "")}.`); } };
+const shows = JSON.parse(JSON.stringify(t.get("shows")));
+let r = call("countEndedBefore(shows, 2010)", shows, 2010);
+t.expect(r !== undefined, "`countEndedBefore(shows, 2010)` gives back `undefined`. Add `return` before `list.filter(...)`.");
+t.expect(!Array.isArray(r), "`countEndedBefore` gives back a list of shows. Count them: add `.length` after the `filter(...)`.");
+t.expect(typeof r === "number", `\`countEndedBefore(shows, 2010)\` gives ${JSON.stringify(r)}. Return a number: \`list.filter(...).length\`.`);
+t.expect(r !== 7, "`countEndedBefore(shows, 2010)` gives 7: that's how many *premiered* before 2010. Use the year the show ended: `show.ended`.");
+t.expect(r !== 12, "`countEndedBefore(shows, 2010)` gives 12: every show. Compare `show.ended < year` inside the `filter`.");
+t.expect(r === 4, `\`countEndedBefore(shows, 2010)\` gives ${r}. It should give 4: Friends, The Wire, Band of Brothers and Avatar ended before 2010.`);
+r = call("countEndedBefore(shows, 2008)", shows, 2008);
+t.expect(r !== 4, "`countEndedBefore(shows, 2008)` gives 4, but The Wire and Avatar ended *in* 2008. Before 2008 means 2008 itself doesn't count: use `<`, not `<=`.");
+t.expect(r === 2, `\`countEndedBefore(shows, 2008)\` gives ${r}. It should give 2. Compare with the parameter \`year\`, not a fixed year.`);
+r = call("countEndedBefore(another list, 2000)", [{ name: "Show A", ended: 1999 }, { name: "Show B", ended: 2010 }], 2000);
+t.expect(r === 1, `With another list, \`countEndedBefore\` gives ${r}. It should give 1. Use the parameter \`list\`, not \`shows\`.`);
+r = call("countEndedBefore([], 2010)", [], 2010);
+t.expect(r === 0, `\`countEndedBefore([], 2010)\` gives ${JSON.stringify(r)}. An empty list should give 0.`);
+
+
+=== step p-decade
+title: Which decade?
+minutes: 8
+slot: gym
+template: gym
+refs: data.js
+practice: yes
+--- explain
+`Math.floor` rounds **down** (Day 5). It can cut off the last digit of a number: divide by 10, round down, multiply by 10.
+
+```js
+const age = 37;
+const group = Math.floor(age / 10) * 10;   // 3.7 becomes 3, then 30
+console.log(`${group}s`);                  // 30s
+```
+
+`Math.round` would be wrong here: 37 would become 40.
+--- task
+Make `decade(show)` return the decade the show premiered in, as text: **1990s** for Friends (1994), **2010s** for Chernobyl (2019).
+--- hint
+Work out `Math.floor(show.premiered / 10) * 10`, then return it in a template literal with an `s` after it.
+--- hint
+```js
+function decade(show) {
+  const start = Math.floor(show.premiered / 10) * 10;
+  return `${start}s`;
+}
+```
+--- starter
+// P19. Which decade did a show start in?
+// decade(show) gets ONE show and gives back text like "1990s".
+
+function decade(show) {
+  // your code here
+}
+
+tryIt(decade, [shows[0]], "1990s");
+tryIt(decade, [shows[6]], "2010s");
+tryIt(decade, [{ name: "Band of Brothers", premiered: 2001 }], "2000s");
+tryIt(decade, [{ name: "Dark", premiered: 2017 }], "2010s");
+--- solution
+// P19. Which decade did a show start in?
+// decade(show) gets ONE show and gives back text like "1990s".
+
+function decade(show) {
+  const start = Math.floor(show.premiered / 10) * 10;
+  return `${start}s`;
+}
+
+tryIt(decade, [shows[0]], "1990s");
+tryIt(decade, [shows[6]], "2010s");
+tryIt(decade, [{ name: "Band of Brothers", premiered: 2001 }], "2000s");
+tryIt(decade, [{ name: "Dark", premiered: 2017 }], "2010s");
+--- learned
+Divide, round down, multiply: a classic trick to group numbers. Day 5's maths and today's objects work together.
+--- summary
+Practice: `Math.floor(year / 10) * 10` gives the start of the decade.
+--- mistakes
+- `Math.round` instead of `Math.floor`: 2017 becomes the 2020s.
+- Forgetting `* 10`: "201s".
+- Returning the number 1990 without the `s`.
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it, fix that line, then check again.`);
+const f = t.get("decade");
+t.expect(f !== undefined, "I can't find a function called `decade`. Press **Start again** to get the starting code back.");
+t.expect(typeof f === "function", "`decade` should be a function.");
+const call = (label, show) => { try { return f(show); } catch (e) { t.fail(`\`${label}\` crashed: ${e.message.replace(/\.$/, "")}.`); } };
+const shows = JSON.parse(JSON.stringify(t.get("shows")));
+const r = call("decade(shows[0])", shows[0]);
+t.expect(r !== undefined, "`decade(shows[0])` gives back `undefined`. Add `return` with the decade as text.");
+t.expect(r !== 1990, "`decade(shows[0])` gives the number 1990. Add the s: return a template literal, with backticks around `${start}s`.");
+t.expect(typeof r === "string", `\`decade(shows[0])\` gives ${JSON.stringify(r)}. Return text like "1990s".`);
+t.expect(!/\$\{/.test(r), `\`decade(shows[0])\` gives "${r}". Use backticks, not quotes, so \`\${...}\` is filled in.`);
+t.expect(r !== "199s", "`decade(shows[0])` gives \"199s\". Multiply by 10 after rounding down: `Math.floor(show.premiered / 10) * 10`.");
+t.expect(r.trim() === "1990s", `\`decade(shows[0])\` gives "${r}". It should give "1990s" for Friends (1994).`);
+for (const [year, want] of [[1997, "1990s"], [2005, "2000s"], [2019, "2010s"], [2020, "2020s"], [1989, "1980s"]]) {
+  const got = call(`decade({ premiered: ${year} })`, { name: "Show A", premiered: year });
+  const tip = Number.parseInt(got) > Number.parseInt(want) ? " That's rounded up: use `Math.floor`, which always rounds down." : " Use the parameter `show`, not a fixed show.";
+  t.expect(String(got).trim() === want, `For a show that premiered in ${year}, \`decade\` gives "${got}". It should give "${want}".${tip}`);
+}
+
+
+=== step p-rating-of
+title: The rating of a show
+minutes: 8
+slot: gym
+template: gym
+refs: data.js
+practice: yes
+--- explain
+`find` gives back the matching item, or `undefined` when nothing matches. Reading a property of `undefined` crashes: *Cannot read properties of undefined*. So check the result before you use it:
+
+```js
+function priceOf(list, wanted) {
+  const found = list.find((snack) => snack.name === wanted);
+  if (found === undefined) {
+    return 0;
+  }
+  return found.price;
+}
+```
+
+For the name, use the lower-case trick from P9 so capital letters don't matter.
+--- task
+Make `ratingOf(list, title)` return the `rating` of the show whose name is `title` (capital letters don't matter). If there's no such show, return `0`.
+--- hint
+`find` the show with `show.name.toLowerCase() === title.toLowerCase()`. If the result is `undefined`, return 0; otherwise return its `.rating`.
+--- hint
+```js
+function ratingOf(list, title) {
+  const wanted = title.toLowerCase();
+  const found = list.find((show) => show.name.toLowerCase() === wanted);
+  if (found === undefined) {
+    return 0;
+  }
+  return found.rating;
+}
+```
+--- starter
+// P20. The rating of a show, by its name
+// ratingOf(list, title) gives back the rating of the show called title
+// (capital letters don't matter), or 0 if there is no such show.
+
+function ratingOf(list, title) {
+  // your code here
+}
+
+const none = [];
+
+tryIt(ratingOf, [shows, "Dark"], 8.7);
+tryIt(ratingOf, [shows, "the office"], 8.6);
+tryIt(ratingOf, [shows, "CHERNOBYL"], 9.1);
+tryIt(ratingOf, [shows, "Lost"], 0);
+tryIt(ratingOf, [none, "Dark"], 0);
+--- solution
+// P20. The rating of a show, by its name
+// ratingOf(list, title) gives back the rating of the show called title
+// (capital letters don't matter), or 0 if there is no such show.
+
+function ratingOf(list, title) {
+  const wanted = title.toLowerCase();
+  const found = list.find((show) => show.name.toLowerCase() === wanted);
+  if (found === undefined) {
+    return 0;
+  }
+  return found.rating;
+}
+
+const none = [];
+
+tryIt(ratingOf, [shows, "Dark"], 8.7);
+tryIt(ratingOf, [shows, "the office"], 8.6);
+tryIt(ratingOf, [shows, "CHERNOBYL"], 9.1);
+tryIt(ratingOf, [shows, "Lost"], 0);
+tryIt(ratingOf, [none, "Dark"], 0);
+--- learned
+Check for `undefined` before you read a property of what `find` gave you. That one `if` prevents the most common crash in JavaScript.
+--- summary
+Practice: `if (found === undefined)` before reading `found.rating`.
+--- mistakes
+- No `if`: "Cannot read properties of undefined (reading 'rating')" for an unknown name.
+- Returning the whole show instead of `found.rating`.
+- Making only one side lower case.
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it, fix that line, then check again.`);
+const f = t.get("ratingOf");
+t.expect(f !== undefined, "I can't find a function called `ratingOf`. Press **Start again** to get the starting code back.");
+t.expect(typeof f === "function" && f.length === 2, "`ratingOf` needs two parameters: `function ratingOf(list, title) {`.");
+const call = (label, ...args) => {
+  try { return f(...args); } catch (e) {
+    t.expect(!/reading 'rating'/.test(e.message), `\`${label}\` crashed: nothing matched, so \`find\` gave \`undefined\`, and \`undefined\` has no rating. Before reading \`found.rating\`, add \`if (found === undefined) { return 0; }\`.`);
+    t.fail(`\`${label}\` crashed: ${e.message.replace(/\.$/, "")}.`);
+  }
+};
+const shows = JSON.parse(JSON.stringify(t.get("shows")));
+let r = call('ratingOf(shows, "Dark")', shows, "Dark");
+t.expect(r !== undefined, "`ratingOf(shows, \"Dark\")` gives back `undefined`. Return the rating of the show you found: `return found.rating;`.");
+t.expect(!(r && typeof r === "object"), "`ratingOf` gives back a whole show. Return only its rating: `found.rating`.");
+t.expect(r === 8.7, `\`ratingOf(shows, "Dark")\` gives ${JSON.stringify(r)}. It should give 8.7, Dark's rating. Compare the names in lower case on both sides.`);
+for (const [typed, want] of [["the office", 8.6], ["CHERNOBYL", 9.1]]) {
+  r = call(`ratingOf(shows, "${typed}")`, shows, typed);
+  t.expect(r === want, `\`ratingOf(shows, "${typed}")\` gives ${JSON.stringify(r)}. It should give ${want}. Capital letters shouldn't matter: \`show.name.toLowerCase() === title.toLowerCase()\`.`);
+}
+r = call('ratingOf(shows, "Lost")', shows, "Lost");
+t.expect(r === 0, `\`ratingOf(shows, "Lost")\` gives ${JSON.stringify(r)}. No show is called Lost, so it should give 0.`);
+r = call('ratingOf(shows, "Office")', shows, "Office");
+t.expect(r === 0, `\`ratingOf(shows, "Office")\` gives ${JSON.stringify(r)}. No show is called exactly Office, so it should give 0. Compare whole names with \`===\`.`);
+r = call('ratingOf(another list, "show a")', [{ name: "Show A", rating: 7.5 }], "show a");
+t.expect(r === 7.5, `With another list, \`ratingOf\` gives ${JSON.stringify(r)}. It should give 7.5. Use the parameter \`list\`, not \`shows\`.`);
+r = call('ratingOf([], "Dark")', [], "Dark");
+t.expect(r === 0, `\`ratingOf([], "Dark")\` gives ${JSON.stringify(r)}. An empty list has no shows, so it should give 0.`);
+
+
+=== step p-name-years
+title: Small objects with map
+minutes: 10
+slot: gym
+template: gym
+refs: data.js
+practice: yes
+--- explain
+`map` can turn each show into a **new, smaller object** with only what you need. One catch: after an arrow, `{` means "a block of code starts here". To give back an object, put round brackets around it:
+
+```js
+const cards = snackList.map((snack) => ({ name: snack.name, cheap: snack.price < 3 }));
+// [{"name":"crisps","cheap":true}, {"name":"popcorn","cheap":false}, ...]
+```
+
+Without the round brackets, every item becomes `undefined`. The longer way works too: `(snack) => { return { name: snack.name, cheap: snack.price < 3 }; }`.
+--- task
+Make `nameAndYears(list)` return one small object per show, with two properties: `name` (the show's name) and `years` (`ended` minus `premiered`). Friends becomes `{ name: "Friends", years: 10 }`.
+--- hint
+`return list.map((show) => ({ ... }));`, with `name: show.name` and `years: show.ended - show.premiered` inside the curly brackets.
+--- hint
+```js
+function nameAndYears(list) {
+  return list.map((show) => ({ name: show.name, years: show.ended - show.premiered }));
+}
+```
+--- starter
+// P21. Small objects with map
+// nameAndYears(list) gives back one object per show: { name: ..., years: ... },
+// where years is ended minus premiered.
+
+function nameAndYears(list) {
+  // your code here
+}
+
+const mini = [
+  { name: "The Wire", premiered: 2002, ended: 2008, network: "HBO" },
+  { name: "Chernobyl", premiered: 2019, ended: 2019, network: "HBO" },
+];
+const none = [];
+
+tryIt(nameAndYears, [mini], [{ name: "The Wire", years: 6 }, { name: "Chernobyl", years: 0 }]);
+tryIt(nameAndYears, [none], []);
+--- solution
+// P21. Small objects with map
+// nameAndYears(list) gives back one object per show: { name: ..., years: ... },
+// where years is ended minus premiered.
+
+function nameAndYears(list) {
+  return list.map((show) => ({ name: show.name, years: show.ended - show.premiered }));
+}
+
+const mini = [
+  { name: "The Wire", premiered: 2002, ended: 2008, network: "HBO" },
+  { name: "Chernobyl", premiered: 2019, ended: 2019, network: "HBO" },
+];
+const none = [];
+
+tryIt(nameAndYears, [mini], [{ name: "The Wire", years: 6 }, { name: "Chernobyl", years: 0 }]);
+tryIt(nameAndYears, [none], []);
+--- learned
+`map` can build new objects, not only texts and numbers. Round brackets around `{ }` after the arrow tell JavaScript "this is an object".
+--- summary
+Practice: `list.map((x) => ({ key: value }))` makes a list of new objects.
+--- mistakes
+- No round brackets around the object: every item is `undefined`.
+- `premiered - ended` (a negative number of years).
+- Keeping the whole show instead of a new object with two properties.
+--- teacher
+The round brackets around an object after `=>` are a real JavaScript quirk. If a student is stuck, show them the longer version with `{ return { ... }; }`, which also passes.
+--- check
+t.expect(!(t.errors.length && /Unexpected token ':'/.test(t.errors[0]) && /=>\s*\{\s*name\s*:/.test(t.clean)), "After the arrow, `{` starts a block of code, so JavaScript doesn't understand `name: ...` there. Put round brackets around the object: `(show) => ({ name: show.name, years: show.ended - show.premiered })`.");
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it, fix that line, then check again.`);
+const f = t.get("nameAndYears");
+t.expect(f !== undefined, "I can't find a function called `nameAndYears`. Press **Start again** to get the starting code back.");
+t.expect(typeof f === "function", "`nameAndYears` should be a function.");
+const call = (label, list) => { try { return f(list); } catch (e) { t.fail(`\`${label}\` crashed: ${e.message.replace(/\.$/, "")}.`); } };
+const shows = JSON.parse(JSON.stringify(t.get("shows")));
+const r = call("nameAndYears(shows)", shows);
+t.expect(r !== undefined, "`nameAndYears(shows)` gives back `undefined`. Add `return` before `list.map(...)`.");
+t.expect(Array.isArray(r), `\`nameAndYears(shows)\` gives back ${JSON.stringify(r)}, not a list. Return what \`map\` gives you.`);
+t.expect(r.length === 12, `\`nameAndYears(shows)\` gives ${r.length} items. \`map\` gives one item per show: 12.`);
+t.expect(!r.every((x) => x === undefined), "Every item is `undefined`. After the arrow, `{` starts a block of code. Put round brackets around the object: `(show) => ({ name: show.name, years: ... })`.");
+t.expect(r.every((x) => x && typeof x === "object"), `The first item is ${JSON.stringify(r[0])}. Each item should be a small object: \`{ name: show.name, years: show.ended - show.premiered }\`.`);
+t.expect(!("id" in r[0]), "Each item is still the whole show. Make a new, small object with only two properties: `({ name: show.name, years: show.ended - show.premiered })`.");
+t.expect(Object.keys(r[0]).length === 2, `The first item is ${JSON.stringify(r[0])}. Make a new object with only two properties, \`name\` and \`years\`.`);
+t.expect(r[0].name === "Friends", `The first item is ${JSON.stringify(r[0])}. Its \`name\` should be "Friends": \`name: show.name\`.`);
+t.expect(r[0].years !== -10, "Friends gets `years: -10`. Subtract the other way round: `show.ended - show.premiered`.");
+t.expect(r[0].years === 10, `The first item is ${JSON.stringify(r[0])}. Its \`years\` should be 10 (2004 minus 1994): \`years: show.ended - show.premiered\`.`);
+t.expect(r[6].name === "Chernobyl" && r[6].years === 0, `Chernobyl gives ${JSON.stringify(r[6])}. It should give {"name":"Chernobyl","years":0}.`);
+const r2 = call("nameAndYears(another list)", [{ name: "Show A", premiered: 2000, ended: 2003 }]);
+t.expect(Array.isArray(r2) && r2.length === 1 && r2[0] && r2[0].name === "Show A" && r2[0].years === 3, `With another list, \`nameAndYears\` gives ${JSON.stringify(r2)}. It should give [{"name":"Show A","years":3}]. Use the parameter \`list\`, not \`shows\`.`);
+const r3 = call("nameAndYears([])", []);
+t.expect(Array.isArray(r3) && r3.length === 0, `\`nameAndYears([])\` gives ${JSON.stringify(r3)}. It should give an empty list \`[]\`.`);
+
+
+=== step p-long-runners
+title: Longer than N years
+minutes: 8
+slot: gym
+template: gym
+refs: data.js
+practice: yes
+--- explain
+The test inside `filter` can be a calculation, not only a property:
+
+```js
+const bigSavings = snackList.filter((snack) => snack.price - snack.salePrice > 1);
+```
+
+How long a show ran is `show.ended - show.premiered`: Friends ran 10 years, The Office 8.
+
+"Longer than 8 years" means more than 8, so exactly 8 doesn't count.
+--- task
+Make `longRunners(list, minYears)` return the **names** of the shows that ran **longer than** `minYears` years (`ended` minus `premiered`).
+--- hint
+Filter with `show.ended - show.premiered > minYears`, then `map` to the names.
+--- hint
+```js
+function longRunners(list, minYears) {
+  const long = list.filter((show) => show.ended - show.premiered > minYears);
+  return long.map((show) => show.name);
+}
+```
+--- starter
+// P22. Shows that ran longer than N years
+// longRunners(list, minYears) gives back the NAMES of the shows with
+// (ended minus premiered) greater than minYears.
+
+function longRunners(list, minYears) {
+  // your code here
+}
+
+const mini = [
+  { name: "Friends", premiered: 1994, ended: 2004 },
+  { name: "Dark", premiered: 2017, ended: 2020 },
+  { name: "The Office", premiered: 2005, ended: 2013 },
+];
+const none = [];
+
+tryIt(longRunners, [mini, 5], ["Friends", "The Office"]);
+tryIt(longRunners, [mini, 8], ["Friends"]);
+tryIt(longRunners, [mini, 20], []);
+tryIt(longRunners, [none, 1], []);
+--- solution
+// P22. Shows that ran longer than N years
+// longRunners(list, minYears) gives back the NAMES of the shows with
+// (ended minus premiered) greater than minYears.
+
+function longRunners(list, minYears) {
+  const long = list.filter((show) => show.ended - show.premiered > minYears);
+  return long.map((show) => show.name);
+}
+
+const mini = [
+  { name: "Friends", premiered: 1994, ended: 2004 },
+  { name: "Dark", premiered: 2017, ended: 2020 },
+  { name: "The Office", premiered: 2005, ended: 2013 },
+];
+const none = [];
+
+tryIt(longRunners, [mini, 5], ["Friends", "The Office"]);
+tryIt(longRunners, [mini, 8], ["Friends"]);
+tryIt(longRunners, [mini, 20], []);
+tryIt(longRunners, [none, 1], []);
+--- learned
+A calculation inside `filter` works like any other test. Only Friends and How I Met Your Mother ran longer than 8 years.
+--- summary
+Practice: a calculation as the test: `filter((show) => show.ended - show.premiered > n)`.
+--- mistakes
+- `>=` instead of `>`: shows of exactly `minYears` are included.
+- `premiered - ended` (always negative, so nothing is kept).
+- Returning the shows without the `map` to names.
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it, fix that line, then check again.`);
+const f = t.get("longRunners");
+t.expect(f !== undefined, "I can't find a function called `longRunners`. Press **Start again** to get the starting code back.");
+t.expect(typeof f === "function" && f.length === 2, "`longRunners` needs two parameters: `function longRunners(list, minYears) {`.");
+const call = (label, ...args) => { try { return f(...args); } catch (e) { t.fail(`\`${label}\` crashed: ${e.message.replace(/\.$/, "")}.`); } };
+const fmt = (r) => (Array.isArray(r) ? `[${r.map((s) => (s && typeof s === "object" ? s.name : s)).join(", ")}]` : JSON.stringify(r));
+const shows = JSON.parse(JSON.stringify(t.get("shows")));
+let r = call("longRunners(shows, 8)", shows, 8);
+t.expect(r !== undefined, "`longRunners(shows, 8)` gives back `undefined`. Add `return` before the list you give back.");
+t.expect(Array.isArray(r), `\`longRunners(shows, 8)\` gives back ${JSON.stringify(r)}, not a list.`);
+t.expect(!r.some((s) => s && typeof s === "object"), "`longRunners` gives back whole shows. Add `.map((show) => show.name)` after the filter.");
+t.expect(r.length !== 12, "`longRunners(shows, 8)` gives all 12 names. Filter first with `show.ended - show.premiered > minYears`.");
+t.expect(r.length, "`longRunners(shows, 8)` gives an empty list. Subtract in this order: `show.ended - show.premiered` (the later year first).");
+t.expect(!r.includes("The Office"), "`longRunners(shows, 8)` includes The Office, which ran exactly 8 years (2005 to 2013). *Longer than* 8 means more than 8: use `>`, not `>=`.");
+t.expect(fmt(r) === "[Friends, How I Met Your Mother]", `\`longRunners(shows, 8)\` gives ${fmt(r)}. It should give Friends (10 years) and How I Met Your Mother (9 years).`);
+r = call("longRunners(shows, 7)", shows, 7);
+t.expect(fmt(r) === "[Friends, The Office, Game of Thrones, How I Met Your Mother]", `\`longRunners(shows, 7)\` gives ${fmt(r)}. It should give Friends, The Office, Game of Thrones and How I Met Your Mother. Compare with the parameter \`minYears\`, not a fixed number.`);
+r = call("longRunners(shows, 20)", shows, 20);
+t.expect(Array.isArray(r) && r.length === 0, `\`longRunners(shows, 20)\` gives ${fmt(r)}. It should give an empty list.`);
+r = call("longRunners(another list, 1)", [{ name: "Show A", premiered: 2000, ended: 2005 }, { name: "Show B", premiered: 2010, ended: 2010 }], 1);
+t.expect(fmt(r) === "[Show A]", `With another list, \`longRunners\` gives ${fmt(r)}. It should give [Show A]. Use the parameter \`list\`, not \`shows\`.`);
+r = call("longRunners([], 1)", [], 1);
+t.expect(Array.isArray(r) && r.length === 0, `\`longRunners([], 1)\` gives ${fmt(r)}. It should give an empty list \`[]\`.`);
+
+
+=== step p-short-good
+title: Short and good: two conditions
+minutes: 10
+slot: gym
+template: gym
+refs: data.js
+practice: yes
+--- explain
+New: `&&` means **and**. It joins two tests, and the whole thing is `true` only when **both** sides are true.
+
+```js
+const deals = snackList.filter((snack) => snack.price < 3 && snack.salty === true);
+```
+
+| price < 3 | salty | kept? |
+|---|---|---|
+| true | true | yes |
+| true | false | no |
+| false | true | no |
+
+Each side of `&&` is a complete comparison. Write `show.runtime <= 30 && show.rating >= 8`, not `show.runtime <= 30 && >= 8`.
+--- task
+Make `shortAndGood(list, minRating)` return the **names** of the shows with episodes of **30 minutes or less** **and** a rating of `minRating` **or more**.
+--- hint
+One `filter` with both tests joined by `&&`: `show.runtime <= 30 && show.rating >= minRating`. Then `map` to the names.
+--- hint
+```js
+function shortAndGood(list, minRating) {
+  const picked = list.filter((show) => show.runtime <= 30 && show.rating >= minRating);
+  return picked.map((show) => show.name);
+}
+```
+--- starter
+// P23. Short AND good
+// shortAndGood(list, minRating) gives back the NAMES of the shows with
+// episodes of 30 minutes or less AND a rating of minRating or more.
+
+function shortAndGood(list, minRating) {
+  // your code here
+}
+
+const mini = [
+  { name: "Fleabag", runtime: 30, rating: 8.4 },
+  { name: "Dark", runtime: 60, rating: 8.7 },
+  { name: "Friends", runtime: 30, rating: 8.8 },
+];
+const none = [];
+
+tryIt(shortAndGood, [mini, 8.5], ["Friends"]);
+tryIt(shortAndGood, [mini, 8], ["Fleabag", "Friends"]);
+tryIt(shortAndGood, [none, 8], []);
+tryIt(shortAndGood, [shows, 8.5], ["Friends", "The Office", "Avatar: The Last Airbender"]);
+--- solution
+// P23. Short AND good
+// shortAndGood(list, minRating) gives back the NAMES of the shows with
+// episodes of 30 minutes or less AND a rating of minRating or more.
+
+function shortAndGood(list, minRating) {
+  const picked = list.filter((show) => show.runtime <= 30 && show.rating >= minRating);
+  return picked.map((show) => show.name);
+}
+
+const mini = [
+  { name: "Fleabag", runtime: 30, rating: 8.4 },
+  { name: "Dark", runtime: 60, rating: 8.7 },
+  { name: "Friends", runtime: 30, rating: 8.8 },
+];
+const none = [];
+
+tryIt(shortAndGood, [mini, 8.5], ["Friends"]);
+tryIt(shortAndGood, [mini, 8], ["Fleabag", "Friends"]);
+tryIt(shortAndGood, [none, 8], []);
+tryIt(shortAndGood, [shows, 8.5], ["Friends", "The Office", "Avatar: The Last Airbender"]);
+--- learned
+`&&` keeps an item only when both tests pass. Three short shows are rated 8.5 or more.
+--- summary
+Practice: `a && b` is true only when both are true.
+--- mistakes
+- Only one of the two tests.
+- `show.runtime <= 30 && >= minRating` (the second test needs its own `show.rating`).
+- A single `&` instead of `&&`.
+--- teacher
+`&&` is new in this exercise; the explanation introduces it. "And" in plain English is the right way to read it aloud.
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it, fix that line, then check again. Each side of \`&&\` needs a full comparison, like \`show.rating >= minRating\`.`);
+const f = t.get("shortAndGood");
+t.expect(f !== undefined, "I can't find a function called `shortAndGood`. Press **Start again** to get the starting code back.");
+t.expect(typeof f === "function" && f.length === 2, "`shortAndGood` needs two parameters: `function shortAndGood(list, minRating) {`.");
+const call = (label, ...args) => { try { return f(...args); } catch (e) { t.fail(`\`${label}\` crashed: ${e.message.replace(/\.$/, "")}.`); } };
+const fmt = (r) => (Array.isArray(r) ? `[${r.map((s) => (s && typeof s === "object" ? s.name : s)).join(", ")}]` : JSON.stringify(r));
+const shows = JSON.parse(JSON.stringify(t.get("shows")));
+let r = call("shortAndGood(shows, 8.5)", shows, 8.5);
+t.expect(r !== undefined, "`shortAndGood(shows, 8.5)` gives back `undefined`. Add `return` before the list you give back.");
+t.expect(Array.isArray(r), `\`shortAndGood(shows, 8.5)\` gives back ${JSON.stringify(r)}, not a list.`);
+t.expect(!r.some((s) => s && typeof s === "object"), "`shortAndGood` gives back whole shows. Add `.map((show) => show.name)` after the filter.");
+t.expect(!r.includes("Breaking Bad"), `\`shortAndGood(shows, 8.5)\` gives ${fmt(r)}, with Breaking Bad, which has 60-minute episodes. Add the second test with \`&&\`: \`show.runtime <= 30 && show.rating >= minRating\`.`);
+t.expect(!r.includes("How I Met Your Mother"), `\`shortAndGood(shows, 8.5)\` gives ${fmt(r)}, with How I Met Your Mother, which is rated 8.0. Add the rating test with \`&&\`: \`show.runtime <= 30 && show.rating >= minRating\`.`);
+t.expect(fmt(r) === "[Friends, The Office, Avatar: The Last Airbender]", `\`shortAndGood(shows, 8.5)\` gives ${fmt(r)}. It should give Friends, The Office and Avatar: 30-minute episodes and rated 8.5 or more. Use \`<= 30\` and \`>= minRating\`.`);
+r = call("shortAndGood(shows, 9)", shows, 9);
+t.expect(fmt(r) === "[Avatar: The Last Airbender]", `\`shortAndGood(shows, 9)\` gives ${fmt(r)}. It should give only Avatar: The Last Airbender. Compare with the parameter \`minRating\`, not a fixed number.`);
+const mix = [{ name: "Show A", runtime: 25, rating: 9 }, { name: "Show B", runtime: 60, rating: 9 }, { name: "Show C", runtime: 25, rating: 7 }];
+r = call("shortAndGood(another list, 8)", mix, 8);
+t.expect(fmt(r) === "[Show A]", `With another list, \`shortAndGood\` gives ${fmt(r)}. It should give [Show A], the only one that is short *and* good. Use the parameter \`list\`, not \`shows\`.`);
+r = call("shortAndGood([], 8)", [], 8);
+t.expect(Array.isArray(r) && r.length === 0, `\`shortAndGood([], 8)\` gives ${fmt(r)}. It should give an empty list \`[]\`.`);
+
+
+=== step p-between
+title: Started between two years
+minutes: 10
+slot: gym
+template: gym
+refs: data.js
+practice: yes
+--- explain
+In maths you might write 2005 ≤ year ≤ 2010. JavaScript can't read that: `2005 <= year <= 2010` first works out `2005 <= year` (true or false) and then compares true or false with 2010, which gives nonsense. Write **two** comparisons and join them with `&&`:
+
+```js
+if (from <= snack.price && snack.price <= to) {
+  // the price is from ... to ..., both included
+}
+```
+
+This time, build the list with a loop and `push` (like P8) instead of `filter`: good practice for when you need more than one line inside the loop.
+--- task
+Make `startedBetween(list, from, to)` return the **names** of the shows that premiered from the year `from` to the year `to`, **both years included**. Use a loop, an `if` and `push`.
+--- hint
+`const found = [];` before the loop. Inside: `if (from <= show.premiered && show.premiered <= to)`, push `show.name`. Return `found` after the loop.
+--- hint
+```js
+function startedBetween(list, from, to) {
+  const found = [];
+  for (const show of list) {
+    if (from <= show.premiered && show.premiered <= to) {
+      found.push(show.name);
+    }
+  }
+  return found;
+}
+```
+--- starter
+// P24. Shows that started between two years
+// startedBetween(list, from, to) gives back the NAMES of the shows that
+// premiered from the year "from" to the year "to" (both included).
+// Use a loop, an if and push.
+
+function startedBetween(list, from, to) {
+  // your code here
+}
+
+const mini = [
+  { name: "The Office", premiered: 2005 },
+  { name: "Breaking Bad", premiered: 2008 },
+  { name: "Game of Thrones", premiered: 2011 },
+];
+const none = [];
+
+tryIt(startedBetween, [mini, 2005, 2010], ["The Office", "Breaking Bad"]);
+tryIt(startedBetween, [mini, 2008, 2008], ["Breaking Bad"]);
+tryIt(startedBetween, [mini, 1990, 2000], []);
+tryIt(startedBetween, [none, 2000, 2020], []);
+--- solution
+// P24. Shows that started between two years
+// startedBetween(list, from, to) gives back the NAMES of the shows that
+// premiered from the year "from" to the year "to" (both included).
+// Use a loop, an if and push.
+
+function startedBetween(list, from, to) {
+  const found = [];
+  for (const show of list) {
+    if (from <= show.premiered && show.premiered <= to) {
+      found.push(show.name);
+    }
+  }
+  return found;
+}
+
+const mini = [
+  { name: "The Office", premiered: 2005 },
+  { name: "Breaking Bad", premiered: 2008 },
+  { name: "Game of Thrones", premiered: 2011 },
+];
+const none = [];
+
+tryIt(startedBetween, [mini, 2005, 2010], ["The Office", "Breaking Bad"]);
+tryIt(startedBetween, [mini, 2008, 2008], ["Breaking Bad"]);
+tryIt(startedBetween, [mini, 1990, 2000], []);
+tryIt(startedBetween, [none, 2000, 2020], []);
+--- learned
+A range is two comparisons joined with `&&`. `<=` on both sides includes the first and the last year.
+--- summary
+Practice: a range: `from <= x && x <= to`.
+--- mistakes
+- `from <= show.premiered <= to`, written like maths: every show is kept.
+- `<` instead of `<=`: the first or last year is left out.
+- `const found = [];` inside the loop.
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it, fix that line, then check again.`);
+const f = t.get("startedBetween");
+t.expect(f !== undefined, "I can't find a function called `startedBetween`. Press **Start again** to get the starting code back.");
+t.expect(typeof f === "function" && f.length === 3, "`startedBetween` needs three parameters: `function startedBetween(list, from, to) {`.");
+const call = (label, ...args) => {
+  try { return f(...args); } catch (e) {
+    t.expect(!/is not defined/.test(e.message), `\`${label}\` crashed: ${e.message.replace(/\.$/, "")}. Create the empty array before the loop, not inside it, so it still exists after the loop.`);
+    t.fail(`\`${label}\` crashed: ${e.message.replace(/\.$/, "")}.`);
+  }
+};
+const fmt = (r) => (Array.isArray(r) ? `[${r.map((s) => (s && typeof s === "object" ? s.name : s)).join(", ")}]` : JSON.stringify(r));
+const shows = JSON.parse(JSON.stringify(t.get("shows")));
+let r = call("startedBetween(shows, 2005, 2010)", shows, 2005, 2010);
+t.expect(r !== undefined, "`startedBetween(shows, 2005, 2010)` gives back `undefined`. After the loop's closing `}`, add `return found;`.");
+t.expect(Array.isArray(r), `\`startedBetween(shows, 2005, 2010)\` gives back ${JSON.stringify(r)}, not a list.`);
+t.expect(!r.some((s) => s && typeof s === "object"), "`startedBetween` gives back whole shows. Push only the name: `found.push(show.name);`.");
+t.expect(r.length !== 12, "`startedBetween(shows, 2005, 2010)` gives all 12 names. JavaScript can't read `from <= x <= to` like maths. Write two comparisons joined with `&&`: `from <= show.premiered && show.premiered <= to`.");
+t.expect(r.length, "`startedBetween(shows, 2005, 2010)` gives an empty list. Check that `return` comes after the loop's closing `}`, and test `from <= show.premiered && show.premiered <= to`.");
+t.expect(r.includes("The Office"), `\`startedBetween(shows, 2005, 2010)\` gives ${fmt(r)}, without The Office, which premiered in 2005. Both years are included: use \`<=\` on both sides, not \`<\`.`);
+t.expect(fmt(r) === "[Breaking Bad, The Office, How I Met Your Mother, Avatar: The Last Airbender]", `\`startedBetween(shows, 2005, 2010)\` gives ${fmt(r)}. It should give Breaking Bad, The Office, How I Met Your Mother and Avatar (three of them premiered in 2005, so use \`<=\` to include the first year).`);
+r = call("startedBetween(shows, 2016, 2017)", shows, 2016, 2017);
+t.expect(fmt(r) === "[The Crown, Dark, Fleabag]", `\`startedBetween(shows, 2016, 2017)\` gives ${fmt(r)}. It should give The Crown, Dark and Fleabag. Use the parameters \`from\` and \`to\`, and \`<=\` on both sides.`);
+r = call("startedBetween(shows, 2019, 2019)", shows, 2019, 2019);
+t.expect(fmt(r) === "[Chernobyl]", `\`startedBetween(shows, 2019, 2019)\` gives ${fmt(r)}. It should give Chernobyl: both years are included, so use \`<=\` on both sides.`);
+r = call("startedBetween(another list, 2000, 2002)", [{ name: "Show A", premiered: 1999 }, { name: "Show B", premiered: 2001 }], 2000, 2002);
+t.expect(fmt(r) === "[Show B]", `With another list, \`startedBetween\` gives ${fmt(r)}. It should give [Show B]. Loop through the parameter \`list\`, not \`shows\`.`);
+r = call("startedBetween([], 2000, 2020)", [], 2000, 2020);
+t.expect(Array.isArray(r) && r.length === 0, `\`startedBetween([], 2000, 2020)\` gives ${fmt(r)}. It should give an empty list \`[]\`.`);
+
+
+=== step p-all-rated
+title: Does every show have a rating?
+minutes: 8
+slot: gym
+template: gym
+refs: data.js
+practice: yes
+--- explain
+A **flag** is a `let` variable that holds `true` or `false`. Start it as `true`, and switch it to `false` as soon as one item fails. Never switch it back.
+
+```js
+function allCheap(list) {
+  let ok = true;
+  for (const snack of list) {
+    if (snack.price >= 3) {
+      ok = false;
+    }
+  }
+  return ok;
+}
+```
+
+A show without a rating has `rating: null`. **null** means "no value, on purpose". Test it with `show.rating === null`, without quotes.
+
+An empty list has no show without a rating, so the answer is `true`.
+--- task
+Make `allRated(list)` return `true` when every show in `list` has a rating, and `false` when at least one has `rating: null`. Use a flag.
+--- hint
+`let allHave = true;` before the loop. Inside: `if (show.rating === null)`, set it to `false`. Return it after the loop.
+--- hint
+```js
+function allRated(list) {
+  let allHave = true;
+  for (const show of list) {
+    if (show.rating === null) {
+      allHave = false;
+    }
+  }
+  return allHave;
+}
+```
+--- starter
+// P25. Does every show have a rating?
+// allRated(list) gives back true if every show has a rating,
+// and false if at least one has rating: null.
+
+function allRated(list) {
+  // your code here
+}
+
+const oneMissing = [
+  { name: "Dark", rating: 8.7 },
+  { name: "Show Without Rating", rating: null },
+];
+const none = [];
+
+tryIt(allRated, [shows], true);
+tryIt(allRated, [oneMissing], false);
+tryIt(allRated, [none], true);
+--- solution
+// P25. Does every show have a rating?
+// allRated(list) gives back true if every show has a rating,
+// and false if at least one has rating: null.
+
+function allRated(list) {
+  let allHave = true;
+  for (const show of list) {
+    if (show.rating === null) {
+      allHave = false;
+    }
+  }
+  return allHave;
+}
+
+const oneMissing = [
+  { name: "Dark", rating: 8.7 },
+  { name: "Show Without Rating", rating: null },
+];
+const none = [];
+
+tryIt(allRated, [shows], true);
+tryIt(allRated, [oneMissing], false);
+tryIt(allRated, [none], true);
+--- learned
+A flag starts `true` and one failing item turns it `false` for good. All twelve shows have a rating.
+--- summary
+Practice: a flag: `let ok = true;`, set it to `false` in the loop when an item fails.
+--- mistakes
+- An `else` that sets the flag back to `true`, so only the last show counts.
+- `return` inside the loop, so only the first show is checked.
+- `show.rating === "null"` in quotes (that's the word null, not the value).
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it, fix that line, then check again.`);
+const f = t.get("allRated");
+t.expect(f !== undefined, "I can't find a function called `allRated`. Press **Start again** to get the starting code back.");
+t.expect(typeof f === "function", "`allRated` should be a function.");
+const call = (label, list) => {
+  try { return f(list); } catch (e) {
+    t.expect(!/constant/.test(e.message), `\`${label}\` crashed: ${e.message.replace(/\.$/, "")}. The flag changes, so create it with \`let\`, not \`const\`.`);
+    t.fail(`\`${label}\` crashed: ${e.message.replace(/\.$/, "")}.`);
+  }
+};
+const shows = JSON.parse(JSON.stringify(t.get("shows")));
+let r = call("allRated(shows)", shows);
+t.expect(r !== undefined, "`allRated(shows)` gives back `undefined`. After the loop's closing `}`, return your flag.");
+t.expect(typeof r === "boolean", `\`allRated(shows)\` gives ${JSON.stringify(r)}. Return \`true\` or \`false\`, without quotes.`);
+t.expect(r === true, "`allRated(shows)` gives false, but every show in data.js has a rating. Start the flag as `true`, and set it to `false` only when `show.rating === null`.");
+const lastMissing = [{ name: "Show A", rating: 8 }, { name: "Show B", rating: null }];
+r = call("allRated([rated, null])", lastMissing);
+t.expect(r !== true || !/["']null["']/.test(String(f)), "With a show whose rating is `null`, `allRated` gives true. Write `null` without quotes: `show.rating === null`.");
+t.expect(r === false, "With shows rated 8 and `null`, `allRated` gives true. One show has no rating, so it should give false. Check every show, and `return` after the loop, not inside it.");
+const firstMissing = [{ name: "Show A", rating: null }, { name: "Show B", rating: 8 }];
+r = call("allRated([null, rated])", firstMissing);
+t.expect(r === false, "With shows rated `null` and 8, `allRated` gives true. Once the flag is `false`, never set it back to `true`: remove the `else`.");
+r = call("allRated([])", []);
+t.expect(r === true, `\`allRated([])\` gives ${JSON.stringify(r)}. An empty list has no show without a rating, so it should give true. Start the flag as \`true\`.`);
+
+
+=== step p-shortest-name
+title: The shortest name
+minutes: 10
+slot: gym
+template: gym
+refs: data.js
+practice: yes
+--- explain
+"Best so far" (P14) also finds the **smallest**: use `<` instead of `>`. And a text's `.length` counts its characters (Day 4):
+
+```js
+"Dark".length;      // 4
+"Friends".length;   // 7
+```
+
+Compare the lengths, not the names themselves: `"Avatar" < "Dark"` compares alphabetical order, not size.
+
+With `<`, a show only replaces the best so far when it is really shorter, so on a tie the first one stays. As in P15, an empty list has no best show: return `""` straight away.
+--- task
+Make `shortestName(list)` return the shortest show name in `list`. If two are equally short, the first one wins. For an empty list, return `""`.
+--- hint
+`if (list.length === 0) { return ""; }`, then `let best = list[0];` and a loop. Replace `best` when `show.name.length < best.name.length`. Return `best.name`.
+--- hint
+```js
+function shortestName(list) {
+  if (list.length === 0) {
+    return "";
+  }
+  let best = list[0];
+  for (const show of list) {
+    if (show.name.length < best.name.length) {
+      best = show;
+    }
+  }
+  return best.name;
+}
+```
+--- starter
+// P26. The shortest name
+// shortestName(list) gives back the shortest show name.
+// On a tie the first one wins. An empty list gives "".
+
+function shortestName(list) {
+  // your code here
+}
+
+const mini = [{ name: "The Crown" }, { name: "Fleabag" }, { name: "Chernobyl" }];
+const tie = [{ name: "Friends" }, { name: "Fleabag" }];
+const none = [];
+
+tryIt(shortestName, [mini], "Fleabag");
+tryIt(shortestName, [tie], "Friends");
+tryIt(shortestName, [none], "");
+tryIt(shortestName, [shows], "Dark");
+--- solution
+// P26. The shortest name
+// shortestName(list) gives back the shortest show name.
+// On a tie the first one wins. An empty list gives "".
+
+function shortestName(list) {
+  if (list.length === 0) {
+    return "";
+  }
+  let best = list[0];
+  for (const show of list) {
+    if (show.name.length < best.name.length) {
+      best = show;
+    }
+  }
+  return best.name;
+}
+
+const mini = [{ name: "The Crown" }, { name: "Fleabag" }, { name: "Chernobyl" }];
+const tie = [{ name: "Friends" }, { name: "Fleabag" }];
+const none = [];
+
+tryIt(shortestName, [mini], "Fleabag");
+tryIt(shortestName, [tie], "Friends");
+tryIt(shortestName, [none], "");
+tryIt(shortestName, [shows], "Dark");
+--- learned
+"Best so far" with `<` finds the smallest, and `.length` turns a name into a number to compare. Dark wins with 4 letters.
+--- summary
+Practice: smallest so far: replace `best` when `show.name.length < best.name.length`.
+--- mistakes
+- Comparing `show.name < best.name` (alphabetical order, not length).
+- `>` instead of `<` (the longest name).
+- `<=` instead of `<`: on a tie the last one wins.
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it, fix that line, then check again.`);
+const f = t.get("shortestName");
+t.expect(f !== undefined, "I can't find a function called `shortestName`. Press **Start again** to get the starting code back.");
+t.expect(typeof f === "function", "`shortestName` should be a function.");
+const call = (label, list) => {
+  try { return f(list); } catch (e) {
+    t.expect(!/constant/.test(e.message), `\`${label}\` crashed: ${e.message.replace(/\.$/, "")}. \`best\` changes, so create it with \`let\`, not \`const\`.`);
+    t.expect(!(list.length === 0 && /reading/.test(e.message)), `\`${label}\` crashed: ${e.message.replace(/\.$/, "")}. An empty list has no names. At the start of the function, add \`if (list.length === 0) { return ""; }\`.`);
+    t.fail(`\`${label}\` crashed: ${e.message.replace(/\.$/, "")}.`);
+  }
+};
+const shows = JSON.parse(JSON.stringify(t.get("shows")));
+let r = call("shortestName(shows)", shows);
+t.expect(r !== undefined, "`shortestName(shows)` gives back `undefined`. After the loop's closing `}`, add `return best.name;`.");
+t.expect(!(r && typeof r === "object"), "`shortestName(shows)` gives back a whole show. Return only its name: `best.name`.");
+t.expect(typeof r === "string", `\`shortestName(shows)\` gives ${JSON.stringify(r)}. Return the name, a text.`);
+t.expect(r !== "Avatar: The Last Airbender", "`shortestName(shows)` gives Avatar: The Last Airbender, the first name in alphabetical order. Compare the lengths: `show.name.length < best.name.length`.");
+t.expect(r !== "How I Met Your Mother", "`shortestName(shows)` gives How I Met Your Mother, the longest name. Use `<` to find the shortest.");
+t.expect(r === "Dark", `\`shortestName(shows)\` gives "${r}". It should give "Dark" (4 letters). Compare \`show.name.length\` with \`best.name.length\`.`);
+r = call("shortestName([Show Long, Ab, Abcd])", [{ name: "Show Long" }, { name: "Ab" }, { name: "Abcd" }]);
+t.expect(r === "Ab", `With the names Show Long, Ab and Abcd, \`shortestName\` gives ${JSON.stringify(r)}. It should give "Ab". Loop through the parameter \`list\`, not \`shows\`.`);
+r = call("shortestName([Abc, Xyz])", [{ name: "Abc" }, { name: "Xyz" }]);
+t.expect(r === "Abc", `With two names of the same length, Abc and Xyz, \`shortestName\` gives ${JSON.stringify(r)}. The first one should win: use \`<\`, not \`<=\`.`);
+r = call("shortestName([])", []);
+t.expect(r === "", `\`shortestName([])\` gives ${JSON.stringify(r)}. An empty list should give an empty string: \`if (list.length === 0) { return ""; }\` at the start.`);
+
+
+=== step p-lowest
+title: The lowest rating
+minutes: 10
+slot: gym
+template: gym
+refs: data.js
+practice: yes
+--- explain
+One more "smallest so far", this time on a number property. Start with the first show and replace it whenever a show has a **lower** rating:
+
+```js
+if (snack.price < best.price) {
+  best = snack;
+}
+```
+
+Two of the twelve shows share the lowest rating, 8.0: The Crown and How I Met Your Mother. With `<`, the first one stays the best, because the second isn't *lower*, only equal.
+--- task
+Make `lowestRated(list)` return the **name** of the show with the lowest rating. On a tie, the first one wins. For an empty list, return `""`.
+--- hint
+Same shape as P26: the empty-list `if`, `let best = list[0];`, a loop that replaces `best` when `show.rating < best.rating`, and `return best.name;`.
+--- hint
+```js
+function lowestRated(list) {
+  if (list.length === 0) {
+    return "";
+  }
+  let best = list[0];
+  for (const show of list) {
+    if (show.rating < best.rating) {
+      best = show;
+    }
+  }
+  return best.name;
+}
+```
+--- starter
+// P27. The lowest rating
+// lowestRated(list) gives back the NAME of the show with the lowest rating.
+// On a tie the first one wins. An empty list gives "".
+
+function lowestRated(list) {
+  // your code here
+}
+
+const mini = [
+  { name: "Dark", rating: 8.7 },
+  { name: "Fleabag", rating: 8.4 },
+  { name: "Chernobyl", rating: 9.1 },
+];
+const none = [];
+
+tryIt(lowestRated, [mini], "Fleabag");
+tryIt(lowestRated, [none], "");
+tryIt(lowestRated, [shows], "The Crown");
+--- solution
+// P27. The lowest rating
+// lowestRated(list) gives back the NAME of the show with the lowest rating.
+// On a tie the first one wins. An empty list gives "".
+
+function lowestRated(list) {
+  if (list.length === 0) {
+    return "";
+  }
+  let best = list[0];
+  for (const show of list) {
+    if (show.rating < best.rating) {
+      best = show;
+    }
+  }
+  return best.name;
+}
+
+const mini = [
+  { name: "Dark", rating: 8.7 },
+  { name: "Fleabag", rating: 8.4 },
+  { name: "Chernobyl", rating: 9.1 },
+];
+const none = [];
+
+tryIt(lowestRated, [mini], "Fleabag");
+tryIt(lowestRated, [none], "");
+tryIt(lowestRated, [shows], "The Crown");
+--- learned
+`<` finds the lowest and keeps the first on a tie. "Lowest" here is still 8.0: every show in data.js is worth watching.
+--- summary
+Practice: lowest so far: replace `best` when `show.rating < best.rating`.
+--- mistakes
+- `>` instead of `<` (the highest rating).
+- `<=` instead of `<`: on the tie, How I Met Your Mother wins instead of The Crown.
+- No empty-list check: a crash on `best.name`.
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it, fix that line, then check again.`);
+const f = t.get("lowestRated");
+t.expect(f !== undefined, "I can't find a function called `lowestRated`. Press **Start again** to get the starting code back.");
+t.expect(typeof f === "function", "`lowestRated` should be a function.");
+const call = (label, list) => {
+  try { return f(list); } catch (e) {
+    t.expect(!/constant/.test(e.message), `\`${label}\` crashed: ${e.message.replace(/\.$/, "")}. \`best\` changes, so create it with \`let\`, not \`const\`.`);
+    t.expect(!(list.length === 0 && /reading/.test(e.message)), `\`${label}\` crashed: ${e.message.replace(/\.$/, "")}. An empty list has no shows. At the start of the function, add \`if (list.length === 0) { return ""; }\`.`);
+    t.fail(`\`${label}\` crashed: ${e.message.replace(/\.$/, "")}.`);
+  }
+};
+const shows = JSON.parse(JSON.stringify(t.get("shows")));
+let r = call("lowestRated(shows)", shows);
+t.expect(r !== undefined, "`lowestRated(shows)` gives back `undefined`. After the loop's closing `}`, add `return best.name;`.");
+t.expect(!(r && typeof r === "object"), "`lowestRated(shows)` gives back a whole show. Return only its name: `best.name`.");
+t.expect(typeof r === "string", `\`lowestRated(shows)\` gives ${JSON.stringify(r)}. Return the name of the show.`);
+t.expect(r !== "Breaking Bad", "`lowestRated(shows)` gives Breaking Bad, the highest rated show. Use `<` to find the lowest: `show.rating < best.rating`.");
+t.expect(r !== "How I Met Your Mother", "`lowestRated(shows)` gives How I Met Your Mother. It shares the lowest rating, 8.0, with The Crown, which comes first. Use `<`, not `<=`, so the first one stays.");
+t.expect(r === "The Crown", `\`lowestRated(shows)\` gives "${r}". It should give "The Crown" (rated 8.0, and first of the two 8.0 shows).`);
+r = call("lowestRated([9, 7, 8])", [{ name: "Show A", rating: 9 }, { name: "Show B", rating: 7 }, { name: "Show C", rating: 8 }]);
+t.expect(r === "Show B", `With ratings 9, 7 and 8, \`lowestRated\` gives ${JSON.stringify(r)}. It should give "Show B". Loop through the parameter \`list\`, not \`shows\`.`);
+r = call("lowestRated([9, 8, 7])", [{ name: "Show A", rating: 9 }, { name: "Show B", rating: 8 }, { name: "Show C", rating: 7 }]);
+t.expect(r === "Show C", `With ratings 9, 8 and 7, \`lowestRated\` gives ${JSON.stringify(r)}. It should give "Show C", the last one. Replace \`best\` every time a show is lower.`);
+r = call("lowestRated([])", []);
+t.expect(r === "", `\`lowestRated([])\` gives ${JSON.stringify(r)}. An empty list should give an empty string: \`if (list.length === 0) { return ""; }\` at the start.`);
+
+
+=== step p-watchlist
+title: A watchlist from ids (harder)
+minutes: 12
+slot: gym
+template: gym
+refs: data.js
+practice: yes
+--- explain
+Apps often save only the **ids** of your favourite shows, like `[7, 1]`, and look up the rest when they need it. This time, loop through the **ids**, not the shows, and use `find` for each one:
+
+```js
+const basket = [];
+for (const wanted of wantedNames) {
+  const snack = snackList.find((item) => item.name === wanted);
+  if (snack !== undefined) {
+    basket.push(snack.price);
+  }
+}
+```
+
+Looping through the ids keeps them in **their** order: `[7, 1]` gives Chernobyl first, then Friends. An id that no show has is skipped, thanks to the `if`.
+--- task
+Make `watchlist(list, ids)` return the **names** of the shows whose ids are in `ids`, in the order of `ids`. Skip ids that no show has.
+--- hint
+`const names = [];`, then `for (const id of ids)`. Inside: `find` the show with `show.id === id`; if it isn't `undefined`, push its name. Return `names` after the loop.
+--- hint
+```js
+function watchlist(list, ids) {
+  const names = [];
+  for (const id of ids) {
+    const found = list.find((show) => show.id === id);
+    if (found !== undefined) {
+      names.push(found.name);
+    }
+  }
+  return names;
+}
+```
+--- starter
+// P28. A watchlist from ids
+// watchlist(list, ids) gives back the NAMES of the shows with those ids,
+// in the order of ids. Ids that no show has are skipped.
+
+function watchlist(list, ids) {
+  // your code here
+}
+
+tryIt(watchlist, [shows, [7, 1]], ["Chernobyl", "Friends"]);
+tryIt(watchlist, [shows, [2, 99, 4]], ["Breaking Bad", "Game of Thrones"]);
+tryIt(watchlist, [shows, []], []);
+--- solution
+// P28. A watchlist from ids
+// watchlist(list, ids) gives back the NAMES of the shows with those ids,
+// in the order of ids. Ids that no show has are skipped.
+
+function watchlist(list, ids) {
+  const names = [];
+  for (const id of ids) {
+    const found = list.find((show) => show.id === id);
+    if (found !== undefined) {
+      names.push(found.name);
+    }
+  }
+  return names;
+}
+
+tryIt(watchlist, [shows, [7, 1]], ["Chernobyl", "Friends"]);
+tryIt(watchlist, [shows, [2, 99, 4]], ["Breaking Bad", "Game of Thrones"]);
+tryIt(watchlist, [shows, []], []);
+--- learned
+A loop through one list, a `find` in another, an `if` and a `push`: that's how My List will turn saved ids into shows.
+--- summary
+Practice: loop through ids, `find` each show, push it if found.
+--- mistakes
+- Looping through `list` instead of `ids`: the names come in the wrong order.
+- No `if`: id 99 crashes with "Cannot read properties of undefined".
+- `show.id === ids` (the whole list) instead of `show.id === id`.
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it, fix that line, then check again.`);
+const f = t.get("watchlist");
+t.expect(f !== undefined, "I can't find a function called `watchlist`. Press **Start again** to get the starting code back.");
+t.expect(typeof f === "function" && f.length === 2, "`watchlist` needs two parameters: `function watchlist(list, ids) {`.");
+const call = (label, ...args) => {
+  try { return f(...args); } catch (e) {
+    t.expect(!/reading 'name'/.test(e.message), `\`${label}\` crashed: no show has one of the ids, so \`find\` gave \`undefined\`. Push only when \`found !== undefined\`.`);
+    t.fail(`\`${label}\` crashed: ${e.message.replace(/\.$/, "")}.`);
+  }
+};
+const fmt = (r) => (Array.isArray(r) ? `[${r.map((s) => (s && typeof s === "object" ? s.name : s)).join(", ")}]` : JSON.stringify(r));
+const shows = JSON.parse(JSON.stringify(t.get("shows")));
+let r = call("watchlist(shows, [7, 1])", shows, [7, 1]);
+t.expect(r !== undefined, "`watchlist(shows, [7, 1])` gives back `undefined`. After the loop's closing `}`, add `return names;`.");
+t.expect(Array.isArray(r), `\`watchlist(shows, [7, 1])\` gives back ${JSON.stringify(r)}, not a list.`);
+t.expect(!r.some((s) => s && typeof s === "object"), "`watchlist` gives back whole shows. Push only the name: `names.push(found.name);`.");
+t.expect(r.length, "`watchlist(shows, [7, 1])` gives an empty list. For each `id` in `ids`, find the show with `show.id === id`, and push its name.");
+t.expect(fmt(r) !== "[Friends, Chernobyl]", "`watchlist(shows, [7, 1])` gives [Friends, Chernobyl]: the order of data.js. Keep the order of `ids`: loop through `ids` (`for (const id of ids)`), and `find` each show.");
+t.expect(fmt(r) === "[Chernobyl, Friends]", `\`watchlist(shows, [7, 1])\` gives ${fmt(r)}. It should give [Chernobyl, Friends]: id 7, then id 1.`);
+r = call("watchlist(shows, [2, 99, 4])", shows, [2, 99, 4]);
+t.expect(fmt(r) === "[Breaking Bad, Game of Thrones]", `\`watchlist(shows, [2, 99, 4])\` gives ${fmt(r)}. It should give [Breaking Bad, Game of Thrones]: no show has id 99, so skip it.`);
+r = call("watchlist(shows, [])", shows, []);
+t.expect(Array.isArray(r) && r.length === 0, `\`watchlist(shows, [])\` gives ${fmt(r)}. No ids means an empty list \`[]\`.`);
+r = call("watchlist(another list, [20, 10])", [{ id: 10, name: "Show A" }, { id: 20, name: "Show B" }], [20, 10]);
+t.expect(fmt(r) === "[Show B, Show A]", `With another list, \`watchlist\` gives ${fmt(r)}. It should give [Show B, Show A]. Search the parameter \`list\`, not \`shows\`.`);
+r = call("watchlist([], [1])", [], [1]);
+t.expect(Array.isArray(r) && r.length === 0, `\`watchlist([], [1])\` gives ${fmt(r)}. An empty list has no shows, so it should give \`[]\`.`);
+
+
+=== step p-all-genres
+title: Every genre once (harder)
+minutes: 12
+slot: gym
+template: gym
+refs: data.js
+practice: yes
+--- explain
+P13 collected each network once. Genres are harder: every show has a **list** of genres. So you need a loop **inside** a loop: one through the shows, and inside it, one through that show's `genres`.
+
+```js
+const allTags = [];
+for (const snack of snackList) {
+  for (const tag of snack.tags) {
+    if (allTags.includes(tag) === false) {
+      allTags.push(tag);
+    }
+  }
+}
+```
+
+The inner loop runs completely for every round of the outer loop. Indent each level by two more spaces so you can see where each block ends.
+--- task
+Make `allGenres(list)` return every genre of the shows in `list`, each only once, in the order they first appear.
+--- hint
+`const genres = [];`. Loop through the shows; inside, `for (const genre of show.genres)`. If `genres.includes(genre) === false`, push it. Return `genres` after both loops.
+--- hint
+```js
+function allGenres(list) {
+  const genres = [];
+  for (const show of list) {
+    for (const genre of show.genres) {
+      if (genres.includes(genre) === false) {
+        genres.push(genre);
+      }
+    }
+  }
+  return genres;
+}
+```
+--- starter
+// P29. Every genre once
+// allGenres(list) gives back every genre of the shows, without duplicates,
+// in the order they first appear.
+
+function allGenres(list) {
+  // your code here
+}
+
+const mini = [
+  { name: "Friends", genres: ["Comedy", "Romance"] },
+  { name: "Fleabag", genres: ["Comedy", "Drama"] },
+];
+const none = [];
+
+tryIt(allGenres, [mini], ["Comedy", "Romance", "Drama"]);
+tryIt(allGenres, [none], []);
+--- solution
+// P29. Every genre once
+// allGenres(list) gives back every genre of the shows, without duplicates,
+// in the order they first appear.
+
+function allGenres(list) {
+  const genres = [];
+  for (const show of list) {
+    for (const genre of show.genres) {
+      if (genres.includes(genre) === false) {
+        genres.push(genre);
+      }
+    }
+  }
+  return genres;
+}
+
+const mini = [
+  { name: "Friends", genres: ["Comedy", "Romance"] },
+  { name: "Fleabag", genres: ["Comedy", "Drama"] },
+];
+const none = [];
+
+tryIt(allGenres, [mini], ["Comedy", "Romance", "Drama"]);
+tryIt(allGenres, [none], []);
+--- learned
+A loop inside a loop reaches every genre of every show. The twelve shows cover twelve different genres.
+--- summary
+Practice: a loop inside a loop: `for (const genre of show.genres)` inside `for (const show of list)`.
+--- mistakes
+- Pushing `show.genres` (a whole array) instead of each `genre`.
+- The `includes` test missing, so Comedy and Drama appear many times.
+- `return` between the two closing `}` (after the first show only).
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it, fix that line, then check again.`);
+const f = t.get("allGenres");
+t.expect(f !== undefined, "I can't find a function called `allGenres`. Press **Start again** to get the starting code back.");
+t.expect(typeof f === "function", "`allGenres` should be a function.");
+const call = (label, list) => {
+  try { return f(list); } catch (e) {
+    t.expect(!/is not defined/.test(e.message), `\`${label}\` crashed: ${e.message.replace(/\.$/, "")}. Create the new list before the loops, so it still exists after them.`);
+    t.fail(`\`${label}\` crashed: ${e.message.replace(/\.$/, "")}.`);
+  }
+};
+const sorted = (r) => (Array.isArray(r) ? [...r].map(String).sort().join("|") : "");
+const shows = JSON.parse(JSON.stringify(t.get("shows")));
+const want = [];
+for (const s of shows) for (const g of s.genres) if (!want.includes(g)) want.push(g);
+let r = call("allGenres(shows)", shows);
+t.expect(r !== undefined, "`allGenres(shows)` gives back `undefined`. After both loops, add `return genres;`.");
+t.expect(Array.isArray(r), `\`allGenres(shows)\` gives back ${JSON.stringify(r)}, not a list.`);
+t.expect(!r.some((g) => Array.isArray(g)), "`allGenres` gives back a list of lists. Push each genre on its own: a second loop, `for (const genre of show.genres)`, inside the first.");
+t.expect(r.every((g) => typeof g === "string"), "Each item should be one genre (text), not a whole show.");
+t.expect(r.length <= want.length, `\`allGenres(shows)\` gives ${r.length} genres, with duplicates. Before you push, check your new list: \`if (genres.includes(genre) === false)\`.`);
+t.expect(r.length > 2, `\`allGenres(shows)\` gives only ${JSON.stringify(r)}. Loop through every show, and put \`return\` after both loops' closing \`}\`.`);
+t.expect(sorted(r) === sorted(want), `\`allGenres(shows)\` gives ${JSON.stringify(r)}. It should give the ${want.length} genres once each: ${want.join(", ")}.`);
+r = call("allGenres(another list)", [{ name: "Show A", genres: ["Drama", "War"] }, { name: "Show B", genres: ["War"] }]);
+t.expect(sorted(r) === "Drama|War", `With another list, \`allGenres\` gives ${JSON.stringify(r)}. It should give ["Drama", "War"]. Loop through the parameter \`list\`, not \`shows\`.`);
+r = call("allGenres([])", []);
+t.expect(Array.isArray(r) && r.length === 0, `\`allGenres([])\` gives ${JSON.stringify(r)}. It should give an empty list \`[]\`.`);
+
+
+=== step p-best-in-genre
+title: The best in a genre (harder)
+minutes: 12
+slot: gym
+template: gym
+refs: data.js
+practice: yes
+--- explain
+Two tools you know, one after the other:
+
+1. `filter` keeps only the shows of the genre (like step 10).
+2. "Best so far" finds the highest rating among **those** shows (like P14).
+
+```js
+const salty = snackList.filter((snack) => snack.tags.includes("salty"));
+let best = salty[0];
+// ... then the usual loop, through salty
+```
+
+If no show has the genre, the filtered list is empty. Check for that before you start, and return `""`.
+--- task
+Make `bestInGenre(list, genre)` return the **name** of the highest-rated show in `list` with that genre. If no show has it, return `""`.
+--- hint
+`const inGenre = list.filter((show) => show.genres.includes(genre));`. If `inGenre.length === 0`, return `""`. Then best so far through `inGenre` with `show.rating > best.rating`, and `return best.name;`.
+--- hint
+```js
+function bestInGenre(list, genre) {
+  const inGenre = list.filter((show) => show.genres.includes(genre));
+  if (inGenre.length === 0) {
+    return "";
+  }
+  let best = inGenre[0];
+  for (const show of inGenre) {
+    if (show.rating > best.rating) {
+      best = show;
+    }
+  }
+  return best.name;
+}
+```
+--- starter
+// P30. The best show in a genre
+// bestInGenre(list, genre) gives back the NAME of the highest-rated show
+// with that genre, or "" if no show has it.
+
+function bestInGenre(list, genre) {
+  // your code here
+}
+
+const mini = [
+  { name: "Dark", rating: 8.7, genres: ["Drama", "Mystery"] },
+  { name: "Fleabag", rating: 8.4, genres: ["Comedy", "Drama"] },
+  { name: "Friends", rating: 8.8, genres: ["Comedy", "Romance"] },
+];
+
+tryIt(bestInGenre, [mini, "Comedy"], "Friends");
+tryIt(bestInGenre, [mini, "Drama"], "Dark");
+tryIt(bestInGenre, [mini, "Western"], "");
+tryIt(bestInGenre, [shows, "Fantasy"], "Avatar: The Last Airbender");
+--- solution
+// P30. The best show in a genre
+// bestInGenre(list, genre) gives back the NAME of the highest-rated show
+// with that genre, or "" if no show has it.
+
+function bestInGenre(list, genre) {
+  const inGenre = list.filter((show) => show.genres.includes(genre));
+  if (inGenre.length === 0) {
+    return "";
+  }
+  let best = inGenre[0];
+  for (const show of inGenre) {
+    if (show.rating > best.rating) {
+      best = show;
+    }
+  }
+  return best.name;
+}
+
+const mini = [
+  { name: "Dark", rating: 8.7, genres: ["Drama", "Mystery"] },
+  { name: "Fleabag", rating: 8.4, genres: ["Comedy", "Drama"] },
+  { name: "Friends", rating: 8.8, genres: ["Comedy", "Romance"] },
+];
+
+tryIt(bestInGenre, [mini, "Comedy"], "Friends");
+tryIt(bestInGenre, [mini, "Drama"], "Dark");
+tryIt(bestInGenre, [mini, "Western"], "");
+tryIt(bestInGenre, [shows, "Fantasy"], "Avatar: The Last Airbender");
+--- learned
+Filter first, then find the best among what's left: two small steps make a real feature, "the best comedy".
+--- summary
+Practice: `filter` to narrow the list, then "best so far" on the result.
+--- mistakes
+- Looping through `list` instead of the filtered list: the best show of any genre.
+- No check for an empty result: a crash for Western.
+- `show.genres === genre` instead of `show.genres.includes(genre)`.
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it, fix that line, then check again.`);
+const f = t.get("bestInGenre");
+t.expect(f !== undefined, "I can't find a function called `bestInGenre`. Press **Start again** to get the starting code back.");
+t.expect(typeof f === "function" && f.length === 2, "`bestInGenre` needs two parameters: `function bestInGenre(list, genre) {`.");
+const call = (label, ...args) => {
+  try { return f(...args); } catch (e) {
+    t.expect(!/constant/.test(e.message), `\`${label}\` crashed: ${e.message.replace(/\.$/, "")}. \`best\` changes, so create it with \`let\`, not \`const\`.`);
+    t.expect(!/reading '(name|rating)'/.test(e.message), `\`${label}\` crashed: ${e.message.replace(/\.$/, "")}. When no show has the genre, the filtered list is empty. Check for that first: \`if (inGenre.length === 0) { return ""; }\`.`);
+    t.fail(`\`${label}\` crashed: ${e.message.replace(/\.$/, "")}.`);
+  }
+};
+const shows = JSON.parse(JSON.stringify(t.get("shows")));
+let r = call('bestInGenre(shows, "Comedy")', shows, "Comedy");
+t.expect(r !== undefined, "`bestInGenre(shows, \"Comedy\")` gives back `undefined`. After the loop, add `return best.name;`.");
+t.expect(!(r && typeof r === "object"), "`bestInGenre` gives back a whole show. Return only its name: `best.name`.");
+t.expect(typeof r === "string", `\`bestInGenre(shows, "Comedy")\` gives ${JSON.stringify(r)}. Return the name of the show.`);
+t.expect(r !== "Breaking Bad", "`bestInGenre(shows, \"Comedy\")` gives Breaking Bad, which isn't a comedy. Loop through the filtered list (`inGenre`), not through `list`.");
+t.expect(r === "Friends", `\`bestInGenre(shows, "Comedy")\` gives "${r}". It should give "Friends", the highest-rated comedy (8.8).`);
+for (const [g, want] of [["Fantasy", "Avatar: The Last Airbender"], ["History", "Chernobyl"], ["Crime", "Breaking Bad"]]) {
+  r = call(`bestInGenre(shows, "${g}")`, shows, g);
+  t.expect(r === want, `\`bestInGenre(shows, "${g}")\` gives ${JSON.stringify(r)}. It should give "${want}". Use the parameter \`genre\` in the filter, and compare \`show.rating > best.rating\`.`);
+}
+r = call('bestInGenre(shows, "Western")', shows, "Western");
+t.expect(r === "", `\`bestInGenre(shows, "Western")\` gives ${JSON.stringify(r)}. No show is a Western, so it should give an empty string \`""\`.`);
+r = call('bestInGenre(another list, "Drama")', [{ name: "Show A", rating: 7, genres: ["Drama"] }, { name: "Show B", rating: 9, genres: ["Comedy"] }, { name: "Show C", rating: 8, genres: ["Drama"] }], "Drama");
+t.expect(r === "Show C", `With another list, \`bestInGenre(..., "Drama")\` gives ${JSON.stringify(r)}. It should give "Show C". Filter the parameter \`list\`, not \`shows\`.`);
+r = call('bestInGenre([], "Drama")', [], "Drama");
+t.expect(r === "", `\`bestInGenre([], "Drama")\` gives ${JSON.stringify(r)}. An empty list should give \`""\`.`);
+
+
+=== step p-rating-bands
+title: Rating bands (harder)
+minutes: 12
+slot: gym
+template: gym
+refs: data.js
+practice: yes
+--- explain
+An object can hold several counters at once. When you know the keys in advance, create them all at 0 before the loop. Then an `if / else if / else` (Day 5) decides which counter goes up:
+
+```js
+const sizes = { small: 0, large: 0 };
+for (const snack of snackList) {
+  if (snack.grams < 100) {
+    sizes.small = sizes.small + 1;
+  } else {
+    sizes.large = sizes.large + 1;
+  }
+}
+```
+
+Remember from Day 5: the strictest test goes first, because 9.2 is also `>= 8`.
+--- task
+Make `ratingBands(list)` return an object `{ mustWatch: ..., good: ..., ok: ... }` that counts the shows rated **9 or more** (`mustWatch`), **8 or more** but under 9 (`good`), and **under 8** (`ok`). An empty list gives all three at 0.
+--- hint
+`const bands = { mustWatch: 0, good: 0, ok: 0 };`. In the loop: `if (show.rating >= 9)` add 1 to `bands.mustWatch`, `else if (show.rating >= 8)` to `bands.good`, `else` to `bands.ok`. Return `bands`.
+--- hint
+```js
+function ratingBands(list) {
+  const bands = { mustWatch: 0, good: 0, ok: 0 };
+  for (const show of list) {
+    if (show.rating >= 9) {
+      bands.mustWatch = bands.mustWatch + 1;
+    } else if (show.rating >= 8) {
+      bands.good = bands.good + 1;
+    } else {
+      bands.ok = bands.ok + 1;
+    }
+  }
+  return bands;
+}
+```
+--- starter
+// P31. Rating bands
+// ratingBands(list) counts the shows in three bands and gives back
+// { mustWatch: ..., good: ..., ok: ... }:
+// mustWatch = rated 9 or more, good = 8 or more, ok = under 8.
+
+function ratingBands(list) {
+  // your code here
+}
+
+const mini = [
+  { name: "Chernobyl", rating: 9.1 },
+  { name: "Dark", rating: 8.7 },
+  { name: "Fleabag", rating: 8.4 },
+];
+const none = [];
+
+tryIt(ratingBands, [mini], { mustWatch: 1, good: 2, ok: 0 });
+tryIt(ratingBands, [none], { mustWatch: 0, good: 0, ok: 0 });
+tryIt(ratingBands, [shows], { mustWatch: 5, good: 7, ok: 0 });
+--- solution
+// P31. Rating bands
+// ratingBands(list) counts the shows in three bands and gives back
+// { mustWatch: ..., good: ..., ok: ... }:
+// mustWatch = rated 9 or more, good = 8 or more, ok = under 8.
+
+function ratingBands(list) {
+  const bands = { mustWatch: 0, good: 0, ok: 0 };
+  for (const show of list) {
+    if (show.rating >= 9) {
+      bands.mustWatch = bands.mustWatch + 1;
+    } else if (show.rating >= 8) {
+      bands.good = bands.good + 1;
+    } else {
+      bands.ok = bands.ok + 1;
+    }
+  }
+  return bands;
+}
+
+const mini = [
+  { name: "Chernobyl", rating: 9.1 },
+  { name: "Dark", rating: 8.7 },
+  { name: "Fleabag", rating: 8.4 },
+];
+const none = [];
+
+tryIt(ratingBands, [mini], { mustWatch: 1, good: 2, ok: 0 });
+tryIt(ratingBands, [none], { mustWatch: 0, good: 0, ok: 0 });
+tryIt(ratingBands, [shows], { mustWatch: 5, good: 7, ok: 0 });
+--- learned
+An object of counters, a loop and Day 5's `if / else if / else`: three ideas in one small function. Five shows are a must-watch.
+--- summary
+Practice: counters in one object: `{ a: 0, b: 0 }`, then `obj.a = obj.a + 1` in the right branch.
+--- mistakes
+- `>= 8` tested before `>= 9`: every show lands in `good`.
+- `>` instead of `>=`: shows rated exactly 9.0 count as good.
+- Creating the object inside the loop.
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it, fix that line, then check again.`);
+const f = t.get("ratingBands");
+t.expect(f !== undefined, "I can't find a function called `ratingBands`. Press **Start again** to get the starting code back.");
+t.expect(typeof f === "function", "`ratingBands` should be a function.");
+const call = (label, list) => {
+  try { return f(list); } catch (e) {
+    t.expect(!/is not defined/.test(e.message), `\`${label}\` crashed: ${e.message.replace(/\.$/, "")}. Create the \`bands\` object before the loop, so it still exists after the loop.`);
+    t.fail(`\`${label}\` crashed: ${e.message.replace(/\.$/, "")}.`);
+  }
+};
+const show = (o) => JSON.stringify(o, (k, v) => (typeof v === "number" && Number.isNaN(v) ? "NaN" : v));
+const same = (got, a, b, c) => got && typeof got === "object" && !Array.isArray(got) && Object.keys(got).length === 3 && got.mustWatch === a && got.good === b && got.ok === c;
+const shows = JSON.parse(JSON.stringify(t.get("shows")));
+const r = call("ratingBands(shows)", shows);
+t.expect(r !== undefined, "`ratingBands(shows)` gives back `undefined`. After the loop's closing `}`, add `return bands;`.");
+t.expect(r && typeof r === "object" && !Array.isArray(r), `\`ratingBands(shows)\` gives ${show(r)}. Return an object: \`{ mustWatch: ..., good: ..., ok: ... }\`.`);
+t.expect(!Object.values(r).some((v) => Number.isNaN(v)), "Some of your counts are `NaN` (*not a number*): `undefined + 1`. Create every counter at 0 before the loop: `{ mustWatch: 0, good: 0, ok: 0 }`.");
+t.expect(["mustWatch", "good", "ok"].every((k) => k in r), `\`ratingBands(shows)\` gives ${show(r)}. The object needs exactly these keys, spelled like this: \`mustWatch\`, \`good\` and \`ok\`. Create them all at 0 before the loop.`);
+t.expect(!(r.mustWatch === 0 && r.good === 12), "`ratingBands(shows)` puts all 12 shows in `good`. Test `>= 9` first: a show rated 9.2 is also `>= 8`, and the first true test wins.");
+t.expect(!(r.mustWatch === 3 && r.good === 9), "`ratingBands(shows)` counts only 3 must-watch shows. The Wire and Avatar are rated exactly 9.0: use `>=`, not `>`.");
+t.expect(r.mustWatch + r.good + r.ok === 12, `\`ratingBands(shows)\` gives ${show(r)}: the counts don't add up to 12. Add 1 to exactly one counter for every show, and create the object before the loop.`);
+t.expect(same(r, 5, 7, 0), `\`ratingBands(shows)\` gives ${show(r)}. It should give {"mustWatch":5,"good":7,"ok":0}.`);
+const r2 = call("ratingBands([9.5, 7, 8, 6])", [{ name: "Show A", rating: 9.5 }, { name: "Show B", rating: 7 }, { name: "Show C", rating: 8 }, { name: "Show D", rating: 6 }]);
+t.expect(same(r2, 1, 1, 2), `With ratings 9.5, 7, 8 and 6, \`ratingBands\` gives ${show(r2)}. It should give {"mustWatch":1,"good":1,"ok":2}. Loop through the parameter \`list\`, and add to \`ok\` in the final \`else\`.`);
+const r3 = call("ratingBands([])", []);
+t.expect(same(r3, 0, 0, 0), `\`ratingBands([])\` gives ${show(r3)}. An empty list should give {"mustWatch":0,"good":0,"ok":0}.`);
+
+
+=== step p-by-network
+title: Names per network (harder)
+minutes: 15
+slot: gym
+template: gym
+refs: data.js
+practice: yes
+--- explain
+In P16 each network's value was a number. A value can also be an **array**, so one object can group names:
+
+```js
+{ HBO: ["Chernobyl", "The Wire"], Netflix: ["Dark"] }
+```
+
+The pattern is the same as counting, with an array instead of a number:
+
+```js
+const byColour = {};
+for (const snack of snackList) {
+  if (byColour[snack.colour] === undefined) {
+    byColour[snack.colour] = [];          // first time: an empty list
+  }
+  byColour[snack.colour].push(snack.name); // every time: add the name
+}
+```
+
+The `if` has no `else` this time: the first time it creates the empty list, and then the `push` always runs.
+--- task
+Make `namesByNetwork(list)` return an object with one key per network, whose value is the list of the names of the shows on that network, in the order of `list`. An empty list gives `{}`.
+--- hint
+`const groups = {};`. In the loop: if `groups[show.network] === undefined`, set it to `[]`. Then `groups[show.network].push(show.name);`. Return `groups`.
+--- hint
+```js
+function namesByNetwork(list) {
+  const groups = {};
+  for (const show of list) {
+    if (groups[show.network] === undefined) {
+      groups[show.network] = [];
+    }
+    groups[show.network].push(show.name);
+  }
+  return groups;
+}
+```
+--- starter
+// P32. Names per network
+// namesByNetwork(list) gives back an object like
+// { HBO: ["Chernobyl", "The Wire"], Netflix: ["Dark"] }
+
+function namesByNetwork(list) {
+  // your code here
+}
+
+const mini = [
+  { name: "Chernobyl", network: "HBO" },
+  { name: "Dark", network: "Netflix" },
+  { name: "The Wire", network: "HBO" },
+];
+const none = [];
+
+tryIt(namesByNetwork, [mini], { HBO: ["Chernobyl", "The Wire"], Netflix: ["Dark"] });
+tryIt(namesByNetwork, [none], {});
+--- solution
+// P32. Names per network
+// namesByNetwork(list) gives back an object like
+// { HBO: ["Chernobyl", "The Wire"], Netflix: ["Dark"] }
+
+function namesByNetwork(list) {
+  const groups = {};
+  for (const show of list) {
+    if (groups[show.network] === undefined) {
+      groups[show.network] = [];
+    }
+    groups[show.network].push(show.name);
+  }
+  return groups;
+}
+
+const mini = [
+  { name: "Chernobyl", network: "HBO" },
+  { name: "Dark", network: "Netflix" },
+  { name: "The Wire", network: "HBO" },
+];
+const none = [];
+
+tryIt(namesByNetwork, [mini], { HBO: ["Chernobyl", "The Wire"], Netflix: ["Dark"] });
+tryIt(namesByNetwork, [none], {});
+--- learned
+An object whose values are arrays groups a list by any key. Arrays, objects, loops and `if` all in one function: that's the whole of Day 6.
+--- summary
+Practice: group into an object of arrays: create `[]` the first time, then `push`.
+--- mistakes
+- `groups[show.network] = [show.name]` every time: only the last name per network is left.
+- `push` before the empty list exists: "Cannot read properties of undefined (reading 'push')".
+- `groups.network` instead of `groups[show.network]`.
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it, fix that line, then check again.`);
+const f = t.get("namesByNetwork");
+t.expect(f !== undefined, "I can't find a function called `namesByNetwork`. Press **Start again** to get the starting code back.");
+t.expect(typeof f === "function", "`namesByNetwork` should be a function.");
+const call = (label, list) => {
+  try { return f(list); } catch (e) {
+    t.expect(!/reading 'push'/.test(e.message), `\`${label}\` crashed: ${e.message.replace(/\.$/, "")}. The first time you meet a network, its list doesn't exist yet. Before the \`push\`, add \`if (groups[show.network] === undefined) { groups[show.network] = []; }\`.`);
+    t.expect(!/is not defined/.test(e.message), `\`${label}\` crashed: ${e.message.replace(/\.$/, "")}. Create \`const groups = {};\` before the loop, so it still exists after the loop.`);
+    t.fail(`\`${label}\` crashed: ${e.message.replace(/\.$/, "")}.`);
+  }
+};
+const show = (o) => { const s = JSON.stringify(o); return s && s.length > 220 ? s.slice(0, 217) + "..." : s; };
+const sameGroups = (got, want) => got && typeof got === "object" && !Array.isArray(got) && Object.keys(got).length === Object.keys(want).length && Object.keys(want).every((k) => Array.isArray(got[k]) && got[k].join("|") === want[k].join("|"));
+const shows = JSON.parse(JSON.stringify(t.get("shows")));
+const want = {};
+for (const s of shows) { if (!want[s.network]) want[s.network] = []; want[s.network].push(s.name); }
+const r = call("namesByNetwork(shows)", shows);
+t.expect(r !== undefined, "`namesByNetwork(shows)` gives back `undefined`. After the loop's closing `}`, add `return groups;`.");
+t.expect(!Array.isArray(r), "`namesByNetwork` gives back a list. Group in an object instead: `const groups = {};`.");
+t.expect(r && typeof r === "object", `\`namesByNetwork(shows)\` gives ${show(r)}. Return the \`groups\` object.`);
+t.expect(!("network" in r), `\`namesByNetwork(shows)\` gives ${show(r)}. With a dot, the key is the word "network". Use square brackets: \`groups[show.network]\`.`);
+t.expect(Object.values(r).every((v) => Array.isArray(v)), `\`namesByNetwork(shows)\` gives ${show(r)}. Each value should be a list of names: create \`[]\` the first time, then \`push(show.name)\`.`);
+t.expect(Object.values(r).every((v) => v.every((x) => typeof x === "string")), "The lists should hold names, not whole shows: `push(show.name)`.");
+t.expect(!(Array.isArray(r.HBO) && r.HBO.length === 1), `\`namesByNetwork(shows)\` gives HBO only ${JSON.stringify(r.HBO)}, but four shows are on HBO. Create the empty list only the first time (inside the \`if\`), and \`push\` every time, outside the \`if\`.`);
+t.expect(sameGroups(r, want), `\`namesByNetwork(shows)\` gives ${show(r)}. HBO, for example, should be ${JSON.stringify(want.HBO)}.`);
+const r2 = call("namesByNetwork(another list)", [{ name: "Show A", network: "CBS" }, { name: "Show B", network: "Test TV" }, { name: "Show C", network: "CBS" }]);
+t.expect(sameGroups(r2, { CBS: ["Show A", "Show C"], "Test TV": ["Show B"] }), `With another list, \`namesByNetwork\` gives ${show(r2)}. It should give {"CBS":["Show A","Show C"],"Test TV":["Show B"]}. Loop through the parameter \`list\`, not \`shows\`.`);
+const r3 = call("namesByNetwork([])", []);
+t.expect(sameGroups(r3, {}), `\`namesByNetwork([])\` gives ${show(r3)}. An empty list should give an empty object \`{}\`.`);
 
 
 === step sort

@@ -318,3 +318,8 @@ dialog::backdrop { background: rgba(20, 16, 40, .45); }
 .editor-pane.vscode .actions .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
 .editor-pane.vscode .ro-banner { background: #333; color: #ccc; }
 .muted { color: var(--muted); font-size: 13px; }
+
+/* practice exercises (P1, P2, ...) */
+.dot.practice { border-style: solid; border-color: #b9d7c6; color: #2f6b4a; }
+.dot.practice.done { background: #2f8a57; border-color: #2f8a57; color: #fff; }
+.pill.practice { background: #e3f3ea; color: #2f6b4a; }

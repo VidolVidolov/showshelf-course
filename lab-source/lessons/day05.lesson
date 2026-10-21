@@ -5,7 +5,9 @@ subtitle: Reusable code, if and else
 hours: 3 hours
 page: index.html
 slot: js | js | app.js
+slot: gym | js | practice.js
 file: app.js = js
+file: practice.js = gym
 refs: @page, page.js
 
 --- intro
@@ -14,6 +16,8 @@ Yesterday you wrote instructions that run once, from top to bottom. Today you pa
 The page shows four show cards. Every card has grey notes like *(write watchTime)*. A helper file, **page.js**, is already written: it runs after your code and uses your functions to fill in the cards. So each function you finish makes all four cards light up at once.
 
 You'll also learn the most important difference in today's lesson: a function can *print* a value, or *give it back*. Only one of them fills the cards.
+
+When the cards are full, keep going with the **practice exercises** (P1 to P36): small functions of their own, from one line to a few decisions. Do them before the extra challenges.
 
 --- template
 <!doctype html>
@@ -123,6 +127,16 @@ You'll also learn the most important difference in today's lesson: a function ca
   <script src="page.js"></script>
 </body>
 </html>
+
+--- template gym
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Practice gym</title>
+<link rel="stylesheet" href="style.css"></head>
+<body>
+<main class="container"><h1>Practice gym</h1><p class="gym-intro">Every try below turns green when your function gives the right answer.</p><div id="gym"></div></main>
+<script>{{asset:gymJs}}</script>
+<script src="practice.js"></script>
+</body></html>
 
 --- file style.css
 {{asset:appCss}}
@@ -958,7 +972,3398 @@ Default values: `function f(a, b = "x")` uses `"x"` when `b` is left out.
 - `word == "episode"` or `word: "episode"` in the brackets instead of `word = "episode"`.
 - Writing `episodes` in the text instead of `${word}s`.
 --- teacher
-All six grey notes should now be filled. Students who finish early can try the extra challenges, which add two more lines to every card.
+All six grey notes should now be filled. Students who finish now go on to the practice exercises P1 to P36 (the Next button leads there), and then the extra challenges.
+
+
+=== step p-episodes-left
+title: Episodes left to watch
+minutes: 5
+slot: gym
+template: gym
+practice: yes
+refs:
+--- explain
+Time to practise on your own. Each exercise is one small function in its own code box, on a page called the **practice gym**. The `tryIt` lines under your function call it with some test values: each one becomes a row in the preview, with a green tick or a red cross.
+
+Let's start with a one-line calculation. A function that gives back a difference:
+
+```js
+function changeBack(paid, price) {
+  return paid - price;
+}
+
+console.log(changeBack(20, 13));   // 7
+```
+
+> The order matters: `paid - price` is 7, but `price - paid` is -7.
+--- task
+Write `episodesLeft(total, watched)`. It returns how many episodes are still left to watch.
+
+Friends has 236 episodes, so after 10 of them, `episodesLeft(236, 10)` gives **226**.
+
+Write your line where it says `// your code here`, then watch the ticks in the preview.
+--- hint
+One line: `return`, then a subtraction with the two parameters.
+--- hint
+```js
+function episodesLeft(total, watched) {
+  return total - watched;
+}
+```
+--- starter
+// Practice 1: how many episodes are left to watch?
+// episodesLeft(236, 10) should give 226.
+function episodesLeft(total, watched) {
+  // your code here
+}
+
+tryIt(episodesLeft, [236, 10], 226);
+tryIt(episodesLeft, [62, 62], 0);
+tryIt(episodesLeft, [5, 0], 5);
+--- solution
+// Practice 1: how many episodes are left to watch?
+// episodesLeft(236, 10) should give 226.
+function episodesLeft(total, watched) {
+  return total - watched;
+}
+
+tryIt(episodesLeft, [236, 10], 226);
+tryIt(episodesLeft, [62, 62], 0);
+tryIt(episodesLeft, [5, 0], 5);
+--- learned
+A one-line function with `return` is the most common kind there is, and the gym tells you at once whether it works.
+--- summary
+Practice: return a calculation made from two parameters.
+--- mistakes
+- `watched - total`, which gives negative numbers.
+- `console.log` instead of `return` (the gym asks "Did you forget return?").
+--- teacher
+Practice exercises have their own code box on a separate page, the practice gym, so they never change the cards from the guided steps. Students can skip any of them. Every `tryIt` line becomes a row with a tick or a cross; the Check button tests more values than the rows show.
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it and fix that line.`);
+const f = t.get("episodesLeft");
+t.expect(typeof f === "function", "I can't find a function called `episodesLeft`. Press **Start again** to get the starting code back.");
+for (const [a, b, want] of [[236, 10, 226], [62, 62, 0], [5, 0, 5], [201, 200, 1], [0, 0, 0]]) {
+  const c = `\`episodesLeft(${a}, ${b})\``;
+  let got;
+  try { got = f(a, b); } catch (e) { t.fail(`${c} crashed: ${e.message}`); }
+  t.expect(got !== undefined, `${c} gives back \`undefined\`. Did you forget \`return\`?`);
+  t.expect(!(want !== 0 && got === -want), `${c} gives ${got}: a negative number. Swap the two sides: \`total - watched\`.`);
+  t.expect(got === want, `${c} gives ${JSON.stringify(got)}. It should give ${want}: ${a} episodes minus ${b} watched.`);
+}
+
+
+=== step p-shout
+title: Shout the title
+minutes: 5
+slot: gym
+template: gym
+practice: yes
+refs:
+--- explain
+On Day 4 you met two string **methods**: `.toUpperCase()` gives the text in capital letters, and `.toLowerCase()` in small letters. The round brackets matter: they make the method run.
+
+Here's an arrow function that whispers:
+
+```js
+const whisper = (word) => {
+  return word.toLowerCase();
+};
+
+console.log(whisper("QUIET"));   // quiet
+```
+
+With curly brackets `{ }`, an arrow function needs `return`, like any other function. Without them, on one line, the value after `=>` is returned by itself.
+--- task
+Finish the arrow function `shout(title)`. It returns the title in capital letters: `shout("Dark")` gives **"DARK"**.
+
+Keep the curly brackets and write `return` inside, or, if you like, rewrite it on one line without `{ }` and `return`.
+--- hint
+Use the parameter `title`, without quotes, followed by `.toUpperCase()`.
+--- hint
+```js
+const shout = (title) => {
+  return title.toUpperCase();
+};
+```
+--- starter
+// Practice 2: the title in capital letters.
+// shout("Dark") should give "DARK".
+const shout = (title) => {
+  // your code here
+};
+
+tryIt(shout, ["Dark"], "DARK");
+tryIt(shout, ["Breaking Bad"], "BREAKING BAD");
+tryIt(shout, [""], "");
+--- solution
+// Practice 2: the title in capital letters.
+// shout("Dark") should give "DARK".
+const shout = (title) => {
+  return title.toUpperCase();
+};
+
+tryIt(shout, ["Dark"], "DARK");
+tryIt(shout, ["Breaking Bad"], "BREAKING BAD");
+tryIt(shout, [""], "");
+--- learned
+`title.toUpperCase()` gives back a new string; `title` itself doesn't change. An empty string stays empty, and that's fine.
+--- summary
+Practice: string methods inside an arrow function.
+--- mistakes
+- Forgetting the brackets: `title.toUpperCase` gives the method itself, not the result.
+- Quotes around the parameter: `"title".toUpperCase()` always gives `"TITLE"`.
+- Curly brackets without `return`.
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it and fix that line.`);
+const f = t.get("shout");
+t.expect(typeof f === "function", "I can't find a function called `shout`. Press **Start again** to get the starting code back.");
+for (const [x, want] of [["Dark", "DARK"], ["Breaking Bad", "BREAKING BAD"], ["fleabag", "FLEABAG"], ["The Wire", "THE WIRE"], ["", ""]]) {
+  const c = `\`shout(${JSON.stringify(x)})\``;
+  let got;
+  try { got = f(x); } catch (e) { t.fail(`${c} crashed: ${e.message}`); }
+  t.expect(got !== undefined, `${c} gives back \`undefined\`. With curly brackets \`{ }\` you need \`return\`. Did you forget it?`);
+  t.expect(typeof got !== "function", `${c} gives back a function, not text. Add the round brackets: \`title.toUpperCase()\`.`);
+  t.expect(got !== "TITLE", `${c} gives "TITLE". Use the parameter \`title\` without quotes around it.`);
+  t.expect(!(x && got === x), `${c} gives "${got}", unchanged. Use \`.toUpperCase()\` to make it capital letters.`);
+  t.expect(got === want, `${c} gives ${JSON.stringify(got)}. It should give ${JSON.stringify(want)}.`);
+}
+
+
+=== step p-show-age
+title: How old is the show?
+minutes: 6
+slot: gym
+template: gym
+practice: yes
+refs:
+--- explain
+How many years ago something happened is a subtraction: the later year minus the earlier one. With a **default value**, the function can assume the current year when you don't give one:
+
+```js
+const yearsAgo = (year, thisYear = 2026) => thisYear - year;
+
+console.log(yearsAgo(1969));         // 57, the first Moon landing
+console.log(yearsAgo(1969, 2000));   // 31
+```
+
+The default goes in the brackets, with one `=`. An argument, when there is one, always wins.
+--- task
+Write the arrow function `showAge(premiered, thisYear)`. It returns how many years ago the show started.
+
+1. Give `thisYear` a default value of `2026`.
+2. Return the difference between the two years.
+
+Friends premiered in 1994, so `showAge(1994)` gives **32**, and `showAge(1994, 2004)` gives **10**.
+--- hint
+Add `= 2026` after `thisYear` in the brackets. The answer is `thisYear` minus `premiered`.
+--- hint
+```js
+const showAge = (premiered, thisYear = 2026) => {
+  return thisYear - premiered;
+};
+```
+--- starter
+// Practice 3: how many years ago did the show start?
+// showAge(1994) should give 32 (this year is 2026).
+const showAge = (premiered, thisYear) => {
+  // your code here
+};
+
+tryIt(showAge, [1994], 32);
+tryIt(showAge, [1994, 2004], 10);
+tryIt(showAge, [2019, 2019], 0);
+--- solution
+// Practice 3: how many years ago did the show start?
+// showAge(1994) should give 32 (this year is 2026).
+const showAge = (premiered, thisYear = 2026) => {
+  return thisYear - premiered;
+};
+
+tryIt(showAge, [1994], 32);
+tryIt(showAge, [1994, 2004], 10);
+tryIt(showAge, [2019, 2019], 0);
+--- learned
+A default value plus a subtraction. When you leave out the second argument, the function uses 2026 by itself.
+--- summary
+Practice: a default value in an arrow function.
+--- mistakes
+- No default, so `showAge(1994)` gives `NaN` (2026 is missing: undefined minus 1994).
+- `premiered - thisYear`, which gives negative numbers.
+--- teacher
+The default year 2026 is written into the task and the check. If you teach this course in a later year, students may ask why: it's only practice for default values.
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it and fix that line.`);
+const f = t.get("showAge");
+t.expect(typeof f === "function", "I can't find a function called `showAge`. Press **Start again** to get the starting code back.");
+const call = (...a) => {
+  const c = `\`showAge(${a.join(", ")})\``;
+  let got;
+  try { got = f(...a); } catch (e) { t.fail(`${c} crashed: ${e.message}`); }
+  t.expect(got !== undefined, `${c} gives back \`undefined\`. With curly brackets \`{ }\` you need \`return\`. Did you forget it?`);
+  return [got, c];
+};
+for (const [a, b, want] of [[1994, 2004, 10], [2008, 2020, 12], [2019, 2019, 0], [2001, 2026, 25]]) {
+  const [got, c] = call(a, b);
+  t.expect(got !== -want || want === 0, `${c} gives ${got}: a negative number. Swap the two sides: \`thisYear - premiered\`.`);
+  t.expect(got === want, `${c} gives ${JSON.stringify(got)}. It should give ${want}: ${b} minus ${a}.`);
+}
+const [d, c1] = call(1994);
+t.expect(!Number.isNaN(d), `${c1} gives NaN ("not a number"): without a second argument, \`thisYear\` is \`undefined\`. Give it a default value in the brackets: \`thisYear = 2026\`.`);
+t.expect(d === 32, `${c1} gives ${JSON.stringify(d)}. It should give 32: give \`thisYear\` the default value 2026.`);
+const [e] = call(2026);
+t.expect(e === 0, `\`showAge(2026)\` gives ${JSON.stringify(e)}. It should give 0: a show from this year is 0 years old.`);
+
+
+=== step p-fits-card
+title: Does the title fit on the card?
+minutes: 6
+slot: gym
+template: gym
+practice: yes
+refs:
+--- explain
+`.length` counts the characters in a string, spaces included. It has no brackets: it's a fact about the string, not an action.
+
+```js
+console.log("Good morning".length);   // 12
+console.log("".length);               // 0
+```
+
+A function can return a comparison directly, like `isQuickWatch` in step 8. The comparison *is* the answer, `true` or `false`:
+
+```js
+const isShortWord = (word) => word.length <= 3;
+
+console.log(isShortWord("cat"));     // true
+console.log(isShortWord("horse"));   // false
+```
+--- task
+A card has room for 12 characters on one line. Write `fitsOnCard(title)`: it returns `true` when the title has **12 characters or fewer**, and `false` otherwise.
+
+"Breaking Bad" has exactly 12 characters (count the space), so it fits.
+--- hint
+Compare `title.length` with 12. Use `<=`, so that exactly 12 fits too. Return the comparison itself.
+--- hint
+```js
+function fitsOnCard(title) {
+  return title.length <= 12;
+}
+```
+--- starter
+// Practice 4: does the title fit in 12 characters?
+// fitsOnCard("Dark") should give true.
+function fitsOnCard(title) {
+  // your code here
+}
+
+tryIt(fitsOnCard, ["Dark"], true);
+tryIt(fitsOnCard, ["Breaking Bad"], true);
+tryIt(fitsOnCard, ["Game of Thrones"], false);
+tryIt(fitsOnCard, [""], true);
+--- solution
+// Practice 4: does the title fit in 12 characters?
+// fitsOnCard("Dark") should give true.
+function fitsOnCard(title) {
+  return title.length <= 12;
+}
+
+tryIt(fitsOnCard, ["Dark"], true);
+tryIt(fitsOnCard, ["Breaking Bad"], true);
+tryIt(fitsOnCard, ["Game of Thrones"], false);
+tryIt(fitsOnCard, [""], true);
+--- learned
+`.length` turns text into a number you can compare. Returning the comparison directly gives a clean `true` or `false`.
+--- summary
+Practice: `.length` in a comparison that returns `true` or `false`.
+--- mistakes
+- `title.length()` with brackets: "title.length is not a function".
+- `< 12` instead of `<= 12`, so "Breaking Bad" doesn't fit.
+- Returning `"true"` in quotes, which is text, not a boolean.
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it and fix that line.`);
+const f = t.get("fitsOnCard");
+t.expect(typeof f === "function", "I can't find a function called `fitsOnCard`. Press **Start again** to get the starting code back.");
+for (const [x, want] of [["Dark", true], ["Game of Thrones", false], ["Breaking Bad", true], ["How I Met Your Mother", false], ["The Crown", true], ["Band of Brothers", false], ["", true]]) {
+  const c = `\`fitsOnCard(${JSON.stringify(x)})\``;
+  let got;
+  try { got = f(x); } catch (e) {
+    t.fail(/not a function/.test(e.message) ? "`.length` has no brackets: write `title.length`, not `title.length()`." : `${c} crashed: ${e.message}`);
+  }
+  t.expect(got !== undefined, `${c} gives back \`undefined\`. Did you forget \`return\`?`);
+  t.expect(typeof got !== "number", `${c} gives ${got}: that's the length. Compare it with 12 and return the answer: \`title.length <= 12\`.`);
+  t.expect(typeof got === "boolean", `${c} gives ${JSON.stringify(got)}, which is text. Return the comparison itself, without quotes: \`return title.length <= 12;\`.`);
+  const tip = x === "Breaking Bad" ? " It has exactly 12 characters: use `<=` so that 12 fits too." : "";
+  t.expect(got === want, `${c} gives ${got}. It should give ${want}: the title has ${x.length} characters.${tip}`);
+}
+
+
+=== step p-about-show
+title: One sentence about a show
+minutes: 7
+slot: gym
+template: gym
+practice: yes
+refs:
+--- explain
+A function can take as many parameters as it needs, and a template literal can use all of them:
+
+```js
+function weather(city, degrees, sky) {
+  return `${city}: ${degrees} degrees and ${sky}.`;
+}
+
+console.log(weather("Sofia", 24, "sunny"));
+// Sofia: 24 degrees and sunny.
+```
+
+The arguments go into the parameters in the same order: `"Sofia"` into `city`, `24` into `degrees`, `"sunny"` into `sky`.
+--- task
+Write `aboutShow(name, episodes, runtime, network)`. It returns one sentence like this:
+
+**Fleabag has 12 episodes of 30 minutes on BBC Three.**
+
+Use all four parameters, so the same function works for every show.
+--- hint
+Return a template literal (backticks!) with `${name}`, `${episodes}`, `${runtime}` and `${network}` in the right places.
+--- hint
+```js
+function aboutShow(name, episodes, runtime, network) {
+  return `${name} has ${episodes} episodes of ${runtime} minutes on ${network}.`;
+}
+```
+--- starter
+// Practice 5: one sentence about a show, from four parameters.
+// aboutShow("Fleabag", 12, 30, "BBC Three") should give
+// "Fleabag has 12 episodes of 30 minutes on BBC Three."
+function aboutShow(name, episodes, runtime, network) {
+  // your code here
+}
+
+tryIt(aboutShow, ["Fleabag", 12, 30, "BBC Three"], "Fleabag has 12 episodes of 30 minutes on BBC Three.");
+tryIt(aboutShow, ["Dark", 26, 60, "Netflix"], "Dark has 26 episodes of 60 minutes on Netflix.");
+--- solution
+// Practice 5: one sentence about a show, from four parameters.
+// aboutShow("Fleabag", 12, 30, "BBC Three") should give
+// "Fleabag has 12 episodes of 30 minutes on BBC Three."
+function aboutShow(name, episodes, runtime, network) {
+  return `${name} has ${episodes} episodes of ${runtime} minutes on ${network}.`;
+}
+
+tryIt(aboutShow, ["Fleabag", 12, 30, "BBC Three"], "Fleabag has 12 episodes of 30 minutes on BBC Three.");
+tryIt(aboutShow, ["Dark", 26, 60, "Netflix"], "Dark has 26 episodes of 60 minutes on Netflix.");
+--- learned
+Four parameters, one template literal. The gym shows the sentence exactly, so a missing space or full stop is easy to spot.
+--- summary
+Practice: a template literal built from four parameters.
+--- mistakes
+- Normal quotes instead of backticks: the `${ }` parts appear as they are.
+- Typing "Fleabag" into the sentence instead of `${name}`.
+- A missing space around a `${ }` part, so words stick together.
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it and fix that line.`);
+const f = t.get("aboutShow");
+t.expect(typeof f === "function", "I can't find a function called `aboutShow`. Press **Start again** to get the starting code back.");
+const norm = (s) => String(s).replace(/\s+/g, " ").trim().replace(/\.$/, "").toLowerCase();
+for (const a of [["Chernobyl", 5, 60, "HBO"], ["The Office", 201, 30, "NBC"], ["Fleabag", 12, 30, "BBC Three"]]) {
+  const want = `${a[0]} has ${a[1]} episodes of ${a[2]} minutes on ${a[3]}.`;
+  const c = `\`aboutShow(${a.map((v) => JSON.stringify(v)).join(", ")})\``;
+  let got;
+  try { got = f(...a); } catch (e) { t.fail(`${c} crashed: ${e.message}`); }
+  t.expect(got !== undefined, `${c} gives back \`undefined\`. Did you forget \`return\`?`);
+  t.expect(!/\$\{/.test(String(got)), `${c} gives "${got}". Use backticks around the text, not quotes: only backticks fill in \`\${ }\`.`);
+  t.expect(!/fleabag|bbc three/i.test(String(got)) || a[0] === "Fleabag", `${c} gives "${got}". Use the parameters (\`\${name}\`, \`\${network}\` ...) instead of typing Fleabag's facts.`);
+  t.expect(!/\b(name|network|runtime|episodes) (has|on)\b|\bon network\b|^name\b/i.test(String(got)), `${c} gives "${got}": the parameter's name, not its value. Write it inside \`\${ }\`.`);
+  t.expect(norm(got) === norm(want), `${c} gives "${got}". It should give "${want}"`);
+}
+
+
+=== step p-stars
+title: Stars out of five
+minutes: 6
+slot: gym
+template: gym
+practice: yes
+refs:
+--- explain
+Our ratings go from 0 to 10, but many apps show 0 to 5 stars. Halve the rating and round it to a whole number.
+
+`Math.round` rounds to the nearest whole number, and exactly .5 goes up:
+
+```js
+const outOfTen = (points) => Math.round(points / 10);
+
+console.log(outOfTen(87));   // 9 (8.7 rounds up)
+console.log(outOfTen(45));   // 5 (4.5 goes up too)
+console.log(outOfTen(42));   // 4
+```
+
+The calculation goes inside the brackets of `Math.round( )`, so the result of the division is what gets rounded.
+--- task
+Write the arrow function `stars(rating)`. It returns the rating divided by 2 and rounded to a whole number.
+
+Friends is rated 8.8, so `stars(8.8)` gives **4**. Breaking Bad's 9.2 gives **5**.
+--- hint
+Divide `rating` by 2 inside `Math.round( )`. Don't forget `return` if you keep the curly brackets.
+--- hint
+```js
+const stars = (rating) => Math.round(rating / 2);
+```
+--- starter
+// Practice 6: a rating out of 10 as whole stars out of 5.
+// stars(8.8) should give 4.
+const stars = (rating) => {
+  // your code here
+};
+
+tryIt(stars, [8.8], 4);
+tryIt(stars, [9.2], 5);
+tryIt(stars, [0], 0);
+--- solution
+// Practice 6: a rating out of 10 as whole stars out of 5.
+// stars(8.8) should give 4.
+const stars = (rating) => Math.round(rating / 2);
+
+tryIt(stars, [8.8], 4);
+tryIt(stars, [9.2], 5);
+tryIt(stars, [0], 0);
+--- learned
+Divide first, then round: `Math.round(rating / 2)`. The Wire's 9.0 is exactly 4.5 stars, and `Math.round` makes it 5.
+--- summary
+Practice: `Math.round` around a calculation.
+--- mistakes
+- `Math.round(rating) / 2`: rounds first, divides second, and gives 4.5.
+- `Math.floor` instead of `Math.round`: 9.0 becomes 4 stars.
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it and fix that line.`);
+const f = t.get("stars");
+t.expect(typeof f === "function", "I can't find a function called `stars`. Press **Start again** to get the starting code back.");
+for (const [x, want] of [[8.8, 4], [9.2, 5], [9, 5], [8, 4], [6.9, 3], [10, 5], [0, 0]]) {
+  const c = `\`stars(${x})\``;
+  let got;
+  try { got = f(x); } catch (e) { t.fail(`${c} crashed: ${e.message}`); }
+  t.expect(got !== undefined, `${c} gives back \`undefined\`. With curly brackets \`{ }\` you need \`return\`. Did you forget it?`);
+  t.expect(typeof got === "number", `${c} gives ${JSON.stringify(got)}. Return a number: \`Math.round(rating / 2)\`.`);
+  t.expect(Number.isInteger(got), `${c} gives ${got}. Round the result to a whole number: put the division inside \`Math.round( )\`.`);
+  t.expect(!(x === 9 && got === 4), "`stars(9)` gives 4, but 4.5 should round up to 5. Use `Math.round`, not `Math.floor`.");
+  t.expect(!(got === Math.floor(x / 2) && got !== want), `${c} gives ${got}, but ${x / 2} should round up to ${want}. Use \`Math.round\`, not \`Math.floor\`.`);
+  t.expect(got === want, `${c} gives ${got}. It should give ${want}: ${x} divided by 2 is ${x / 2}, rounded.`);
+}
+
+
+=== step p-percent
+title: How much have I watched?
+minutes: 8
+slot: gym
+template: gym
+practice: yes
+refs:
+--- explain
+A **percentage** is a part out of a hundred. Divide the part by the whole, then multiply by 100:
+
+```js
+// 17 of 20 quiz questions right
+console.log(17 / 20 * 100);               // 85
+console.log(Math.round(2 / 3 * 100));     // 67
+```
+
+`2 / 3 * 100` is 66.666..., so `Math.round` makes it a tidy whole number.
+
+> Part first, whole second: `17 / 20`, not `20 / 17`.
+--- task
+Write `percentWatched(watched, total)`. It returns the percentage of the show you've watched, rounded to a whole number.
+
+Breaking Bad has 62 episodes, so `percentWatched(31, 62)` gives **50**. Friends has 236, so 10 of them is **4**.
+--- hint
+`watched / total * 100`, inside `Math.round( )`.
+--- hint
+```js
+function percentWatched(watched, total) {
+  return Math.round(watched / total * 100);
+}
+```
+--- starter
+// Practice 7: what percentage of the show have you watched?
+// percentWatched(31, 62) should give 50.
+function percentWatched(watched, total) {
+  // your code here
+}
+
+tryIt(percentWatched, [31, 62], 50);
+tryIt(percentWatched, [10, 236], 4);
+tryIt(percentWatched, [0, 26], 0);
+tryIt(percentWatched, [12, 12], 100);
+--- solution
+// Practice 7: what percentage of the show have you watched?
+// percentWatched(31, 62) should give 50.
+function percentWatched(watched, total) {
+  return Math.round(watched / total * 100);
+}
+
+tryIt(percentWatched, [31, 62], 50);
+tryIt(percentWatched, [10, 236], 4);
+tryIt(percentWatched, [0, 26], 0);
+tryIt(percentWatched, [12, 12], 100);
+--- learned
+Part divided by whole, times 100, rounded. Progress bars in every app start with this line.
+--- summary
+Practice: percentages with `/`, `*` and `Math.round`.
+--- mistakes
+- Forgetting `* 100`, so the answer is 0.5 instead of 50.
+- `total / watched`, the wrong way round.
+- No rounding, so 10 of 236 gives 4.237...
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it and fix that line.`);
+const f = t.get("percentWatched");
+t.expect(typeof f === "function", "I can't find a function called `percentWatched`. Press **Start again** to get the starting code back.");
+for (const [w, n, want] of [[31, 62, 50], [10, 236, 4], [0, 26, 0], [12, 12, 100], [1, 3, 33], [2, 3, 67], [5, 5, 100]]) {
+  const c = `\`percentWatched(${w}, ${n})\``;
+  let got;
+  try { got = f(w, n); } catch (e) { t.fail(`${c} crashed: ${e.message}`); }
+  t.expect(got !== undefined, `${c} gives back \`undefined\`. Did you forget \`return\`?`);
+  t.expect(typeof got === "number", `${c} gives ${JSON.stringify(got)}. Return the number itself, not text.`);
+  t.expect(!(w && Math.abs(got - w / n) < 1e-9 && w !== n), `${c} gives ${got}: that's a part of 1. Multiply by 100 to get a percentage.`);
+  t.expect(!(w !== n && got !== want && got === Math.round(w / n)), `${c} gives ${got}. Multiply by 100 inside \`Math.round( )\`: \`Math.round(watched / total * 100)\`.`);
+  t.expect(!(w && w !== n && Math.abs(got - Math.round(n / w * 100)) < 1e-9), `${c} gives ${got}. Divide the other way round: \`watched / total\`.`);
+  t.expect(Number.isInteger(got), `${c} gives ${got}. Round it to a whole number with \`Math.round( )\` around the whole calculation.`);
+  t.expect(got === want, `${c} gives ${got}. It should give ${want}: ${w} divided by ${n}, times 100, rounded.`);
+}
+
+
+=== step p-era
+title: Classic or modern?
+minutes: 6
+slot: gym
+template: gym
+practice: yes
+refs:
+--- explain
+Each block of an `if / else` can return its own text:
+
+```js
+function partOfDay(hour) {
+  if (hour < 12) {
+    return "Morning";
+  } else {
+    return "Afternoon";
+  }
+}
+
+console.log(partOfDay(9));    // Morning
+console.log(partOfDay(12));   // Afternoon
+```
+
+Look at the **boundary**: the value where the answer changes. Here 12 is the first afternoon hour, so the test is `< 12`, not `<= 12`. Always try the boundary value itself.
+--- task
+Write `era(year)`. It returns **"Classic"** for shows that premiered before 2000, and **"Modern"** for 2000 and later.
+
+So Friends (1994) is Classic, and Band of Brothers (2001) is Modern. A show from exactly 2000 is Modern.
+--- hint
+`if (year < 2000)` returns "Classic"; the `else` block returns "Modern".
+--- hint
+```js
+function era(year) {
+  if (year < 2000) {
+    return "Classic";
+  } else {
+    return "Modern";
+  }
+}
+```
+--- starter
+// Practice 8: "Classic" before 2000, "Modern" from 2000 on.
+// era(1994) should give "Classic".
+function era(year) {
+  // your code here
+}
+
+tryIt(era, [1994], "Classic");
+tryIt(era, [2008], "Modern");
+tryIt(era, [2000], "Modern");
+--- solution
+// Practice 8: "Classic" before 2000, "Modern" from 2000 on.
+// era(1994) should give "Classic".
+function era(year) {
+  if (year < 2000) {
+    return "Classic";
+  } else {
+    return "Modern";
+  }
+}
+
+tryIt(era, [1994], "Classic");
+tryIt(era, [2008], "Modern");
+tryIt(era, [2000], "Modern");
+--- learned
+Two blocks, two labels. Testing exactly 2000 is how you find out whether `<` or `<=` is right.
+--- summary
+Practice: `if / else` with a boundary value.
+--- mistakes
+- `<= 2000`, so 2000 becomes Classic.
+- `console.log("Classic")` instead of `return "Classic"`.
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Look for a missing bracket near the line it names.`);
+const f = t.get("era");
+t.expect(typeof f === "function", "I can't find a function called `era`. Press **Start again** to get the starting code back.");
+for (const [y, want] of [[1994, "Classic"], [2008, "Modern"], [1999, "Classic"], [2019, "Modern"], [2000, "Modern"], [1960, "Classic"]]) {
+  const c = `\`era(${y})\``;
+  let got;
+  try { got = f(y); } catch (e) { t.fail(`${c} crashed: ${e.message}`); }
+  t.expect(got !== undefined, `${c} gives back \`undefined\`. Each block needs a \`return\` with its label.`);
+  if (String(got).trim().toLowerCase() !== want.toLowerCase()) {
+    const tip = y === 2000 ? " 2000 is the first Modern year: use `year < 2000` for Classic." : y === 1999 ? " 1999 is before 2000." : "";
+    t.fail(`${c} gives ${JSON.stringify(got)}. It should give "${want}".${tip}`);
+  }
+}
+
+
+=== step p-tonight
+title: Can I finish it tonight?
+minutes: 8
+slot: gym
+template: gym
+practice: yes
+refs:
+--- explain
+A comparison can have a calculation on one side. JavaScript does the maths first, then compares:
+
+```js
+function canAfford(items, price, money) {
+  return items * price <= money;
+}
+
+console.log(canAfford(3, 4, 12));   // true (12 is not more than 12)
+console.log(canAfford(4, 4, 12));   // false (16 is too much)
+```
+
+The answer is `true` or `false`, so the function returns the comparison directly, without `if`.
+--- task
+Write `canFinishTonight(episodes, runtime, minutesFree)`. It returns `true` when all the episodes, one after another, fit into the minutes you have free, and `false` otherwise.
+
+Chernobyl has 5 episodes of 60 minutes, so 300 free minutes are exactly enough: `canFinishTonight(5, 60, 300)` gives **true**.
+--- hint
+The total time is `episodes * runtime`. Compare it with `minutesFree` using `<=`, so exactly enough time counts.
+--- hint
+```js
+function canFinishTonight(episodes, runtime, minutesFree) {
+  return episodes * runtime <= minutesFree;
+}
+```
+--- starter
+// Practice 9: do all the episodes fit into your free evening?
+// canFinishTonight(5, 60, 300) should give true.
+function canFinishTonight(episodes, runtime, minutesFree) {
+  // your code here
+}
+
+tryIt(canFinishTonight, [5, 60, 300], true);
+tryIt(canFinishTonight, [4, 30, 90], false);
+tryIt(canFinishTonight, [0, 60, 0], true);
+--- solution
+// Practice 9: do all the episodes fit into your free evening?
+// canFinishTonight(5, 60, 300) should give true.
+function canFinishTonight(episodes, runtime, minutesFree) {
+  return episodes * runtime <= minutesFree;
+}
+
+tryIt(canFinishTonight, [5, 60, 300], true);
+tryIt(canFinishTonight, [4, 30, 90], false);
+tryIt(canFinishTonight, [0, 60, 0], true);
+--- learned
+Calculate, then compare, in one line. Zero episodes always fit, even with zero minutes free.
+--- summary
+Practice: return a comparison that has a calculation on one side.
+--- mistakes
+- `<` instead of `<=`: 5 episodes of 60 minutes don't "fit" into 300 minutes.
+- Comparing only `runtime` with `minutesFree`, forgetting the number of episodes.
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it and fix that line.`);
+const f = t.get("canFinishTonight");
+t.expect(typeof f === "function", "I can't find a function called `canFinishTonight`. Press **Start again** to get the starting code back.");
+for (const [e, r, m, want] of [[2, 30, 90, true], [4, 30, 90, false], [5, 60, 300, true], [3, 30, 90, true], [1, 60, 45, false], [2, 60, 90, false], [0, 60, 0, true]]) {
+  const c = `\`canFinishTonight(${e}, ${r}, ${m})\``;
+  let got;
+  try { got = f(e, r, m); } catch (err) { t.fail(`${c} crashed: ${err.message}`); }
+  t.expect(got !== undefined, `${c} gives back \`undefined\`. Did you forget \`return\`?`);
+  t.expect(typeof got === "boolean", `${c} gives ${JSON.stringify(got)}. Return the comparison itself, \`true\` or \`false\`, without quotes.`);
+  const tip = e * r === m ? " That's exactly enough time: use `<=` so it counts." : "";
+  t.expect(got === want, `${c} gives ${got}. It should give ${want}: ${e} episodes of ${r} minutes take ${e * r} minutes, and you have ${m}.${tip}`);
+}
+
+
+=== step p-hours-minutes
+title: Minutes as hours and minutes
+minutes: 8
+slot: gym
+template: gym
+practice: yes
+refs:
+--- explain
+Remember the two tools from step 7: `Math.floor( )` rounds **down**, and `%` gives the **remainder**, what's left over after dividing.
+
+Here they split seconds into minutes and seconds:
+
+```js
+function clock(seconds) {
+  const minutes = Math.floor(seconds / 60);
+  const rest = seconds % 60;
+  return `${minutes} min ${rest} s`;
+}
+
+console.log(clock(135));   // 2 min 15 s
+console.log(clock(60));    // 1 min 0 s
+```
+
+Variables made inside a function, like `minutes` and `rest`, only exist inside its `{ }`.
+--- task
+Write `hoursAndMinutes(minutes)`. It **always** returns both parts, like **"2 h 15 min"**, even when one of them is 0: `hoursAndMinutes(45)` gives **"0 h 45 min"**.
+
+Watching all of The Office takes 6030 minutes. What does your function make of that?
+--- hint
+Make two variables inside the function: the whole hours with `Math.floor(minutes / 60)` and the rest with `minutes % 60`. Then return a template literal.
+--- hint
+```js
+function hoursAndMinutes(minutes) {
+  const hours = Math.floor(minutes / 60);
+  const rest = minutes % 60;
+  return `${hours} h ${rest} min`;
+}
+```
+--- starter
+// Practice 10: minutes as "2 h 15 min", always with both parts.
+// hoursAndMinutes(135) should give "2 h 15 min".
+function hoursAndMinutes(minutes) {
+  // your code here
+}
+
+tryIt(hoursAndMinutes, [135], "2 h 15 min");
+tryIt(hoursAndMinutes, [60], "1 h 0 min");
+tryIt(hoursAndMinutes, [45], "0 h 45 min");
+tryIt(hoursAndMinutes, [6030], "100 h 30 min");
+--- solution
+// Practice 10: minutes as "2 h 15 min", always with both parts.
+// hoursAndMinutes(135) should give "2 h 15 min".
+function hoursAndMinutes(minutes) {
+  const hours = Math.floor(minutes / 60);
+  const rest = minutes % 60;
+  return `${hours} h ${rest} min`;
+}
+
+tryIt(hoursAndMinutes, [135], "2 h 15 min");
+tryIt(hoursAndMinutes, [60], "1 h 0 min");
+tryIt(hoursAndMinutes, [45], "0 h 45 min");
+tryIt(hoursAndMinutes, [6030], "100 h 30 min");
+--- learned
+`Math.floor` for the whole hours, `%` for the rest. The Office takes 100 h 30 min: that's where `Math.round` would have gone wrong.
+--- summary
+Practice: `Math.floor` and `%` to split minutes.
+--- mistakes
+- `Math.round(minutes / 60)`: 6030 minutes becomes 101 hours.
+- No `Math.floor` at all, so the hours have decimals: "2.25 h".
+- Normal quotes instead of backticks.
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it and fix that line.`);
+const f = t.get("hoursAndMinutes");
+t.expect(typeof f === "function", "I can't find a function called `hoursAndMinutes`. Press **Start again** to get the starting code back.");
+const norm = (s) => String(s).replace(/\s+/g, "").toLowerCase();
+for (const [m, want] of [[135, "2 h 15 min"], [60, "1 h 0 min"], [45, "0 h 45 min"], [6030, "100 h 30 min"], [7080, "118 h 0 min"], [0, "0 h 0 min"], [59, "0 h 59 min"]]) {
+  const c = `\`hoursAndMinutes(${m})\``;
+  let got;
+  try { got = f(m); } catch (e) { t.fail(`${c} crashed: ${e.message}`); }
+  t.expect(got !== undefined, `${c} gives back \`undefined\`. Did you forget \`return\`?`);
+  const g = String(got);
+  t.expect(!/\$\{/.test(g), `${c} gives "${g}". Use backticks around the text, not quotes, so \`\${ }\` is filled in.`);
+  t.expect(!/\d\.\d/.test(g), `${c} gives "${g}": the hours have decimals. Round them down with \`Math.floor(minutes / 60)\`.`);
+  if (norm(got) !== norm(want)) {
+    let tip = "";
+    if (norm(got) === norm(`${Math.round(m / 60)} h ${m % 60} min`)) tip = ` ${m} minutes is ${Math.floor(m / 60)} whole hours and ${m % 60} left over: round the hours **down** with \`Math.floor\`, not \`Math.round\`.`;
+    else if (!/min/.test(g) || !/h/.test(g)) tip = " Always show both parts, even when one of them is 0.";
+    t.fail(`${c} gives "${g}". It should give "${want}".${tip}`);
+  }
+}
+
+
+=== step p-round-rating
+title: Round a rating to one decimal
+minutes: 8
+slot: gym
+template: gym
+practice: yes
+refs:
+--- explain
+`Math.round` always rounds to a whole number. To keep **one decimal**, use a trick: multiply by 10, round, then divide by 10.
+
+```js
+const roundKm = (km) => Math.round(km * 10) / 10;
+
+console.log(roundKm(3.4567));   // 3.5
+```
+
+Step by step: 3.4567 × 10 is 34.567, rounded that's 35, and 35 ÷ 10 is 3.5.
+
+> You may find `toFixed(1)` online. It gives back **text**, not a number, so the gym will say it's wrong. Stick with the trick.
+--- task
+A rating worked out from many votes can look like 8.7634. Write the arrow function `roundRating(rating)` that rounds it to one decimal: `roundRating(8.76)` gives **8.8**.
+--- hint
+Three parts: `rating * 10`, then `Math.round( )` around that, then `/ 10` after the closing bracket.
+--- hint
+```js
+const roundRating = (rating) => Math.round(rating * 10) / 10;
+```
+--- starter
+// Practice 11: round a rating to one decimal.
+// roundRating(8.76) should give 8.8.
+const roundRating = (rating) => {
+  // your code here
+};
+
+tryIt(roundRating, [8.76], 8.8);
+tryIt(roundRating, [9.04], 9);
+tryIt(roundRating, [8.333], 8.3);
+--- solution
+// Practice 11: round a rating to one decimal.
+// roundRating(8.76) should give 8.8.
+const roundRating = (rating) => Math.round(rating * 10) / 10;
+
+tryIt(roundRating, [8.76], 8.8);
+tryIt(roundRating, [9.04], 9);
+tryIt(roundRating, [8.333], 8.3);
+--- learned
+Multiply, round, divide: the same trick rounds to two decimals with 100 instead of 10. You'll use that in a moment.
+--- summary
+Practice: round to one decimal with `Math.round(x * 10) / 10`.
+--- mistakes
+- `Math.round(rating) / 10` or `Math.round(rating / 10)`: the brackets in the wrong place.
+- Forgetting `/ 10` at the end, so 8.76 becomes 88.
+- `rating.toFixed(1)`, which gives the text "8.8".
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it and fix that line.`);
+const f = t.get("roundRating");
+t.expect(typeof f === "function", "I can't find a function called `roundRating`. Press **Start again** to get the starting code back.");
+for (const [x, want] of [[8.76, 8.8], [9.04, 9], [8.333, 8.3], [7.96, 8], [10, 10], [0, 0], [8.81, 8.8]]) {
+  const c = `\`roundRating(${x})\``;
+  let got;
+  try { got = f(x); } catch (e) { t.fail(`${c} crashed: ${e.message}`); }
+  t.expect(got !== undefined, `${c} gives back \`undefined\`. With curly brackets \`{ }\` you need \`return\`. Did you forget it?`);
+  t.expect(typeof got !== "string", `${c} gives "${got}": that's text (\`toFixed\` does that). Use the trick instead: \`Math.round(rating * 10) / 10\`.`);
+  t.expect(typeof got === "number", `${c} gives ${JSON.stringify(got)}. Return a number.`);
+  if (Math.abs(got - want) > 1e-9) {
+    let tip = "";
+    if (x && Math.abs(got - Math.round(x * 10)) < 1e-9) tip = " Divide by 10 at the end: `Math.round(rating * 10) / 10`.";
+    else if (Math.abs(got - Math.round(x)) < 1e-9) tip = " That's rounded to a whole number. Multiply by 10 inside `Math.round( )`, then divide by 10.";
+    else if (Math.abs(got - x) < 1e-9) tip = " It's not rounded yet.";
+    else tip = " Multiply by 10 first, round, then divide by 10: `Math.round(rating * 10) / 10`.";
+    t.fail(`${c} gives ${got}. It should give ${want}.${tip}`);
+  }
+}
+
+
+=== step p-progress
+title: Not started, watching or finished?
+minutes: 12
+slot: gym
+template: gym
+practice: yes
+refs:
+--- explain
+With `else if` you can have as many cases as you need. JavaScript checks them from the top and returns from the **first** one that's true:
+
+```js
+function batteryLabel(percent) {
+  if (percent === 0) {
+    return "Empty";
+  } else if (percent === 100) {
+    return "Full";
+  } else if (percent <= 10) {
+    return "Low";
+  } else {
+    return "OK";
+  }
+}
+```
+
+The order matters when cases overlap: 0 is also `<= 10`, so "Empty" must be tested before "Low".
+--- task
+Write `progressLabel(watched, total)` with four cases:
+
+1. **"Not started"** when `watched` is 0
+2. **"Finished"** when `watched` is `total`
+3. **"Last episode"** when exactly one episode is left
+4. **"Watching"** otherwise
+
+Think about the order. A one-episode show you haven't started has 0 watched *and* one episode left: it should say "Not started".
+--- hint
+`if (watched === 0)`, then `else if (watched === total)`, then `else if (watched === total - 1)`, then `else`.
+--- hint
+```js
+function progressLabel(watched, total) {
+  if (watched === 0) {
+    return "Not started";
+  } else if (watched === total) {
+    return "Finished";
+  } else if (watched === total - 1) {
+    return "Last episode";
+  } else {
+    return "Watching";
+  }
+}
+```
+--- starter
+// Practice 12: a label for your progress through a show.
+// progressLabel(0, 236) should give "Not started".
+function progressLabel(watched, total) {
+  // your code here
+}
+
+tryIt(progressLabel, [0, 236], "Not started");
+tryIt(progressLabel, [1, 236], "Watching");
+tryIt(progressLabel, [235, 236], "Last episode");
+tryIt(progressLabel, [236, 236], "Finished");
+tryIt(progressLabel, [0, 1], "Not started");
+--- solution
+// Practice 12: a label for your progress through a show.
+// progressLabel(0, 236) should give "Not started".
+function progressLabel(watched, total) {
+  if (watched === 0) {
+    return "Not started";
+  } else if (watched === total) {
+    return "Finished";
+  } else if (watched === total - 1) {
+    return "Last episode";
+  } else {
+    return "Watching";
+  }
+}
+
+tryIt(progressLabel, [0, 236], "Not started");
+tryIt(progressLabel, [1, 236], "Watching");
+tryIt(progressLabel, [235, 236], "Last episode");
+tryIt(progressLabel, [236, 236], "Finished");
+tryIt(progressLabel, [0, 1], "Not started");
+--- learned
+Four cases, one answer each. The tricky test was `(0, 1)`: two conditions are true, and the order decides which label wins.
+--- summary
+Practice: four cases with `if / else if / else`, in the right order.
+--- mistakes
+- Testing "Last episode" before "Not started", so `progressLabel(0, 1)` says "Last episode".
+- One `=` instead of `===` in a condition.
+- `total - 1 === watched` written as `total - 1 = watched` (an error).
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Look for a missing bracket near the line it names.`);
+const f = t.get("progressLabel");
+t.expect(typeof f === "function", "I can't find a function called `progressLabel`. Press **Start again** to get the starting code back.");
+const norm = (s) => String(s).replace(/\s+/g, " ").trim().replace(/[.!]+$/, "").toLowerCase();
+const cases = [[0, 236, "Not started"], [236, 236, "Finished"], [1, 236, "Watching"], [100, 236, "Watching"], [235, 236, "Last episode"], [4, 5, "Last episode"], [5, 5, "Finished"], [2, 5, "Watching"], [1, 1, "Finished"], [0, 1, "Not started"]];
+for (const [w, n, want] of cases) {
+  const c = `\`progressLabel(${w}, ${n})\``;
+  let got;
+  try { got = f(w, n); } catch (e) { t.fail(`${c} crashed: ${e.message}`); }
+  t.expect(got !== undefined, `${c} gives back \`undefined\`. Every block needs a \`return\` with its label.`);
+  if (norm(got) !== norm(want)) {
+    let tip = "";
+    if (w === 0 && n === 1) tip = " Here 0 is watched *and* one episode is left. Test for 0 first.";
+    else if (w === 1 && n === 1) tip = " All episodes are watched. Test for \"Finished\" before \"Last episode\".";
+    else if (want === "Last episode") tip = " One episode is left: `watched === total - 1`.";
+    t.fail(`${c} gives ${JSON.stringify(got)}. It should give "${want}".${tip}`);
+  }
+}
+
+
+=== step p-price
+title: Price per episode
+minutes: 10
+slot: gym
+template: gym
+practice: yes
+refs:
+--- explain
+Two things to know for money:
+
+- To round to **two decimals** (cents), use the trick from Practice 11 with 100: `Math.round(x * 100) / 100`.
+- Dividing by 0 gives `Infinity` in JavaScript. Check for 0 **first**, and `return` early: `return` ends the function, so the lines below don't run.
+
+```js
+function splitBill(total, people) {
+  if (people === 0) {
+    return 0;
+  }
+  return Math.round(total / people * 100) / 100;
+}
+
+console.log(splitBill(10, 3));   // 3.33
+console.log(splitBill(10, 0));   // 0
+```
+
+This `if` has no `else`: when it returns, the function is over anyway.
+--- task
+Imagine a box set that costs `price`. Write `pricePerEpisode(price, episodes)`. It returns the price of one episode, rounded to two decimals.
+
+- When `episodes` is 0, return 0.
+- A 30-euro Fleabag box set (12 episodes) gives **2.5**. 20 euros for 3 episodes gives **6.67**.
+--- hint
+Start with `if (episodes === 0) { return 0; }`. Under it, return `price / episodes`, rounded to two decimals with the times-100 trick.
+--- hint
+```js
+function pricePerEpisode(price, episodes) {
+  if (episodes === 0) {
+    return 0;
+  }
+  return Math.round(price / episodes * 100) / 100;
+}
+```
+--- starter
+// Practice 13: the price of one episode, rounded to cents.
+// pricePerEpisode(30, 12) should give 2.5. With 0 episodes, give 0.
+function pricePerEpisode(price, episodes) {
+  // your code here
+}
+
+tryIt(pricePerEpisode, [30, 12], 2.5);
+tryIt(pricePerEpisode, [20, 3], 6.67);
+tryIt(pricePerEpisode, [15, 0], 0);
+--- solution
+// Practice 13: the price of one episode, rounded to cents.
+// pricePerEpisode(30, 12) should give 2.5. With 0 episodes, give 0.
+function pricePerEpisode(price, episodes) {
+  if (episodes === 0) {
+    return 0;
+  }
+  return Math.round(price / episodes * 100) / 100;
+}
+
+tryIt(pricePerEpisode, [30, 12], 2.5);
+tryIt(pricePerEpisode, [20, 3], 6.67);
+tryIt(pricePerEpisode, [15, 0], 0);
+--- learned
+An early `return` guards against a bad value, and the times-100 trick rounds to cents. Real shops do exactly this before they show a price.
+--- summary
+Practice: an early `return` for 0, and rounding to two decimals.
+--- mistakes
+- No check for 0: `pricePerEpisode(15, 0)` gives `Infinity`.
+- Rounding with 10 instead of 100, so 6.67 becomes 6.7.
+- `toFixed(2)`, which gives text.
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Look for a missing bracket near the line it names.`);
+const f = t.get("pricePerEpisode");
+t.expect(typeof f === "function", "I can't find a function called `pricePerEpisode`. Press **Start again** to get the starting code back.");
+for (const [p, e, want] of [[30, 12, 2.5], [20, 3, 6.67], [10, 6, 1.67], [50, 5, 10], [0, 10, 0], [15, 0, 0], [0, 0, 0]]) {
+  const c = `\`pricePerEpisode(${p}, ${e})\``;
+  let got;
+  try { got = f(p, e); } catch (err) { t.fail(`${c} crashed: ${err.message}`); }
+  t.expect(got !== undefined, `${c} gives back \`undefined\`. Did you forget \`return\`?`);
+  t.expect(typeof got !== "string", `${c} gives "${got}": that's text (\`toFixed\` does that). Use \`Math.round(... * 100) / 100\` instead.`);
+  t.expect(typeof got === "number", `${c} gives ${JSON.stringify(got)}. Return a number.`);
+  t.expect(got !== Infinity && !Number.isNaN(got), `${c} gives ${got}: dividing by 0 doesn't work. At the start, add \`if (episodes === 0) { return 0; }\`.`);
+  if (Math.abs(got - want) > 1e-9) {
+    let tip = "";
+    if (Math.abs(got - p / e) < 1e-9) tip = " Round it to two decimals: `Math.round(price / episodes * 100) / 100`.";
+    else if (Math.abs(got - Math.round(p / e * 10) / 10) < 1e-9) tip = " That's one decimal. For two, multiply and divide by 100.";
+    else if (Math.abs(got - e / p) < 0.01) tip = " Divide the other way round: `price / episodes`.";
+    t.fail(`${c} gives ${got}. It should give ${want}.${tip}`);
+  }
+}
+
+
+=== step p-short-title
+title: Shorten long titles
+minutes: 10
+slot: gym
+template: gym
+practice: yes
+refs:
+--- explain
+A new string method: `.slice(0, n)` gives the **first n characters** of a string.
+
+```js
+console.log("Good morning".slice(0, 4));   // Good
+```
+
+So you can cut a long text and add three dots to show something is missing:
+
+```js
+function preview(message, max = 8) {
+  if (message.length > max) {
+    return message.slice(0, max) + "...";
+  } else {
+    return message;
+  }
+}
+
+console.log(preview("See you at the cinema"));   // See you ...
+console.log(preview("Hi!"));                     // Hi!
+```
+
+The default `max = 8` is used when the call leaves it out.
+--- task
+Write `shortTitle(title, max)`:
+
+1. Give `max` a default value of `10`.
+2. When the title is **longer** than `max`, return its first `max` characters plus `"..."`.
+3. Otherwise, return the title as it is.
+
+`shortTitle("Game of Thrones")` gives **"Game of Th..."**. "The Office" has exactly 10 characters, so it stays as it is.
+--- hint
+`if (title.length > max)`, then return `title.slice(0, max) + "..."`. In the `else` block, return `title`. Add `= 10` after `max` in the brackets.
+--- hint
+```js
+function shortTitle(title, max = 10) {
+  if (title.length > max) {
+    return title.slice(0, max) + "...";
+  } else {
+    return title;
+  }
+}
+```
+--- starter
+// Practice 14: cut titles that are longer than max, and add "...".
+// shortTitle("Game of Thrones") should give "Game of Th...".
+function shortTitle(title, max) {
+  // your code here
+}
+
+tryIt(shortTitle, ["Game of Thrones"], "Game of Th...");
+tryIt(shortTitle, ["Dark"], "Dark");
+tryIt(shortTitle, ["The Office"], "The Office");
+tryIt(shortTitle, ["Chernobyl", 5], "Chern...");
+--- solution
+// Practice 14: cut titles that are longer than max, and add "...".
+// shortTitle("Game of Thrones") should give "Game of Th...".
+function shortTitle(title, max = 10) {
+  if (title.length > max) {
+    return title.slice(0, max) + "...";
+  } else {
+    return title;
+  }
+}
+
+tryIt(shortTitle, ["Game of Thrones"], "Game of Th...");
+tryIt(shortTitle, ["Dark"], "Dark");
+tryIt(shortTitle, ["The Office"], "The Office");
+tryIt(shortTitle, ["Chernobyl", 5], "Chern...");
+--- learned
+`.slice(0, max)` plus a default value: one function for every card size. Many apps cut titles exactly like this.
+--- summary
+Practice: `.slice(0, n)`, `.length` and a default value together.
+--- mistakes
+- `>=` instead of `>`, so "The Office" (exactly 10) gets dots.
+- Writing `10` inside the function instead of `max`, so the second argument is ignored.
+- No default, so `shortTitle("Game of Thrones")` keeps the whole title.
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Look for a missing bracket near the line it names.`);
+const f = t.get("shortTitle");
+t.expect(typeof f === "function", "I can't find a function called `shortTitle`. Press **Start again** to get the starting code back.");
+const call = (...a) => {
+  const c = `\`shortTitle(${a.map((v) => JSON.stringify(v)).join(", ")})\``;
+  let got;
+  try { got = f(...a); } catch (e) { t.fail(`${c} crashed: ${e.message}`); }
+  t.expect(got !== undefined, `${c} gives back \`undefined\`. Each block needs a \`return\`.`);
+  return [got, c];
+};
+let [got, c] = call("Dark");
+t.expect(got === "Dark", `${c} gives ${JSON.stringify(got)}. Short titles should come back as they are: "Dark". Only add "..." when the title is longer than \`max\`.`);
+[got, c] = call("Game of Thrones", 10);
+t.expect(got === "Game of Th...", `${c} gives ${JSON.stringify(got)}. It should give "Game of Th...": the first 10 characters with \`title.slice(0, max)\`, plus "...".`);
+[got, c] = call("Game of Thrones");
+t.expect(got !== "Game of Thrones..." && got !== "Game of Thrones", `${c} gives ${JSON.stringify(got)}. Without a second argument, \`max\` is \`undefined\`. Give it a default value in the brackets: \`max = 10\`.`);
+t.expect(got === "Game of Th...", `${c} gives ${JSON.stringify(got)}. It should give "Game of Th...".`);
+[got, c] = call("The Office");
+t.expect(got === "The Office", `${c} gives ${JSON.stringify(got)}. "The Office" has exactly 10 characters, so it fits: use \`>\`, not \`>=\`.`);
+[got, c] = call("Chernobyl", 5);
+t.expect(got === "Chern...", `${c} gives ${JSON.stringify(got)}. It should give "Chern...". Use \`max\` inside the function, not the number 10.`);
+for (const [a, b, want] of [["Breaking Bad", 10, "Breaking B..."], ["Fleabag", 7, "Fleabag"], ["Fleabag", 6, "Fleaba..."], ["", 5, ""]]) {
+  [got, c] = call(a, b);
+  t.expect(got === want, `${c} gives ${JSON.stringify(got)}. It should give ${JSON.stringify(want)}.`);
+}
+
+
+=== step p-watch-tonight
+title: Old enough, and enough time?
+minutes: 8
+slot: gym
+template: gym
+practice: yes
+refs:
+--- explain
+Sometimes two things must both be true. `&&` means **and**: `a && b` is `true` only when `a` and `b` are both true.
+
+```js
+const goodForPicnic = (degrees, rainMm) => degrees >= 20 && rainMm === 0;
+
+console.log(goodForPicnic(25, 0));   // true
+console.log(goodForPicnic(25, 3));   // false (it rains)
+console.log(goodForPicnic(12, 0));   // false (too cold)
+```
+
+Each side of `&&` is a complete comparison. Write `rainMm === 0` in full; JavaScript doesn't guess what you mean.
+--- task
+Write `canWatchTonight(age, ageLimit, runtime, minutesFree)`. It returns `true` only when **both** are true:
+
+- `age` is at least `ageLimit` (exactly the limit is fine)
+- one episode (`runtime`) fits into `minutesFree` (exactly is fine too)
+
+`canWatchTonight(16, 16, 60, 60)` gives **true**.
+--- hint
+Two comparisons joined with `&&`: `age >= ageLimit` and `runtime <= minutesFree`. Return the whole thing.
+--- hint
+```js
+function canWatchTonight(age, ageLimit, runtime, minutesFree) {
+  return age >= ageLimit && runtime <= minutesFree;
+}
+```
+--- starter
+// Practice 15: old enough AND enough time for one episode?
+// canWatchTonight(16, 16, 60, 60) should give true.
+function canWatchTonight(age, ageLimit, runtime, minutesFree) {
+  // your code here
+}
+
+tryIt(canWatchTonight, [16, 16, 60, 60], true);
+tryIt(canWatchTonight, [15, 16, 60, 90], false);
+tryIt(canWatchTonight, [30, 18, 60, 45], false);
+--- solution
+// Practice 15: old enough AND enough time for one episode?
+// canWatchTonight(16, 16, 60, 60) should give true.
+function canWatchTonight(age, ageLimit, runtime, minutesFree) {
+  return age >= ageLimit && runtime <= minutesFree;
+}
+
+tryIt(canWatchTonight, [16, 16, 60, 60], true);
+tryIt(canWatchTonight, [15, 16, 60, 90], false);
+tryIt(canWatchTonight, [30, 18, 60, 45], false);
+--- learned
+`&&` joins two conditions into one, which is true only when both sides are. You'll use it again whenever a decision depends on two things.
+--- summary
+Practice: `&&` to require two conditions at once.
+--- mistakes
+- Only one of the two comparisons, so a too-young viewer gets `true`.
+- `>` instead of `>=`, so exactly the age limit isn't allowed.
+- Writing `age >= ageLimit && <= minutesFree`: each side needs its own complete comparison.
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it and fix that line. Each side of \`&&\` needs a complete comparison.`);
+const f = t.get("canWatchTonight");
+t.expect(typeof f === "function", "I can't find a function called `canWatchTonight`. Press **Start again** to get the starting code back.");
+const cases = [[20, 16, 60, 90, true], [15, 16, 60, 90, false], [30, 18, 60, 45, false], [10, 12, 90, 30, false], [16, 16, 60, 60, true], [12, 0, 30, 30, true], [40, 18, 30, 120, true]];
+for (const [age, lim, rt, free, want] of cases) {
+  const c = `\`canWatchTonight(${age}, ${lim}, ${rt}, ${free})\``;
+  let got;
+  try { got = f(age, lim, rt, free); } catch (e) { t.fail(`${c} crashed: ${e.message}`); }
+  t.expect(got !== undefined, `${c} gives back \`undefined\`. Did you forget \`return\`?`);
+  t.expect(typeof got === "boolean", `${c} gives ${JSON.stringify(got)}. Return the comparisons themselves, \`true\` or \`false\`, without quotes.`);
+  if (got !== want) {
+    let why = [];
+    why.push(age >= lim ? `${age} is old enough for ${lim}${age === lim ? " (exactly the limit counts: use `>=`)" : ""}` : `${age} is too young for ${lim}`);
+    why.push(rt <= free ? `${rt} minutes fit into ${free}${rt === free ? " (exactly counts: use `<=`)" : ""}` : `${rt} minutes don't fit into ${free}`);
+    t.fail(`${c} gives ${got}. It should give ${want}: ${why.join(", and ")}. Both must be true, joined with \`&&\`.`);
+  }
+}
+
+
+=== step p-evenings
+title: How many evenings? (harder)
+minutes: 12
+slot: gym
+template: gym
+practice: yes
+refs:
+--- explain
+`Math.floor` and `%` can also decide when to round **up**. Imagine packing eggs into boxes of 6:
+
+```js
+function boxesNeeded(eggs, perBox) {
+  const full = Math.floor(eggs / perBox);
+  if (eggs % perBox === 0) {
+    return full;
+  } else {
+    return full + 1;
+  }
+}
+
+console.log(boxesNeeded(12, 6));   // 2
+console.log(boxesNeeded(14, 6));   // 3: two full boxes, and one for the 2 left over
+```
+
+When the remainder is 0, everything fits into full boxes. Otherwise the leftovers need one more.
+--- task
+You watch `perEvening` episodes every evening. Write `eveningsNeeded(episodes, perEvening)`. It returns how many evenings it takes to watch all the episodes. A last evening with fewer episodes still counts.
+
+Fleabag has 12 episodes: at 3 a night that's **4** evenings. Chernobyl's 5 episodes at 2 a night take **3**. And 0 episodes take **0** evenings.
+--- hint
+Follow the egg boxes: first the full evenings with `Math.floor(episodes / perEvening)`. Then check the remainder `episodes % perEvening`: if it's 0, return the full evenings; otherwise one more.
+--- hint
+```js
+function eveningsNeeded(episodes, perEvening) {
+  const full = Math.floor(episodes / perEvening);
+  if (episodes % perEvening === 0) {
+    return full;
+  } else {
+    return full + 1;
+  }
+}
+```
+--- starter
+// Practice 16 (harder): how many evenings to watch every episode?
+// eveningsNeeded(12, 3) should give 4, eveningsNeeded(5, 2) should give 3.
+function eveningsNeeded(episodes, perEvening) {
+  // your code here
+}
+
+tryIt(eveningsNeeded, [12, 3], 4);
+tryIt(eveningsNeeded, [5, 2], 3);
+tryIt(eveningsNeeded, [62, 4], 16);
+tryIt(eveningsNeeded, [0, 3], 0);
+--- solution
+// Practice 16 (harder): how many evenings to watch every episode?
+// eveningsNeeded(12, 3) should give 4, eveningsNeeded(5, 2) should give 3.
+function eveningsNeeded(episodes, perEvening) {
+  const full = Math.floor(episodes / perEvening);
+  if (episodes % perEvening === 0) {
+    return full;
+  } else {
+    return full + 1;
+  }
+}
+
+tryIt(eveningsNeeded, [12, 3], 4);
+tryIt(eveningsNeeded, [5, 2], 3);
+tryIt(eveningsNeeded, [62, 4], 16);
+tryIt(eveningsNeeded, [0, 3], 0);
+--- learned
+`Math.floor` counts the full evenings and `%` tells you whether something is left over. That's rounding up, built from tools you already know.
+--- summary
+Practice: round up with `Math.floor`, `%` and an `if`.
+--- mistakes
+- Always adding 1, so 12 episodes at 3 a night become 5 evenings.
+- `Math.round(episodes / perEvening)`: 10 episodes at 3 a night is 3.33, which rounds to 3, one evening short.
+--- teacher
+Students who did the extra challenge *How many days to binge it?* may know `Math.ceil`. `return Math.ceil(episodes / perEvening);` is also correct and passes.
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Look for a missing bracket near the line it names.`);
+const f = t.get("eveningsNeeded");
+t.expect(typeof f === "function", "I can't find a function called `eveningsNeeded`. Press **Start again** to get the starting code back.");
+for (const [e, p, want] of [[12, 3, 4], [5, 2, 3], [10, 3, 4], [62, 4, 16], [1, 4, 1], [236, 10, 24], [26, 26, 1], [0, 3, 0]]) {
+  const c = `\`eveningsNeeded(${e}, ${p})\``;
+  let got;
+  try { got = f(e, p); } catch (err) { t.fail(`${c} crashed: ${err.message}`); }
+  t.expect(got !== undefined, `${c} gives back \`undefined\`. Each block needs a \`return\`.`);
+  t.expect(typeof got === "number", `${c} gives ${JSON.stringify(got)}. Return a number.`);
+  t.expect(Number.isInteger(got), `${c} gives ${got}. Evenings are whole numbers: start with \`Math.floor(episodes / perEvening)\`.`);
+  if (got !== want) {
+    let tip = "";
+    if (e % p === 0 && got === want + 1) tip = ` ${e} divided by ${p} leaves nothing over (\`${e} % ${p}\` is 0), so there's no extra evening.`;
+    else if (e % p !== 0 && got === want - 1) tip = ` ${e} % ${p} is ${e % p}: ${e % p === 1 ? "that last episode needs" : `those ${e % p} episodes need`} one more evening.`;
+    t.fail(`${c} gives ${got}. It should give ${want}.${tip}`);
+  }
+}
+
+
+=== step p-time-left
+title: Time left, from two helpers (harder)
+minutes: 15
+slot: gym
+template: gym
+practice: yes
+refs:
+--- explain
+Big functions are built from small ones. Above your function, two helpers are already written: `episodesLeft` from Practice 1, and `formatRuntime` from step 7. Your function can call them and use their answers, like `isQuickWatch` used `watchTime`:
+
+```js
+function orderTotal(items, price) {
+  return items * price;
+}
+
+function receipt(items, price) {
+  const total = orderTotal(items, price);
+  if (total === 0) {
+    return "Nothing to pay";
+  }
+  return `${items} items: ${total} euros`;
+}
+```
+
+Save a helper's answer in a variable when you need it more than once.
+--- task
+Write `timeLeft(watched, total, runtime)`. Use `episodesLeft` to work out how many episodes are left, then return:
+
+1. **"Finished!"** when 0 or fewer are left (yes, people type the wrong numbers)
+2. **"Last one! 30 min to go"** when exactly one is left, with `formatRuntime(runtime)` for the time
+3. **"2 episodes left: 1 h to go"** otherwise, with `formatRuntime` of the minutes for **all** the episodes left
+--- hint
+Start with `const left = episodesLeft(total, watched);`. Then `if (left <= 0)`, `else if (left === 1)`, `else`. The time for all of them is `formatRuntime(left * runtime)`.
+--- hint
+```js
+function timeLeft(watched, total, runtime) {
+  const left = episodesLeft(total, watched);
+  if (left <= 0) {
+    return "Finished!";
+  } else if (left === 1) {
+    return `Last one! ${formatRuntime(runtime)} to go`;
+  } else {
+    return `${left} episodes left: ${formatRuntime(left * runtime)} to go`;
+  }
+}
+```
+--- starter
+// Practice 17 (harder): how much is left? Use the two helpers.
+// timeLeft(10, 12, 30) should give "2 episodes left: 1 h to go".
+
+// Helpers, already written (don't change them):
+function episodesLeft(total, watched) {
+  return total - watched;
+}
+
+function formatRuntime(minutes) {
+  const hours = Math.floor(minutes / 60);
+  const rest = minutes % 60;
+  if (hours === 0) {
+    return `${rest} min`;
+  } else if (rest === 0) {
+    return `${hours} h`;
+  } else {
+    return `${hours} h ${rest} min`;
+  }
+}
+
+// Your function:
+function timeLeft(watched, total, runtime) {
+  // your code here
+}
+
+tryIt(timeLeft, [10, 12, 30], "2 episodes left: 1 h to go");
+tryIt(timeLeft, [200, 201, 30], "Last one! 30 min to go");
+tryIt(timeLeft, [100, 201, 30], "101 episodes left: 50 h 30 min to go");
+tryIt(timeLeft, [62, 62, 60], "Finished!");
+--- solution
+// Practice 17 (harder): how much is left? Use the two helpers.
+// timeLeft(10, 12, 30) should give "2 episodes left: 1 h to go".
+
+// Helpers, already written (don't change them):
+function episodesLeft(total, watched) {
+  return total - watched;
+}
+
+function formatRuntime(minutes) {
+  const hours = Math.floor(minutes / 60);
+  const rest = minutes % 60;
+  if (hours === 0) {
+    return `${rest} min`;
+  } else if (rest === 0) {
+    return `${hours} h`;
+  } else {
+    return `${hours} h ${rest} min`;
+  }
+}
+
+// Your function:
+function timeLeft(watched, total, runtime) {
+  const left = episodesLeft(total, watched);
+  if (left <= 0) {
+    return "Finished!";
+  } else if (left === 1) {
+    return `Last one! ${formatRuntime(runtime)} to go`;
+  } else {
+    return `${left} episodes left: ${formatRuntime(left * runtime)} to go`;
+  }
+}
+
+tryIt(timeLeft, [10, 12, 30], "2 episodes left: 1 h to go");
+tryIt(timeLeft, [200, 201, 30], "Last one! 30 min to go");
+tryIt(timeLeft, [100, 201, 30], "101 episodes left: 50 h 30 min to go");
+tryIt(timeLeft, [62, 62, 60], "Finished!");
+--- learned
+Your function asked two helpers for answers and combined them with three cases. That's how real programs grow: small tested pieces, put together.
+--- summary
+Practice: a function that calls two other functions and chooses between three answers.
+--- mistakes
+- `formatRuntime(runtime)` in the last case, so the time is for one episode, not all of them.
+- `left === 0` instead of `left <= 0`, so watching "too many" episodes gives "-8 episodes left".
+- Arguments to `episodesLeft` in the wrong order: it wants `(total, watched)`.
+--- teacher
+The order of the arguments is the trap here: `timeLeft` gets `(watched, total, ...)`, but `episodesLeft` wants `(total, watched)`. Swapped, every show looks finished.
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Look for a missing bracket near the line it names.`);
+const f = t.get("timeLeft");
+t.expect(typeof f === "function", "I can't find a function called `timeLeft`. Press **Start again** to get the starting code back.");
+const el = t.get("episodesLeft"), fr = t.get("formatRuntime");
+t.expect(typeof el === "function" && el(10, 4) === 6, "The helper `episodesLeft` is missing or changed. Press **Start again** to get it back, or copy it from the hint.");
+t.expect(typeof fr === "function" && fr(90) === "1 h 30 min", "The helper `formatRuntime` is missing or changed. Press **Start again** to get it back.");
+const norm = (s) => String(s).replace(/\s+/g, " ").trim().replace(/[.!]+$/, "").toLowerCase();
+const cases = [
+  [10, 12, 30, "2 episodes left: 1 h to go"],
+  [0, 5, 60, "5 episodes left: 5 h to go"],
+  [3, 5, 45, "2 episodes left: 1 h 30 min to go"],
+  [100, 201, 30, "101 episodes left: 50 h 30 min to go"],
+  [200, 201, 30, "Last one! 30 min to go"],
+  [4, 5, 60, "Last one! 1 h to go"],
+  [62, 62, 60, "Finished!"],
+  [70, 62, 60, "Finished!"],
+];
+for (const [w, n, r, want] of cases) {
+  const c = `\`timeLeft(${w}, ${n}, ${r})\``;
+  let got;
+  try { got = f(w, n, r); } catch (e) { t.fail(`${c} crashed: ${e.message}`); }
+  t.expect(got !== undefined, `${c} gives back \`undefined\`. Every block needs a \`return\`.`);
+  const g = String(got);
+  t.expect(!/\$\{/.test(g), `${c} gives "${g}". Use backticks around the text, not quotes, so \`\${ }\` is filled in.`);
+  if (norm(got) !== norm(want)) {
+    let tip = "";
+    if (/^-?\d+ episodes left/.test(norm(got)) && norm(got).startsWith(`${w - n} `)) tip = " The number of episodes is the wrong way round: `episodesLeft` wants `(total, watched)`.";
+    else if (/finished/i.test(g) && n > w) tip = " Check the order of the arguments: `episodesLeft(total, watched)`.";
+    else if (w > n) tip = " More episodes watched than the show has: that counts as finished too. Use `left <= 0`.";
+    else if (/^1 episodes/.test(norm(got))) tip = " Test `left === 1` before the general case.";
+    else if (n - w > 1 && norm(got).endsWith(`${norm(fr(r))} to go`) && fr(r) !== fr((n - w) * r)) tip = " That's the time for one episode. Use `formatRuntime(left * runtime)` for all of them.";
+    t.fail(`${c} gives "${g}". It should give "${want}".${tip}`);
+  }
+}
+t.expect(/episodesLeft\s*\(/.test(String(f)) && /formatRuntime\s*\(/.test(String(f)), "It works! Now use both helpers inside `timeLeft`: `episodesLeft(total, watched)` and `formatRuntime(...)`, instead of doing the maths again.");
+
+
+=== step p-next-episode
+title: What's next? (harder)
+minutes: 15
+slot: gym
+template: gym
+practice: yes
+refs:
+--- explain
+This one puts it all together: four parameters, a calculation inside a template literal, and three cases where the order matters.
+
+A calculation can go **inside** `${ }`. Compare:
+
+```js
+const page = 4;
+console.log(`Next page: ${page + 1}`);    // Next page: 5
+console.log(`Next page: ${page} + 1`);    // Next page: 4 + 1
+```
+
+Only what's inside the curly brackets is worked out.
+
+Fleabag has 2 seasons of 6 episodes. After season 1, episode 3 comes episode 4. After season 1, episode 6 comes season 2, episode 1. And after season 2, episode 6 there's nothing left.
+--- task
+Write `nextEpisode(season, episode, perSeason, seasons)`. It gets the episode you watched last, the number of episodes per season and the number of seasons, and returns:
+
+1. **"Season 1, episode 4"** when the season has more episodes
+2. **"Season 2, episode 1"** when the season is over but there's another season
+3. **"That was the finale!"** when it was the last episode of the last season
+--- hint
+First case: `if (episode < perSeason)`, with `${episode + 1}`. Second: `else if (season < seasons)`, with `${season + 1}` and episode 1. Third: `else`.
+--- hint
+```js
+function nextEpisode(season, episode, perSeason, seasons) {
+  if (episode < perSeason) {
+    return `Season ${season}, episode ${episode + 1}`;
+  } else if (season < seasons) {
+    return `Season ${season + 1}, episode 1`;
+  } else {
+    return "That was the finale!";
+  }
+}
+```
+--- starter
+// Practice 18 (harder): which episode comes next?
+// Fleabag: 2 seasons of 6 episodes.
+// nextEpisode(1, 6, 6, 2) should give "Season 2, episode 1".
+function nextEpisode(season, episode, perSeason, seasons) {
+  // your code here
+}
+
+tryIt(nextEpisode, [1, 3, 6, 2], "Season 1, episode 4");
+tryIt(nextEpisode, [1, 6, 6, 2], "Season 2, episode 1");
+tryIt(nextEpisode, [2, 6, 6, 2], "That was the finale!");
+tryIt(nextEpisode, [1, 5, 5, 1], "That was the finale!");
+--- solution
+// Practice 18 (harder): which episode comes next?
+// Fleabag: 2 seasons of 6 episodes.
+// nextEpisode(1, 6, 6, 2) should give "Season 2, episode 1".
+function nextEpisode(season, episode, perSeason, seasons) {
+  if (episode < perSeason) {
+    return `Season ${season}, episode ${episode + 1}`;
+  } else if (season < seasons) {
+    return `Season ${season + 1}, episode 1`;
+  } else {
+    return "That was the finale!";
+  }
+}
+
+tryIt(nextEpisode, [1, 3, 6, 2], "Season 1, episode 4");
+tryIt(nextEpisode, [1, 6, 6, 2], "Season 2, episode 1");
+tryIt(nextEpisode, [2, 6, 6, 2], "That was the finale!");
+tryIt(nextEpisode, [1, 5, 5, 1], "That was the finale!");
+--- learned
+Three cases, four parameters, maths inside `${ }`. The "Next episode" button in every streaming app makes the same decision.
+--- summary
+Practice: three cases from four parameters, with calculations inside `${ }`.
+--- mistakes
+- `${episode} + 1` instead of `${episode + 1}`: the page shows "3 + 1".
+- `episode <= perSeason`, so after episode 6 comes "episode 7".
+- Testing `season < seasons` first, so the middle of season 1 jumps to season 2.
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Look for a missing bracket near the line it names.`);
+const f = t.get("nextEpisode");
+t.expect(typeof f === "function", "I can't find a function called `nextEpisode`. Press **Start again** to get the starting code back.");
+const norm = (s) => String(s).replace(/\s+/g, " ").trim().replace(/[.!]+$/, "").toLowerCase();
+const cases = [
+  [1, 3, 6, 2, "Season 1, episode 4"],
+  [2, 5, 6, 2, "Season 2, episode 6"],
+  [1, 6, 6, 2, "Season 2, episode 1"],
+  [2, 6, 6, 2, "That was the finale!"],
+  [1, 1, 5, 1, "Season 1, episode 2"],
+  [1, 5, 5, 1, "That was the finale!"],
+  [9, 24, 24, 10, "Season 10, episode 1"],
+];
+for (const [s, e, per, all, want] of cases) {
+  const c = `\`nextEpisode(${s}, ${e}, ${per}, ${all})\``;
+  let got;
+  try { got = f(s, e, per, all); } catch (err) { t.fail(`${c} crashed: ${err.message}`); }
+  t.expect(got !== undefined, `${c} gives back \`undefined\`. Every block needs a \`return\`.`);
+  const g = String(got);
+  t.expect(!/\$\{/.test(g), `${c} gives "${g}". Use backticks around the text, not quotes, so \`\${ }\` is filled in.`);
+  t.expect(!/\+\s*1/.test(g), `${c} gives "${g}". Put the \`+ 1\` inside the curly brackets: \`\${episode + 1}\`.`);
+  if (norm(got) !== norm(want)) {
+    let tip = "";
+    if (e === per && new RegExp(`episode ${e + 1}$`).test(norm(got))) tip = ` Episode ${e} is the last of its season: use \`episode < perSeason\` for the first case.`;
+    else if (e < per && /^season \d+, episode 1$/.test(norm(got))) tip = " The season isn't over yet: test `episode < perSeason` first.";
+    else if (s === all && e === per) tip = " That's the last episode of the last season.";
+    t.fail(`${c} gives "${g}". It should give "${want}".${tip}`);
+  }
+}
+
+
+=== step p-to-seconds
+title: Minutes to seconds
+minutes: 5
+slot: gym
+template: gym
+practice: yes
+refs:
+--- explain
+Converting from one unit to another is often a single multiplication. A **converter** function takes a number in one unit and returns it in another:
+
+```js
+const kgToGrams = (kg) => kg * 1000;
+
+console.log(kgToGrams(2));     // 2000
+console.log(kgToGrams(0.5));   // 500
+```
+
+Think about which way you go: from a big unit to a small one, the number gets bigger, so you multiply.
+--- task
+Write the arrow function `toSeconds(minutes)`. It returns the same time in seconds.
+
+A Friends episode lasts 30 minutes, so `toSeconds(30)` gives **1800**.
+--- hint
+One minute has 60 seconds. Minutes are the bigger unit, so multiply.
+--- hint
+```js
+const toSeconds = (minutes) => minutes * 60;
+```
+--- starter
+// Practice 19: a converter from minutes to seconds.
+// toSeconds(30) should give 1800.
+const toSeconds = (minutes) => {
+  // your code here
+};
+
+tryIt(toSeconds, [30], 1800);
+tryIt(toSeconds, [1], 60);
+tryIt(toSeconds, [0], 0);
+--- solution
+// Practice 19: a converter from minutes to seconds.
+// toSeconds(30) should give 1800.
+const toSeconds = (minutes) => minutes * 60;
+
+tryIt(toSeconds, [30], 1800);
+tryIt(toSeconds, [1], 60);
+tryIt(toSeconds, [0], 0);
+--- learned
+A converter in one line. Big unit to small unit: multiply. Small to big: divide, as the next exercise shows.
+--- summary
+Practice: a one-line converter with an arrow function.
+--- mistakes
+- Dividing by 60 instead of multiplying.
+- Curly brackets without `return`.
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it and fix that line.`);
+const f = t.get("toSeconds");
+t.expect(typeof f === "function", "I can't find a function called `toSeconds`. Press **Start again** to get the starting code back.");
+for (const [m, want] of [[30, 1800], [60, 3600], [1, 60], [2.5, 150], [0, 0]]) {
+  const c = `\`toSeconds(${m})\``;
+  let got;
+  try { got = f(m); } catch (e) { t.fail(`${c} crashed: ${e.message}`); }
+  t.expect(got !== undefined, `${c} gives back \`undefined\`. With curly brackets \`{ }\` you need \`return\`. Did you forget it?`);
+  t.expect(!(m && Math.abs(got - m / 60) < 1e-9), `${c} gives ${got}. Minutes are bigger than seconds, so multiply by 60 instead of dividing.`);
+  t.expect(got === want, `${c} gives ${JSON.stringify(got)}. It should give ${want}: ${m} minutes times 60 seconds.`);
+}
+
+
+=== step p-full-days
+title: Hours to whole days
+minutes: 5
+slot: gym
+template: gym
+practice: yes
+refs:
+--- explain
+Going from a small unit to a big one, you divide. When you only want **whole** units, round down with `Math.floor`:
+
+```js
+const fullWeeks = (days) => Math.floor(days / 7);
+
+console.log(fullWeeks(20));   // 2 (20 days is 2 full weeks and 6 days)
+console.log(fullWeeks(6));    // 0
+```
+
+`Math.round` would say 20 days is 3 weeks, which isn't true yet.
+--- task
+Write the arrow function `fullDays(hours)`. It returns how many **whole** days fit into the hours.
+
+Watching all of Friends takes 118 hours, so `fullDays(118)` gives **4**: four full days and some hours left over.
+--- hint
+Divide by 24 inside `Math.floor( )`.
+--- hint
+```js
+const fullDays = (hours) => Math.floor(hours / 24);
+```
+--- starter
+// Practice 20: how many whole days fit into some hours?
+// fullDays(118) should give 4.
+const fullDays = (hours) => {
+  // your code here
+};
+
+tryIt(fullDays, [118], 4);
+tryIt(fullDays, [24], 1);
+tryIt(fullDays, [23], 0);
+--- solution
+// Practice 20: how many whole days fit into some hours?
+// fullDays(118) should give 4.
+const fullDays = (hours) => Math.floor(hours / 24);
+
+tryIt(fullDays, [118], 4);
+tryIt(fullDays, [24], 1);
+tryIt(fullDays, [23], 0);
+--- learned
+Small unit to big unit: divide, and `Math.floor` keeps only the whole ones. 23 hours isn't a full day yet.
+--- summary
+Practice: divide and round down for whole units.
+--- mistakes
+- `Math.round`, so 23 hours counts as a whole day.
+- Multiplying by 24 instead of dividing.
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it and fix that line.`);
+const f = t.get("fullDays");
+t.expect(typeof f === "function", "I can't find a function called `fullDays`. Press **Start again** to get the starting code back.");
+for (const [h, want] of [[118, 4], [24, 1], [48, 2], [62, 2], [23, 0], [0, 0]]) {
+  const c = `\`fullDays(${h})\``;
+  let got;
+  try { got = f(h); } catch (e) { t.fail(`${c} crashed: ${e.message}`); }
+  t.expect(got !== undefined, `${c} gives back \`undefined\`. With curly brackets \`{ }\` you need \`return\`. Did you forget it?`);
+  t.expect(typeof got === "number", `${c} gives ${JSON.stringify(got)}. Return a number.`);
+  t.expect(!(h && got === h * 24), `${c} gives ${got}. Days are bigger than hours, so divide by 24 instead of multiplying.`);
+  t.expect(Number.isInteger(got), `${c} gives ${got}. Keep only the whole days: put the division inside \`Math.floor( )\`.`);
+  const tip = got === Math.round(h / 24) && got !== want ? " That's rounded to the nearest day: use `Math.floor` to count only full days." : "";
+  t.expect(got === want, `${c} gives ${got}. It should give ${want}.${tip}`);
+}
+
+
+=== step p-title-year
+title: Title with its year
+minutes: 6
+slot: gym
+template: gym
+practice: yes
+refs:
+--- explain
+Lists of shows often add the year in brackets, like **Dark (2017)**, so two shows with the same name can't be confused.
+
+A template literal can contain brackets like any other character. Only `${ }` is special:
+
+```js
+function priceTag(item, euros) {
+  if (item === "") {
+    return `Something (${euros} euros)`;
+  }
+  return `${item} (${euros} euros)`;
+}
+
+console.log(priceTag("Popcorn", 4));   // Popcorn (4 euros)
+console.log(priceTag("", 4));          // Something (4 euros)
+```
+
+An empty string `""` is a string with no characters. Comparing with `=== ""` tells you whether something was typed.
+--- task
+Write `titleWithYear(name, year)`. It returns the name and the year in brackets: `titleWithYear("Dark", 2017)` gives **"Dark (2017)"**.
+
+When `name` is an empty string, use **Untitled** instead: `titleWithYear("", 2005)` gives **"Untitled (2005)"**.
+--- hint
+First `if (name === "")` and return the Untitled version. Under it, return a template literal with `${name}` and `(${year})`.
+--- hint
+```js
+function titleWithYear(name, year) {
+  if (name === "") {
+    return `Untitled (${year})`;
+  }
+  return `${name} (${year})`;
+}
+```
+--- starter
+// Practice 21: a show's name with its year in brackets.
+// titleWithYear("Dark", 2017) should give "Dark (2017)".
+function titleWithYear(name, year) {
+  // your code here
+}
+
+tryIt(titleWithYear, ["Dark", 2017], "Dark (2017)");
+tryIt(titleWithYear, ["The Wire", 2002], "The Wire (2002)");
+tryIt(titleWithYear, ["", 2005], "Untitled (2005)");
+--- solution
+// Practice 21: a show's name with its year in brackets.
+// titleWithYear("Dark", 2017) should give "Dark (2017)".
+function titleWithYear(name, year) {
+  if (name === "") {
+    return `Untitled (${year})`;
+  }
+  return `${name} (${year})`;
+}
+
+tryIt(titleWithYear, ["Dark", 2017], "Dark (2017)");
+tryIt(titleWithYear, ["The Wire", 2002], "The Wire (2002)");
+tryIt(titleWithYear, ["", 2005], "Untitled (2005)");
+--- learned
+Brackets inside a template literal are plain text, and `=== ""` catches an empty name before it causes an odd-looking label.
+--- summary
+Practice: a string builder with a check for the empty string.
+--- mistakes
+- `${(year)}` or `$(year)` instead of `(${year})`.
+- Forgetting the space before the bracket: "Dark(2017)".
+- Checking `name === " "` (a space) instead of `""`.
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it and fix that line.`);
+const f = t.get("titleWithYear");
+t.expect(typeof f === "function", "I can't find a function called `titleWithYear`. Press **Start again** to get the starting code back.");
+for (const [n, y, want] of [["Dark", 2017, "Dark (2017)"], ["The Wire", 2002, "The Wire (2002)"], ["Chernobyl", 2019, "Chernobyl (2019)"], ["", 2005, "Untitled (2005)"], ["", 1994, "Untitled (1994)"]]) {
+  const c = `\`titleWithYear(${JSON.stringify(n)}, ${y})\``;
+  let got;
+  try { got = f(n, y); } catch (e) { t.fail(`${c} crashed: ${e.message}`); }
+  t.expect(got !== undefined, `${c} gives back \`undefined\`. Did you forget \`return\`?`);
+  const g = String(got);
+  t.expect(!/\$\{/.test(g), `${c} gives "${g}". Use backticks around the text, not quotes, so \`\${ }\` is filled in.`);
+  let tip = "";
+  if (n === "" && /^\s*\(/.test(g)) tip = " The name is empty: check `if (name === \"\")` and return \"Untitled\" with the year.";
+  else if (g.replace(/\s+/g, "") === want.replace(/\s+/g, "")) tip = " Check the spaces: one space between the name and the bracket.";
+  else if (/dark/i.test(g) && n !== "Dark") tip = " Use the parameters instead of typing a name.";
+  t.expect(g.trim().toLowerCase() === want.toLowerCase(), `${c} gives "${g}". It should give "${want}".${tip}`);
+}
+
+
+=== step p-older-show
+title: Which show came first?
+minutes: 7
+slot: gym
+template: gym
+practice: yes
+refs:
+--- explain
+Two things can be compared by passing both of them in: a name and a number for each. The function returns the **name** that wins.
+
+```js
+function cheaper(shopA, priceA, shopB, priceB) {
+  if (priceA < priceB) {
+    return shopA;
+  } else if (priceB < priceA) {
+    return shopB;
+  } else {
+    return "Same price";
+  }
+}
+
+console.log(cheaper("Corner shop", 3, "Market", 2));   // Market
+```
+
+Three cases: the first wins, the second wins, or it's a draw. Don't forget the draw.
+--- task
+Write `olderShow(nameA, yearA, nameB, yearB)`. It returns the name of the show that premiered **first**, or **"Same year"** when both started in the same year.
+
+Friends (1994) came before The Office (2005), so `olderShow("Friends", 1994, "The Office", 2005)` gives **"Friends"**.
+--- hint
+Copy the shape of `cheaper`: `if (yearA < yearB)` returns `nameA`, `else if (yearB < yearA)` returns `nameB`, `else` returns "Same year".
+--- hint
+```js
+function olderShow(nameA, yearA, nameB, yearB) {
+  if (yearA < yearB) {
+    return nameA;
+  } else if (yearB < yearA) {
+    return nameB;
+  } else {
+    return "Same year";
+  }
+}
+```
+--- starter
+// Practice 22: which of two shows premiered first?
+// olderShow("Friends", 1994, "The Office", 2005) should give "Friends".
+function olderShow(nameA, yearA, nameB, yearB) {
+  // your code here
+}
+
+tryIt(olderShow, ["Friends", 1994, "The Office", 2005], "Friends");
+tryIt(olderShow, ["Dark", 2017, "The Wire", 2002], "The Wire");
+tryIt(olderShow, ["Fleabag", 2016, "The Crown", 2016], "Same year");
+--- solution
+// Practice 22: which of two shows premiered first?
+// olderShow("Friends", 1994, "The Office", 2005) should give "Friends".
+function olderShow(nameA, yearA, nameB, yearB) {
+  if (yearA < yearB) {
+    return nameA;
+  } else if (yearB < yearA) {
+    return nameB;
+  } else {
+    return "Same year";
+  }
+}
+
+tryIt(olderShow, ["Friends", 1994, "The Office", 2005], "Friends");
+tryIt(olderShow, ["Dark", 2017, "The Wire", 2002], "The Wire");
+tryIt(olderShow, ["Fleabag", 2016, "The Crown", 2016], "Same year");
+--- learned
+Compare the numbers, return the matching name, and don't forget the draw: Fleabag and The Crown both premiered in 2016.
+--- summary
+Practice: compare two shows passed as name and number.
+--- mistakes
+- `>` instead of `<`: the newer show wins.
+- Returning `"nameA"` in quotes, which gives the word nameA.
+- No draw case, so same-year shows return the second name.
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Look for a missing bracket near the line it names.`);
+const f = t.get("olderShow");
+t.expect(typeof f === "function", "I can't find a function called `olderShow`. Press **Start again** to get the starting code back.");
+const cases = [["Friends", 1994, "The Office", 2005, "Friends"], ["Dark", 2017, "The Wire", 2002, "The Wire"], ["Chernobyl", 2019, "Band of Brothers", 2001, "Band of Brothers"], ["Fleabag", 2016, "The Crown", 2016, "Same year"], ["The Office", 2005, "How I Met Your Mother", 2005, "Same year"]];
+for (const [a, ya, b, yb, want] of cases) {
+  const c = `\`olderShow("${a}", ${ya}, "${b}", ${yb})\``;
+  let got;
+  try { got = f(a, ya, b, yb); } catch (e) { t.fail(`${c} crashed: ${e.message}`); }
+  t.expect(got !== undefined, want === "Same year" ? `${c} gives back \`undefined\`. Both premiered in the same year: add a final \`else\` that returns "Same year".` : `${c} gives back \`undefined\`. Every block needs a \`return\`.`);
+  t.expect(!/^name[AB]$/.test(String(got)), `${c} gives "${got}": the parameter's name, not its value. Return it without quotes: \`return nameA;\`.`);
+  if (String(got).trim().toLowerCase() !== want.toLowerCase()) {
+    let tip = "";
+    if (want === "Same year") tip = " Both premiered in the same year: add an `else` that returns \"Same year\".";
+    else if (got === a || got === b) tip = " That's the newer show. The smaller year came first: use `<`.";
+    t.fail(`${c} gives ${JSON.stringify(got)}. It should give "${want}".${tip}`);
+  }
+}
+
+
+=== step p-who-picks
+title: Who picks tonight? Even or odd
+minutes: 6
+slot: gym
+template: gym
+practice: yes
+refs:
+--- explain
+`%` gives the remainder of a division. With `% 2`, the remainder is **0 for even** numbers and **1 for odd** numbers:
+
+```js
+console.log(10 % 2);   // 0 (even)
+console.log(7 % 2);    // 1 (odd)
+
+function side(houseNumber) {
+  if (houseNumber % 2 === 0) {
+    return "Left side";
+  } else {
+    return "Right side";
+  }
+}
+```
+
+That's the standard way to test whether a number is even.
+--- task
+You and a friend take turns choosing what to watch. Write `whoPicks(evening)`:
+
+- odd evenings (1, 3, 5 ...): return **"You"**
+- even evenings (2, 4, 6 ...): return **"Your friend"**
+--- hint
+`if (evening % 2 === 0)` means even: return "Your friend". The `else` block returns "You".
+--- hint
+```js
+function whoPicks(evening) {
+  if (evening % 2 === 0) {
+    return "Your friend";
+  } else {
+    return "You";
+  }
+}
+```
+--- starter
+// Practice 23: odd evenings you pick, even evenings your friend picks.
+// whoPicks(1) should give "You".
+function whoPicks(evening) {
+  // your code here
+}
+
+tryIt(whoPicks, [1], "You");
+tryIt(whoPicks, [2], "Your friend");
+tryIt(whoPicks, [61], "You");
+--- solution
+// Practice 23: odd evenings you pick, even evenings your friend picks.
+// whoPicks(1) should give "You".
+function whoPicks(evening) {
+  if (evening % 2 === 0) {
+    return "Your friend";
+  } else {
+    return "You";
+  }
+}
+
+tryIt(whoPicks, [1], "You");
+tryIt(whoPicks, [2], "Your friend");
+tryIt(whoPicks, [61], "You");
+--- learned
+`% 2 === 0` tests for even numbers. Taking turns, alternating colours and zebra-striped tables all use it.
+--- summary
+Practice: even or odd with `% 2`.
+--- mistakes
+- `evening / 2 === 0`, which is only true for 0.
+- The two labels in the wrong blocks.
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Look for a missing bracket near the line it names.`);
+const f = t.get("whoPicks");
+t.expect(typeof f === "function", "I can't find a function called `whoPicks`. Press **Start again** to get the starting code back.");
+const results = [];
+for (const [n, want] of [[1, "You"], [2, "Your friend"], [3, "You"], [10, "Your friend"], [61, "You"], [236, "Your friend"]]) {
+  const c = `\`whoPicks(${n})\``;
+  let got;
+  try { got = f(n); } catch (e) { t.fail(`${c} crashed: ${e.message}`); }
+  t.expect(got !== undefined, `${c} gives back \`undefined\`. Each block needs a \`return\`.`);
+  results.push(String(got));
+  if (String(got).trim().toLowerCase() !== want.toLowerCase()) {
+    const tip = new Set(results).size === 1 && results.length > 1 ? " Every evening gives the same answer. Test the remainder: `evening % 2 === 0` is true for even numbers." : ` ${n} is ${n % 2 ? "odd" : "even"}.`;
+    t.fail(`${c} gives ${JSON.stringify(got)}. It should give "${want}".${tip}`);
+  }
+}
+
+
+=== step p-valid-rating
+title: Is the rating valid?
+minutes: 6
+slot: gym
+template: gym
+practice: yes
+refs:
+--- explain
+**Validation** means checking that a value makes sense before you use it. Someone could type a rating of 15 or -2 into a form, and your code should notice.
+
+A value is "in a range" when it's at least the lowest value **and** at most the highest. Use `&&` from Practice 15:
+
+```js
+const isSchoolAge = (age) => age >= 6 && age <= 18;
+
+console.log(isSchoolAge(6));    // true
+console.log(isSchoolAge(19));   // false
+```
+
+Write `age` on both sides. `6 <= age <= 18` looks right but doesn't work in JavaScript.
+--- task
+Write the arrow function `isValidRating(rating)`. It returns `true` when the rating is from 0 to 10 (both included), and `false` otherwise.
+--- hint
+Two comparisons joined with `&&`: `rating >= 0` and `rating <= 10`.
+--- hint
+```js
+const isValidRating = (rating) => rating >= 0 && rating <= 10;
+```
+--- starter
+// Practice 24: is the rating from 0 to 10?
+// isValidRating(8.8) should give true, isValidRating(11) false.
+const isValidRating = (rating) => {
+  // your code here
+};
+
+tryIt(isValidRating, [8.8], true);
+tryIt(isValidRating, [11], false);
+tryIt(isValidRating, [-1], false);
+tryIt(isValidRating, [10], true);
+--- solution
+// Practice 24: is the rating from 0 to 10?
+// isValidRating(8.8) should give true, isValidRating(11) false.
+const isValidRating = (rating) => rating >= 0 && rating <= 10;
+
+tryIt(isValidRating, [8.8], true);
+tryIt(isValidRating, [11], false);
+tryIt(isValidRating, [-1], false);
+tryIt(isValidRating, [10], true);
+--- learned
+"From 0 to 10" is two comparisons with `&&`. Forms check values like this before they save them.
+--- summary
+Practice: check a range with `>=`, `<=` and `&&`.
+--- mistakes
+- `0 <= rating <= 10`: JavaScript reads it differently and says `true` for 15.
+- `>` and `<`, so 0 and 10 are rejected.
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it and fix that line.`);
+const f = t.get("isValidRating");
+t.expect(typeof f === "function", "I can't find a function called `isValidRating`. Press **Start again** to get the starting code back.");
+for (const [x, want] of [[8.8, true], [11, false], [-1, false], [15, false], [10.5, false], [-0.5, false], [10, true], [0, true]]) {
+  const c = `\`isValidRating(${x})\``;
+  let got;
+  try { got = f(x); } catch (e) { t.fail(`${c} crashed: ${e.message}`); }
+  t.expect(got !== undefined, `${c} gives back \`undefined\`. With curly brackets \`{ }\` you need \`return\`. Did you forget it?`);
+  t.expect(typeof got === "boolean", `${c} gives ${JSON.stringify(got)}. Return the comparisons themselves, \`true\` or \`false\`, without quotes.`);
+  let tip = "";
+  if (x === 0 || x === 10) tip = ` ${x} is allowed: use \`>=\` and \`<=\`.`;
+  else if (x > 10 && /<=\s*rating\s*<=/.test(t.clean)) tip = " `0 <= rating <= 10` doesn't work in JavaScript. Write two comparisons joined with `&&`.";
+  else if (x > 10) tip = " It's above 10: check `rating <= 10` too.";
+  else if (x < 0) tip = " It's below 0: check `rating >= 0` too.";
+  t.expect(got === want, `${c} gives ${got}. It should give ${want}.${tip}`);
+}
+
+
+=== step p-check-years
+title: Do the years make sense?
+minutes: 8
+slot: gym
+template: gym
+practice: yes
+refs:
+--- explain
+Validation can also explain **what** is wrong, not only say yes or no. Each problem gets its own message, and a final `else` says everything is fine:
+
+```js
+function checkBooking(nights, guests) {
+  if (nights < 1) {
+    return "Book at least one night";
+  } else if (guests > 4) {
+    return "The room sleeps 4";
+  } else {
+    return "OK";
+  }
+}
+```
+
+The function stops at the first problem it finds, so put the most important check first.
+--- task
+Write `checkYears(premiered, ended)`. It returns:
+
+1. **"Not out yet"** when `premiered` is after 2026
+2. **"Ended before it started"** when `ended` is before `premiered`
+3. **"OK"** otherwise
+
+Chernobyl premiered and ended in 2019: that's **"OK"**.
+--- hint
+`if (premiered > 2026)`, then `else if (ended < premiered)`, then `else`.
+--- hint
+```js
+function checkYears(premiered, ended) {
+  if (premiered > 2026) {
+    return "Not out yet";
+  } else if (ended < premiered) {
+    return "Ended before it started";
+  } else {
+    return "OK";
+  }
+}
+```
+--- starter
+// Practice 25: do the two years make sense?
+// checkYears(2013, 2008) should give "Ended before it started".
+function checkYears(premiered, ended) {
+  // your code here
+}
+
+tryIt(checkYears, [1994, 2004], "OK");
+tryIt(checkYears, [2013, 2008], "Ended before it started");
+tryIt(checkYears, [2030, 2035], "Not out yet");
+tryIt(checkYears, [2019, 2019], "OK");
+--- solution
+// Practice 25: do the two years make sense?
+// checkYears(2013, 2008) should give "Ended before it started".
+function checkYears(premiered, ended) {
+  if (premiered > 2026) {
+    return "Not out yet";
+  } else if (ended < premiered) {
+    return "Ended before it started";
+  } else {
+    return "OK";
+  }
+}
+
+tryIt(checkYears, [1994, 2004], "OK");
+tryIt(checkYears, [2013, 2008], "Ended before it started");
+tryIt(checkYears, [2030, 2035], "Not out yet");
+tryIt(checkYears, [2019, 2019], "OK");
+--- learned
+Each problem gets its own message, and "OK" comes last. Chernobyl's 2019–2019 is fine: starting and ending in the same year is allowed.
+--- summary
+Practice: validation that names the problem.
+--- mistakes
+- `ended <= premiered`, so a one-year show like Chernobyl is rejected.
+- `>= 2026`, so a show from this year is "Not out yet".
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Look for a missing bracket near the line it names.`);
+const f = t.get("checkYears");
+t.expect(typeof f === "function", "I can't find a function called `checkYears`. Press **Start again** to get the starting code back.");
+const norm = (s) => String(s).replace(/\s+/g, " ").trim().replace(/[.!]+$/, "").toLowerCase();
+const cases = [[1994, 2004, "OK"], [2013, 2008, "Ended before it started"], [2030, 2035, "Not out yet"], [2019, 2019, "OK"], [2026, 2026, "OK"], [2027, 2027, "Not out yet"], [2005, 2004, "Ended before it started"]];
+for (const [p, e, want] of cases) {
+  const c = `\`checkYears(${p}, ${e})\``;
+  let got;
+  try { got = f(p, e); } catch (err) { t.fail(`${c} crashed: ${err.message}`); }
+  t.expect(got !== undefined, `${c} gives back \`undefined\`. Every block needs a \`return\`.`);
+  if (norm(got) !== norm(want)) {
+    let tip = "";
+    if (p === e && p <= 2026) tip = " Starting and ending in the same year is fine: use `ended < premiered`, not `<=`.";
+    if (p === 2026) tip = " 2026 is this year, so it's out: use `premiered > 2026`.";
+    t.fail(`${c} gives ${JSON.stringify(got)}. It should give "${want}".${tip}`);
+  }
+}
+
+
+=== step p-plan-price
+title: Price tiers for screens
+minutes: 8
+slot: gym
+template: gym
+practice: yes
+refs:
+--- explain
+A **price tier** gives a group of values the same price. `else if` handles each group, and the last group can be "this many or more":
+
+```js
+function parkingFee(hours) {
+  if (hours === 0) {
+    return 0;
+  } else if (hours <= 2) {
+    return 3;
+  } else {
+    return 8;
+  }
+}
+
+console.log(parkingFee(1));   // 3
+console.log(parkingFee(9));   // 8
+```
+
+Check the edges of each group: 2 hours is still 3, and 3 hours is 8.
+--- task
+Imagine a streaming plan whose price depends on how many screens can watch at once. Write `planPrice(screens)`:
+
+- 0 screens: **0**
+- 1 screen: **8**
+- 2 screens: **12**
+- 3 or more screens: **16**
+--- hint
+Four cases: `screens === 0`, `screens === 1`, `screens === 2`, and an `else` for 3 or more.
+--- hint
+```js
+function planPrice(screens) {
+  if (screens === 0) {
+    return 0;
+  } else if (screens === 1) {
+    return 8;
+  } else if (screens === 2) {
+    return 12;
+  } else {
+    return 16;
+  }
+}
+```
+--- starter
+// Practice 26: the price of a plan, by number of screens.
+// planPrice(2) should give 12.
+function planPrice(screens) {
+  // your code here
+}
+
+tryIt(planPrice, [0], 0);
+tryIt(planPrice, [1], 8);
+tryIt(planPrice, [2], 12);
+tryIt(planPrice, [5], 16);
+--- solution
+// Practice 26: the price of a plan, by number of screens.
+// planPrice(2) should give 12.
+function planPrice(screens) {
+  if (screens === 0) {
+    return 0;
+  } else if (screens === 1) {
+    return 8;
+  } else if (screens === 2) {
+    return 12;
+  } else {
+    return 16;
+  }
+}
+
+tryIt(planPrice, [0], 0);
+tryIt(planPrice, [1], 8);
+tryIt(planPrice, [2], 12);
+tryIt(planPrice, [5], 16);
+--- learned
+A table of prices turned into `if / else if / else`. The final `else` covers every value the other cases don't, however big.
+--- summary
+Practice: a price table as a chain of cases.
+--- mistakes
+- `else if (screens === 3)` for the last tier, so 4 screens gives `undefined`.
+- Prices in quotes (`"8"`), which are text, not numbers.
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Look for a missing bracket near the line it names.`);
+const f = t.get("planPrice");
+t.expect(typeof f === "function", "I can't find a function called `planPrice`. Press **Start again** to get the starting code back.");
+for (const [s, want] of [[0, 0], [1, 8], [2, 12], [3, 16], [4, 16], [10, 16]]) {
+  const c = `\`planPrice(${s})\``;
+  let got;
+  try { got = f(s); } catch (e) { t.fail(`${c} crashed: ${e.message}`); }
+  t.expect(got !== undefined, s > 3 ? `${c} gives back \`undefined\`. "3 or more" needs a final \`else\`, not a test for exactly 3.` : `${c} gives back \`undefined\`. Every block needs a \`return\`.`);
+  t.expect(typeof got === "number", `${c} gives ${JSON.stringify(got)}, which is text. Return the price as a number, without quotes.`);
+  t.expect(got === want, `${c} gives ${got}. It should give ${want}.`);
+}
+
+
+=== step p-age-group
+title: Age groups
+minutes: 6
+slot: gym
+template: gym
+practice: yes
+refs:
+--- explain
+Sorting a number into groups is a chain of `<` tests, from the smallest group up. Each test only needs the **upper** edge, because the smaller values were already caught:
+
+```js
+function sizeLabel(cm) {
+  if (cm < 150) {
+    return "Small";
+  } else if (cm < 180) {
+    return "Medium";
+  } else {
+    return "Large";
+  }
+}
+```
+
+When `cm < 180` is tested, you already know it's at least 150.
+--- task
+ShowShelf sorts viewers into groups. Write `ageGroup(age)`:
+
+- under 7: **"Little ones"**
+- 7 to 12: **"Kids"**
+- 13 to 17: **"Teens"**
+- 18 and older: **"Adults"**
+--- hint
+`if (age < 7)`, `else if (age < 13)`, `else if (age < 18)`, `else`.
+--- hint
+```js
+function ageGroup(age) {
+  if (age < 7) {
+    return "Little ones";
+  } else if (age < 13) {
+    return "Kids";
+  } else if (age < 18) {
+    return "Teens";
+  } else {
+    return "Adults";
+  }
+}
+```
+--- starter
+// Practice 27: sort a viewer's age into a group.
+// ageGroup(13) should give "Teens".
+function ageGroup(age) {
+  // your code here
+}
+
+tryIt(ageGroup, [4], "Little ones");
+tryIt(ageGroup, [7], "Kids");
+tryIt(ageGroup, [13], "Teens");
+tryIt(ageGroup, [18], "Adults");
+--- solution
+// Practice 27: sort a viewer's age into a group.
+// ageGroup(13) should give "Teens".
+function ageGroup(age) {
+  if (age < 7) {
+    return "Little ones";
+  } else if (age < 13) {
+    return "Kids";
+  } else if (age < 18) {
+    return "Teens";
+  } else {
+    return "Adults";
+  }
+}
+
+tryIt(ageGroup, [4], "Little ones");
+tryIt(ageGroup, [7], "Kids");
+tryIt(ageGroup, [13], "Teens");
+tryIt(ageGroup, [18], "Adults");
+--- learned
+Smallest group first, then only the upper edge in each test. The first age of each group (7, 13, 18) is the value to try.
+--- summary
+Practice: sort a number into groups, smallest first.
+--- mistakes
+- `<= 13` for Kids, so a 13-year-old is a Kid.
+- Testing `age < 18` first, so everyone under 18 is a Teen.
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Look for a missing bracket near the line it names.`);
+const f = t.get("ageGroup");
+t.expect(typeof f === "function", "I can't find a function called `ageGroup`. Press **Start again** to get the starting code back.");
+const cases = [[0, "Little ones"], [4, "Little ones"], [6, "Little ones"], [7, "Kids"], [12, "Kids"], [13, "Teens"], [17, "Teens"], [18, "Adults"], [70, "Adults"]];
+for (const [a, want] of cases) {
+  const c = `\`ageGroup(${a})\``;
+  let got;
+  try { got = f(a); } catch (e) { t.fail(`${c} crashed: ${e.message}`); }
+  t.expect(got !== undefined, `${c} gives back \`undefined\`. Every block needs a \`return\`.`);
+  if (String(got).trim().toLowerCase() !== want.toLowerCase()) {
+    let tip = "";
+    if ([7, 13, 18].includes(a)) tip = ` ${a} is the first age of a new group: use \`< ${a}\` for the group before it.`;
+    else if (a < 13 && /teen/i.test(String(got))) tip = " Check the order: test the smallest group first.";
+    t.fail(`${c} gives ${JSON.stringify(got)}. It should give "${want}".${tip}`);
+  }
+}
+
+
+=== step p-mood
+title: A show for your mood
+minutes: 8
+slot: gym
+template: gym
+practice: yes
+refs:
+--- explain
+`===` compares strings exactly, capital letters included: `"Happy" === "happy"` is `false`. When people type, you don't know which capitals they'll use. So turn the text into small letters first, then compare:
+
+```js
+function drinkFor(weather) {
+  const w = weather.toLowerCase();
+  if (w === "cold") {
+    return "Hot chocolate";
+  } else if (w === "hot") {
+    return "Lemonade";
+  } else {
+    return "Water";
+  }
+}
+
+console.log(drinkFor("COLD"));   // Hot chocolate
+```
+--- task
+Write `recommend(mood)`, which picks a show from our table by genre:
+
+- **"happy"**: a comedy, **"Friends"**
+- **"curious"**: a mystery, **"Dark"**
+- **"brave"**: an adventure, **"Avatar: The Last Airbender"**
+- anything else: **"The Crown"**
+
+It must work whatever capitals are used: `recommend("Happy")` and `recommend("HAPPY")` both give "Friends".
+--- hint
+Start with `const m = mood.toLowerCase();`, then compare `m` with each mood in small letters.
+--- hint
+```js
+function recommend(mood) {
+  const m = mood.toLowerCase();
+  if (m === "happy") {
+    return "Friends";
+  } else if (m === "curious") {
+    return "Dark";
+  } else if (m === "brave") {
+    return "Avatar: The Last Airbender";
+  } else {
+    return "The Crown";
+  }
+}
+```
+--- starter
+// Practice 28: a show for each mood, whatever capitals are typed.
+// recommend("Happy") should give "Friends".
+function recommend(mood) {
+  // your code here
+}
+
+tryIt(recommend, ["happy"], "Friends");
+tryIt(recommend, ["Curious"], "Dark");
+tryIt(recommend, ["BRAVE"], "Avatar: The Last Airbender");
+tryIt(recommend, ["sleepy"], "The Crown");
+--- solution
+// Practice 28: a show for each mood, whatever capitals are typed.
+// recommend("Happy") should give "Friends".
+function recommend(mood) {
+  const m = mood.toLowerCase();
+  if (m === "happy") {
+    return "Friends";
+  } else if (m === "curious") {
+    return "Dark";
+  } else if (m === "brave") {
+    return "Avatar: The Last Airbender";
+  } else {
+    return "The Crown";
+  }
+}
+
+tryIt(recommend, ["happy"], "Friends");
+tryIt(recommend, ["Curious"], "Dark");
+tryIt(recommend, ["BRAVE"], "Avatar: The Last Airbender");
+tryIt(recommend, ["sleepy"], "The Crown");
+--- learned
+`.toLowerCase()` before comparing makes your code forgive capital letters. Tomorrow's search box uses the same trick.
+--- summary
+Practice: compare text with `===` after `.toLowerCase()`.
+--- mistakes
+- Comparing `mood === "happy"` without `.toLowerCase()`, so "Happy" gives The Crown.
+- Comparing with `"Happy"` (capital H) after making the text small.
+- `mood.toLowerCase` without brackets.
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Look for a missing bracket near the line it names.`);
+const f = t.get("recommend");
+t.expect(typeof f === "function", "I can't find a function called `recommend`. Press **Start again** to get the starting code back.");
+const cases = [["happy", "Friends"], ["curious", "Dark"], ["brave", "Avatar: The Last Airbender"], ["sleepy", "The Crown"], ["", "The Crown"], ["Happy", "Friends"], ["HAPPY", "Friends"], ["Curious", "Dark"], ["BRAVE", "Avatar: The Last Airbender"]];
+for (const [m, want] of cases) {
+  const c = `\`recommend(${JSON.stringify(m)})\``;
+  let got;
+  try { got = f(m); } catch (e) { t.fail(`${c} crashed: ${e.message}`); }
+  t.expect(got !== undefined, `${c} gives back \`undefined\`. Every block needs a \`return\`.`);
+  if (String(got).trim().toLowerCase() !== want.toLowerCase()) {
+    let tip = "";
+    if (/toLowerCase(?!\s*\()/.test(t.clean)) tip = " Add the round brackets: `mood.toLowerCase()`. Without them you get the method itself, not the small-letter text.";
+    else if (m !== m.toLowerCase() && m) tip = " Turn the mood into small letters before you compare: `const m = mood.toLowerCase();`, then compare `m`.";
+    else if (want === "The Crown") tip = " Any other mood goes to the final `else`.";
+    t.fail(`${c} gives ${JSON.stringify(got)}. It should give "${want}".${tip}`);
+  }
+}
+
+
+=== step p-season-of
+title: Which season is episode 7 in?
+minutes: 10
+slot: gym
+template: gym
+practice: yes
+refs:
+--- explain
+Cinema seats are numbered 1, 2, 3 ... with 10 seats per row. Which row is seat 23 in? Count from 0 for a moment:
+
+```js
+function rowOf(seat) {
+  return Math.floor((seat - 1) / 10) + 1;
+}
+
+console.log(rowOf(10));   // 1
+console.log(rowOf(11));   // 2
+console.log(rowOf(23));   // 3
+```
+
+Why `- 1` and `+ 1`? Without them, seat 10 would land in row 2, because 10 / 10 is exactly 1. Subtracting 1 first makes seats 1 to 10 give 0 to 9, all in the same row; the `+ 1` turns row 0 back into row 1.
+--- task
+Write `seasonOf(episode, perSeason)`. Episodes are numbered from 1 across the whole show, and every season has `perSeason` episodes. Return the season the episode is in.
+
+Fleabag has 6 episodes per season: episode 6 is in season **1**, episode 7 in season **2**.
+--- hint
+Use the cinema formula with `episode` for `seat` and `perSeason` for 10.
+--- hint
+```js
+function seasonOf(episode, perSeason) {
+  return Math.floor((episode - 1) / perSeason) + 1;
+}
+```
+--- starter
+// Practice 29: which season is an episode in?
+// Fleabag, 6 per season: seasonOf(7, 6) should give 2.
+function seasonOf(episode, perSeason) {
+  // your code here
+}
+
+tryIt(seasonOf, [1, 6], 1);
+tryIt(seasonOf, [6, 6], 1);
+tryIt(seasonOf, [7, 6], 2);
+tryIt(seasonOf, [12, 6], 2);
+--- solution
+// Practice 29: which season is an episode in?
+// Fleabag, 6 per season: seasonOf(7, 6) should give 2.
+function seasonOf(episode, perSeason) {
+  return Math.floor((episode - 1) / perSeason) + 1;
+}
+
+tryIt(seasonOf, [1, 6], 1);
+tryIt(seasonOf, [6, 6], 1);
+tryIt(seasonOf, [7, 6], 2);
+tryIt(seasonOf, [12, 6], 2);
+--- learned
+"Minus 1, divide, round down, plus 1" puts numbers that start at 1 into groups. The last episode of each season is the test that catches mistakes.
+--- summary
+Practice: put numbered items into groups with `Math.floor`.
+--- mistakes
+- `Math.floor(episode / perSeason) + 1` without `- 1`: episode 6 lands in season 2.
+- Brackets missing around `episode - 1`, so only the 1 is divided.
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it and fix that line.`);
+const f = t.get("seasonOf");
+t.expect(typeof f === "function", "I can't find a function called `seasonOf`. Press **Start again** to get the starting code back.");
+for (const [e, p, want] of [[1, 6, 1], [5, 6, 1], [7, 6, 2], [12, 6, 2], [6, 6, 1], [3, 5, 1], [25, 24, 2], [24, 24, 1], [49, 24, 3]]) {
+  const c = `\`seasonOf(${e}, ${p})\``;
+  let got;
+  try { got = f(e, p); } catch (err) { t.fail(`${c} crashed: ${err.message}`); }
+  t.expect(got !== undefined, `${c} gives back \`undefined\`. Did you forget \`return\`?`);
+  t.expect(typeof got === "number", `${c} gives ${JSON.stringify(got)}. Return a number.`);
+  t.expect(Number.isInteger(got), `${c} gives ${got}. Seasons are whole numbers: use \`Math.floor( )\`.`);
+  let tip = "";
+  if (e % p === 0 && got === want + 1) tip = ` Episode ${e} is the last one of season ${want}. Subtract 1 before dividing: \`Math.floor((episode - 1) / perSeason) + 1\`.`;
+  else if (got === want - 1) tip = " Add 1 at the end, so the first season is 1, not 0.";
+  t.expect(got === want, `${c} gives ${got}. It should give ${want}.${tip}`);
+}
+
+
+=== step p-episode-in-season
+title: Episode number within its season
+minutes: 10
+slot: gym
+template: gym
+practice: yes
+refs:
+--- explain
+The partner of the last exercise: not *which row*, but *which seat in the row*. That's the remainder, with the same `- 1` and `+ 1` trick:
+
+```js
+function seatInRow(seat) {
+  return (seat - 1) % 10 + 1;
+}
+
+console.log(seatInRow(3));    // 3
+console.log(seatInRow(10));   // 10
+console.log(seatInRow(23));   // 3
+```
+
+Without the trick, `10 % 10` is 0, and there's no seat 0. With it, seat 10 gives `9 % 10` (9), plus 1: seat 10.
+--- task
+Write `episodeInSeason(episode, perSeason)`. It returns the episode's number **within its season**.
+
+Fleabag has 6 episodes per season. Episode 8 of the whole show is episode **2** of season 2, and episode 6 is episode **6** of season 1.
+--- hint
+Use the seat formula: `(episode - 1) % perSeason`, then `+ 1`.
+--- hint
+```js
+function episodeInSeason(episode, perSeason) {
+  return (episode - 1) % perSeason + 1;
+}
+```
+--- starter
+// Practice 30: the episode's number within its own season.
+// Fleabag, 6 per season: episodeInSeason(8, 6) should give 2.
+function episodeInSeason(episode, perSeason) {
+  // your code here
+}
+
+tryIt(episodeInSeason, [8, 6], 2);
+tryIt(episodeInSeason, [6, 6], 6);
+tryIt(episodeInSeason, [7, 6], 1);
+tryIt(episodeInSeason, [1, 6], 1);
+--- solution
+// Practice 30: the episode's number within its own season.
+// Fleabag, 6 per season: episodeInSeason(8, 6) should give 2.
+function episodeInSeason(episode, perSeason) {
+  return (episode - 1) % perSeason + 1;
+}
+
+tryIt(episodeInSeason, [8, 6], 2);
+tryIt(episodeInSeason, [6, 6], 6);
+tryIt(episodeInSeason, [7, 6], 1);
+tryIt(episodeInSeason, [1, 6], 1);
+--- learned
+`Math.floor` gives the group, `%` gives the place inside it. Together they turn "episode 8" into "season 2, episode 2", which is what you'll build next.
+--- summary
+Practice: the position inside a group with `%`.
+--- mistakes
+- `episode % perSeason`: the last episode of a season gives 0.
+- `episode - 1 % perSeason + 1` without brackets: `%` happens first and the answer is the episode itself.
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Read the help under it and fix that line.`);
+const f = t.get("episodeInSeason");
+t.expect(typeof f === "function", "I can't find a function called `episodeInSeason`. Press **Start again** to get the starting code back.");
+for (const [e, p, want] of [[8, 6, 2], [7, 6, 1], [1, 6, 1], [3, 5, 3], [25, 24, 1], [6, 6, 6], [12, 6, 6], [48, 24, 24]]) {
+  const c = `\`episodeInSeason(${e}, ${p})\``;
+  let got;
+  try { got = f(e, p); } catch (err) { t.fail(`${c} crashed: ${err.message}`); }
+  t.expect(got !== undefined, `${c} gives back \`undefined\`. Did you forget \`return\`?`);
+  t.expect(typeof got === "number", `${c} gives ${JSON.stringify(got)}. Return a number.`);
+  let tip = "";
+  if (got === 0) tip = ` Episode ${e} is the last of its season, and \`${e} % ${p}\` is 0. Use \`(episode - 1) % perSeason + 1\`.`;
+  else if (got === e && e > p) tip = " Put brackets around `episode - 1`, so the subtraction happens before `%`.";
+  t.expect(got === want, `${c} gives ${got}. It should give ${want}.${tip}`);
+}
+
+
+=== step p-full-label
+title: Episode 8 as a full label (harder)
+minutes: 10
+slot: gym
+template: gym
+practice: yes
+refs:
+--- explain
+Your last two functions are the helpers for this one. They're already written above your function, so you can call them:
+
+```js
+seasonOf(8, 6)          // 2
+episodeInSeason(8, 6)   // 2
+```
+
+A label from two helpers also needs a guard: a number that's too small or too big isn't a real episode. Two separate checks, each with its own `return`, work fine:
+
+```js
+if (seat < 1) {
+  return "No such seat";
+} else if (seat > 200) {
+  return "No such seat";
+}
+```
+--- task
+Write `fullLabel(episode, perSeason, total)`. It returns:
+
+1. **"No such episode"** when `episode` is less than 1, or more than `total`
+2. otherwise a label like **"Season 2, episode 2"**, made with `seasonOf` and `episodeInSeason`
+
+Fleabag has 12 episodes, 6 per season: `fullLabel(8, 6, 12)` gives **"Season 2, episode 2"**.
+--- hint
+Two checks first (`episode < 1`, then `episode > total`), each returning "No such episode". In the `else`, return a template literal with `${seasonOf(episode, perSeason)}` and `${episodeInSeason(episode, perSeason)}`.
+--- hint
+```js
+function fullLabel(episode, perSeason, total) {
+  if (episode < 1) {
+    return "No such episode";
+  } else if (episode > total) {
+    return "No such episode";
+  } else {
+    return `Season ${seasonOf(episode, perSeason)}, episode ${episodeInSeason(episode, perSeason)}`;
+  }
+}
+```
+--- starter
+// Practice 31 (harder): "Season 2, episode 2" from an episode number.
+
+// Helpers, already written (don't change them):
+function seasonOf(episode, perSeason) {
+  return Math.floor((episode - 1) / perSeason) + 1;
+}
+
+function episodeInSeason(episode, perSeason) {
+  return (episode - 1) % perSeason + 1;
+}
+
+// Your function:
+function fullLabel(episode, perSeason, total) {
+  // your code here
+}
+
+tryIt(fullLabel, [8, 6, 12], "Season 2, episode 2");
+tryIt(fullLabel, [6, 6, 12], "Season 1, episode 6");
+tryIt(fullLabel, [13, 6, 12], "No such episode");
+tryIt(fullLabel, [0, 6, 12], "No such episode");
+--- solution
+// Practice 31 (harder): "Season 2, episode 2" from an episode number.
+
+// Helpers, already written (don't change them):
+function seasonOf(episode, perSeason) {
+  return Math.floor((episode - 1) / perSeason) + 1;
+}
+
+function episodeInSeason(episode, perSeason) {
+  return (episode - 1) % perSeason + 1;
+}
+
+// Your function:
+function fullLabel(episode, perSeason, total) {
+  if (episode < 1) {
+    return "No such episode";
+  } else if (episode > total) {
+    return "No such episode";
+  } else {
+    return `Season ${seasonOf(episode, perSeason)}, episode ${episodeInSeason(episode, perSeason)}`;
+  }
+}
+
+tryIt(fullLabel, [8, 6, 12], "Season 2, episode 2");
+tryIt(fullLabel, [6, 6, 12], "Season 1, episode 6");
+tryIt(fullLabel, [13, 6, 12], "No such episode");
+tryIt(fullLabel, [0, 6, 12], "No such episode");
+--- learned
+Guards first, then the real work done by helpers. A function call can go straight inside `${ }`.
+--- summary
+Practice: guard against bad input, then build a label from two helpers.
+--- mistakes
+- Only one guard, so episode 0 becomes "Season 0, episode 0" or episode 13 becomes "Season 3, episode 1".
+- `episode >= total`, so the last episode is rejected.
+- Writing the helper names without the arguments: `${seasonOf}`.
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Look for a missing bracket near the line it names.`);
+const f = t.get("fullLabel");
+t.expect(typeof f === "function", "I can't find a function called `fullLabel`. Press **Start again** to get the starting code back.");
+const so = t.get("seasonOf"), es = t.get("episodeInSeason");
+t.expect(typeof so === "function" && so(7, 6) === 2 && typeof es === "function" && es(8, 6) === 2, "The helpers `seasonOf` and `episodeInSeason` are missing or changed. Press **Start again** to get them back.");
+const norm = (s) => String(s).replace(/\s+/g, " ").trim().replace(/[.!]+$/, "").toLowerCase();
+const cases = [[8, 6, 12, "Season 2, episode 2"], [1, 6, 12, "Season 1, episode 1"], [6, 6, 12, "Season 1, episode 6"], [12, 6, 12, "Season 2, episode 6"], [3, 5, 5, "Season 1, episode 3"], [13, 6, 12, "No such episode"], [0, 6, 12, "No such episode"], [-2, 6, 12, "No such episode"], [6, 5, 5, "No such episode"]];
+for (const [e, p, n, want] of cases) {
+  const c = `\`fullLabel(${e}, ${p}, ${n})\``;
+  let got;
+  try { got = f(e, p, n); } catch (err) { t.fail(`${c} crashed: ${err.message}`); }
+  t.expect(got !== undefined, `${c} gives back \`undefined\`. Every block needs a \`return\`.`);
+  const g = String(got);
+  t.expect(!/\$\{/.test(g), `${c} gives "${g}". Use backticks around the text, not quotes, so \`\${ }\` is filled in.`);
+  t.expect(!/function|=>/.test(g), `${c} puts a helper's code into the text. Call the helper with its arguments: \`\${seasonOf(episode, perSeason)}\`, not \`\${seasonOf}\`.`);
+  if (norm(got) !== norm(want)) {
+    let tip = "";
+    if (e < 1) tip = " Episode numbers start at 1: check `episode < 1` first.";
+    else if (e > n) tip = ` The show only has ${n} episodes: check \`episode > total\` too.`;
+    else if (e === n) tip = " That's the last episode, which exists: use `episode > total`, not `>=`.";
+    t.fail(`${c} gives "${g}". It should give "${want}".${tip}`);
+  }
+}
+t.expect(/seasonOf\s*\(/.test(String(f)) && /episodeInSeason\s*\(/.test(String(f)), "It works! Now use the two helpers inside `fullLabel`, instead of doing the maths again.");
+
+
+=== step p-better-pick
+title: Which of two shows? (harder)
+minutes: 10
+slot: gym
+template: gym
+practice: yes
+refs:
+--- explain
+Real decisions often have a **tie-breaker**: compare the most important thing first, and only when it's equal, look at the second thing.
+
+```js
+function winner(goalsA, goalsB, cardsA, cardsB) {
+  if (goalsA > goalsB) {
+    return "Team A";
+  } else if (goalsB > goalsA) {
+    return "Team B";
+  } else if (cardsA < cardsB) {
+    return "Team A";   // same goals: fewer cards wins
+  } else if (cardsB < cardsA) {
+    return "Team B";
+  } else {
+    return "A draw";
+  }
+}
+```
+
+By the third test, you already know the goals are equal.
+--- task
+Write `betterPick(ratingA, runtimeA, ratingB, runtimeB)`. It returns **"First"** or **"Second"**:
+
+1. The show with the **higher rating** wins.
+2. With the same rating, the **shorter runtime** wins.
+3. When both are the same, return **"Either one"**.
+
+The Wire (9.0, 60 min) against Avatar: The Last Airbender (9.0, 30 min): same rating, so the shorter Avatar wins: **"Second"**.
+--- hint
+Five blocks, in the order of the football example: rating A higher, rating B higher, runtime A shorter, runtime B shorter, else.
+--- hint
+```js
+function betterPick(ratingA, runtimeA, ratingB, runtimeB) {
+  if (ratingA > ratingB) {
+    return "First";
+  } else if (ratingB > ratingA) {
+    return "Second";
+  } else if (runtimeA < runtimeB) {
+    return "First";
+  } else if (runtimeB < runtimeA) {
+    return "Second";
+  } else {
+    return "Either one";
+  }
+}
+```
+--- starter
+// Practice 32 (harder): higher rating wins; same rating, shorter wins.
+// betterPick(9.0, 60, 9.0, 30) should give "Second".
+function betterPick(ratingA, runtimeA, ratingB, runtimeB) {
+  // your code here
+}
+
+tryIt(betterPick, [9.2, 60, 8.8, 30], "First");
+tryIt(betterPick, [9.0, 60, 9.0, 30], "Second");
+tryIt(betterPick, [8.0, 30, 8.0, 60], "First");
+tryIt(betterPick, [9.1, 60, 9.1, 60], "Either one");
+--- solution
+// Practice 32 (harder): higher rating wins; same rating, shorter wins.
+// betterPick(9.0, 60, 9.0, 30) should give "Second".
+function betterPick(ratingA, runtimeA, ratingB, runtimeB) {
+  if (ratingA > ratingB) {
+    return "First";
+  } else if (ratingB > ratingA) {
+    return "Second";
+  } else if (runtimeA < runtimeB) {
+    return "First";
+  } else if (runtimeB < runtimeA) {
+    return "Second";
+  } else {
+    return "Either one";
+  }
+}
+
+tryIt(betterPick, [9.2, 60, 8.8, 30], "First");
+tryIt(betterPick, [9.0, 60, 9.0, 30], "Second");
+tryIt(betterPick, [8.0, 30, 8.0, 60], "First");
+tryIt(betterPick, [9.1, 60, 9.1, 60], "Either one");
+--- learned
+A tie-breaker is one more `else if` after the main comparison. Chernobyl and Band of Brothers are a perfect tie: 9.1 and 60 minutes each.
+--- summary
+Practice: a main comparison with a tie-breaker.
+--- mistakes
+- Comparing runtimes before ratings, so a short, weaker show wins.
+- `runtimeA > runtimeB` for "First": the longer show wins the tie.
+- No final `else`, so a perfect tie gives `undefined`.
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Look for a missing bracket near the line it names.`);
+const f = t.get("betterPick");
+t.expect(typeof f === "function", "I can't find a function called `betterPick`. Press **Start again** to get the starting code back.");
+const cases = [[9.2, 60, 8.8, 30, "First", "a higher rating"], [8.0, 30, 9.0, 30, "Second", "a higher rating"], [8.8, 30, 9.2, 60, "Second", "a higher rating, even though it's longer"], [9.0, 60, 9.0, 30, "Second", "the same rating and a shorter runtime"], [8.0, 30, 8.0, 60, "First", "the same rating and a shorter runtime"], [9.1, 60, 9.1, 60, "Either one", "both are exactly the same"]];
+for (const [ra, ta, rb, tb, want, why] of cases) {
+  const c = `\`betterPick(${ra}, ${ta}, ${rb}, ${tb})\``;
+  let got;
+  try { got = f(ra, ta, rb, tb); } catch (e) { t.fail(`${c} crashed: ${e.message}`); }
+  t.expect(got !== undefined, want === "Either one" ? `${c} gives back \`undefined\`. When both are the same, a final \`else\` should return "Either one".` : `${c} gives back \`undefined\`. Every block needs a \`return\`.`);
+  if (String(got).trim().toLowerCase() !== want.toLowerCase()) {
+    const tip = want === "Either one" ? "" : ` The ${want.toLowerCase()} show has ${why}.${ra !== rb ? " Compare the ratings first." : " With equal ratings, the smaller runtime wins: use `<`."}`;
+    t.fail(`${c} gives ${JSON.stringify(got)}. It should give "${want}".${tip}`);
+  }
+}
+
+
+=== step p-summary
+title: A summary from three helpers (harder)
+minutes: 12
+slot: gym
+template: gym
+practice: yes
+refs:
+--- explain
+Three helpers are written for you this time: `titleWithYear` (Practice 21, short version), `plural` (step 10) and `hoursOf`, which rounds a show's total time to whole hours.
+
+```js
+titleWithYear("Dark", 2017)   // "Dark (2017)"
+plural(26, "episode")         // "26 episodes"
+plural(1, "hour")             // "1 hour"
+hoursOf(26, 60)               // 26
+```
+
+A helper's answer can be the argument of another helper. Read it from the inside out:
+
+```js
+plural(hoursOf(26, 60), "hour")   // hoursOf gives 26, plural makes "26 hours"
+```
+--- task
+Write `showSummary(name, year, episodes, runtime)`, using all three helpers. It returns a line like this:
+
+**Chernobyl (2019): 5 episodes, 5 hours**
+
+and for a one-episode, one-hour special: **Pilot (2020): 1 episode, 1 hour**.
+--- hint
+Return one template literal with three `${ }` parts: `titleWithYear(name, year)`, `plural(episodes, "episode")`, and `plural(hoursOf(episodes, runtime), "hour")`.
+--- hint
+```js
+function showSummary(name, year, episodes, runtime) {
+  return `${titleWithYear(name, year)}: ${plural(episodes, "episode")}, ${plural(hoursOf(episodes, runtime), "hour")}`;
+}
+```
+--- starter
+// Practice 33 (harder): one line about a show, from three helpers.
+// showSummary("Chernobyl", 2019, 5, 60) should give
+// "Chernobyl (2019): 5 episodes, 5 hours"
+
+// Helpers, already written (don't change them):
+function titleWithYear(name, year) {
+  return `${name} (${year})`;
+}
+
+function plural(count, word = "episode") {
+  if (count === 1) {
+    return `${count} ${word}`;
+  } else {
+    return `${count} ${word}s`;
+  }
+}
+
+const hoursOf = (episodes, runtime) => Math.round(episodes * runtime / 60);
+
+// Your function:
+function showSummary(name, year, episodes, runtime) {
+  // your code here
+}
+
+tryIt(showSummary, ["Chernobyl", 2019, 5, 60], "Chernobyl (2019): 5 episodes, 5 hours");
+tryIt(showSummary, ["Friends", 1994, 236, 30], "Friends (1994): 236 episodes, 118 hours");
+tryIt(showSummary, ["Pilot", 2020, 1, 60], "Pilot (2020): 1 episode, 1 hour");
+--- solution
+// Practice 33 (harder): one line about a show, from three helpers.
+// showSummary("Chernobyl", 2019, 5, 60) should give
+// "Chernobyl (2019): 5 episodes, 5 hours"
+
+// Helpers, already written (don't change them):
+function titleWithYear(name, year) {
+  return `${name} (${year})`;
+}
+
+function plural(count, word = "episode") {
+  if (count === 1) {
+    return `${count} ${word}`;
+  } else {
+    return `${count} ${word}s`;
+  }
+}
+
+const hoursOf = (episodes, runtime) => Math.round(episodes * runtime / 60);
+
+// Your function:
+function showSummary(name, year, episodes, runtime) {
+  return `${titleWithYear(name, year)}: ${plural(episodes, "episode")}, ${plural(hoursOf(episodes, runtime), "hour")}`;
+}
+
+tryIt(showSummary, ["Chernobyl", 2019, 5, 60], "Chernobyl (2019): 5 episodes, 5 hours");
+tryIt(showSummary, ["Friends", 1994, 236, 30], "Friends (1994): 236 episodes, 118 hours");
+tryIt(showSummary, ["Pilot", 2020, 1, 60], "Pilot (2020): 1 episode, 1 hour");
+--- learned
+One line, three helpers, and one call inside another. Each helper was tested on its own, so the combination works the first time far more often.
+--- summary
+Practice: combine three helpers, one call inside another.
+--- mistakes
+- `plural(episodes * runtime / 60, "hour")`: the maths is repeated and not rounded.
+- Forgetting the second argument: `plural(hours)` says "118 episodes".
+- `${plural(hoursOf, "hour")}`: the helper's name without calling it.
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Look for a missing bracket near the line it names.`);
+const f = t.get("showSummary");
+t.expect(typeof f === "function", "I can't find a function called `showSummary`. Press **Start again** to get the starting code back.");
+const tw = t.get("titleWithYear"), pl = t.get("plural"), ho = t.get("hoursOf");
+t.expect(typeof tw === "function" && tw("Dark", 2017) === "Dark (2017)" && typeof pl === "function" && pl(1, "hour") === "1 hour" && pl(3, "hour") === "3 hours" && typeof ho === "function" && ho(201, 30) === 101, "One of the helpers (`titleWithYear`, `plural`, `hoursOf`) is missing or changed. Press **Start again** to get them back.");
+const norm = (s) => String(s).replace(/\s+/g, " ").trim().replace(/[.!]+$/, "").toLowerCase();
+const cases = [["Chernobyl", 2019, 5, 60, "Chernobyl (2019): 5 episodes, 5 hours"], ["Friends", 1994, 236, 30, "Friends (1994): 236 episodes, 118 hours"], ["The Office", 2005, 201, 30, "The Office (2005): 201 episodes, 101 hours"], ["Pilot", 2020, 1, 60, "Pilot (2020): 1 episode, 1 hour"], ["Short", 2021, 2, 30, "Short (2021): 2 episodes, 1 hour"]];
+for (const [n, y, e, r, want] of cases) {
+  const c = `\`showSummary("${n}", ${y}, ${e}, ${r})\``;
+  let got;
+  try { got = f(n, y, e, r); } catch (err) { t.fail(`${c} crashed: ${err.message}`); }
+  t.expect(got !== undefined, `${c} gives back \`undefined\`. Did you forget \`return\`?`);
+  const g = String(got);
+  t.expect(!/\$\{/.test(g), `${c} gives "${g}". Use backticks around the text, not quotes, so \`\${ }\` is filled in.`);
+  t.expect(!/function|=>/.test(g), `${c} puts a helper's code into the text. Call each helper with its arguments, like \`hoursOf(episodes, runtime)\`, not \`hoursOf\` alone.`);
+  if (norm(got) !== norm(want)) {
+    let tip = "";
+    if (/\d\.\d/.test(g)) tip = " The hours aren't rounded: use `hoursOf(episodes, runtime)`.";
+    else if (/(hours|hour)\b.*episode|\d+ episodes?$/.test(norm(got)) || (norm(got).match(/episode/g) || []).length > 1) tip = " Give `plural` the word as its second argument: `plural(..., \"hour\")`.";
+    t.fail(`${c} gives "${g}". It should give "${want}".${tip}`);
+  }
+}
+const src = String(f);
+t.expect(/titleWithYear\s*\(/.test(src) && /plural\s*\(/.test(src) && /hoursOf\s*\(/.test(src), "It works! Now use all three helpers inside `showSummary`: `titleWithYear`, `plural` and `hoursOf`.");
+
+
+=== step p-end-time
+title: When does it end? (harder)
+minutes: 12
+slot: gym
+template: gym
+practice: yes
+refs:
+--- explain
+Clock times are a remainder puzzle. Turn the start into **minutes since midnight**, add the runtime, then split it back into hours and minutes:
+
+```js
+const total = 21 * 60 + 30 + 45;        // 21:30 plus 45 minutes = 1335
+const hours = Math.floor(total / 60) % 24;   // 22
+const minutes = total % 60;                  // 15
+```
+
+Two details:
+
+- `% 24` makes the hours wrap past midnight: hour 24 becomes 0, hour 25 becomes 1.
+- Clocks write minutes with two digits: **22:05**, not 22:5. When `minutes` is less than 10, put a `"0"` in front of it.
+--- task
+Write `endTime(hour, minute, runtime)`. It gets the start time and the runtime in minutes, and returns the end time as text, like **"22:15"**. The hours have no extra 0 (**"0:30"** after midnight), but the minutes always have two digits.
+
+Start Friends at 19:00 and watch all 7080 minutes without a break: `endTime(19, 0, 7080)` gives **"17:00"**, some days later.
+--- hint
+Make `total`, `hours` and `minutes` as in the example (with the parameters). Then `if (minutes < 10)`, return `` `${hours}:0${minutes}` ``; else return `` `${hours}:${minutes}` ``.
+--- hint
+```js
+function endTime(hour, minute, runtime) {
+  const total = hour * 60 + minute + runtime;
+  const hours = Math.floor(total / 60) % 24;
+  const minutes = total % 60;
+  if (minutes < 10) {
+    return `${hours}:0${minutes}`;
+  } else {
+    return `${hours}:${minutes}`;
+  }
+}
+```
+--- starter
+// Practice 34 (harder): start at hour:minute, watch for runtime minutes.
+// endTime(21, 30, 45) should give "22:15".
+function endTime(hour, minute, runtime) {
+  // your code here
+}
+
+tryIt(endTime, [21, 30, 45], "22:15");
+tryIt(endTime, [20, 0, 60], "21:00");
+tryIt(endTime, [22, 55, 10], "23:05");
+tryIt(endTime, [23, 30, 60], "0:30");
+--- solution
+// Practice 34 (harder): start at hour:minute, watch for runtime minutes.
+// endTime(21, 30, 45) should give "22:15".
+function endTime(hour, minute, runtime) {
+  const total = hour * 60 + minute + runtime;
+  const hours = Math.floor(total / 60) % 24;
+  const minutes = total % 60;
+  if (minutes < 10) {
+    return `${hours}:0${minutes}`;
+  } else {
+    return `${hours}:${minutes}`;
+  }
+}
+
+tryIt(endTime, [21, 30, 45], "22:15");
+tryIt(endTime, [20, 0, 60], "21:00");
+tryIt(endTime, [22, 55, 10], "23:05");
+tryIt(endTime, [23, 30, 60], "0:30");
+--- learned
+Minutes since midnight, then `Math.floor`, `%` and `% 24`. Every clock and calendar app does this behind the scenes.
+--- summary
+Practice: clock times with `Math.floor`, `%` and a leading zero.
+--- mistakes
+- No `% 24`, so a late show ends at "24:30".
+- Forgetting the leading zero: "23:5".
+- `hour + runtime / 60` instead of counting everything in minutes.
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Look for a missing bracket near the line it names.`);
+const f = t.get("endTime");
+t.expect(typeof f === "function", "I can't find a function called `endTime`. Press **Start again** to get the starting code back.");
+const cases = [[21, 30, 45, "22:15"], [20, 0, 60, "21:00"], [20, 0, 30, "20:30"], [22, 55, 10, "23:05"], [20, 0, 0, "20:00"], [23, 30, 60, "0:30"], [23, 0, 70, "0:10"], [19, 0, 7080, "17:00"]];
+for (const [h, m, r, want] of cases) {
+  const c = `\`endTime(${h}, ${m}, ${r})\``;
+  let got;
+  try { got = f(h, m, r); } catch (e) { t.fail(`${c} crashed: ${e.message}`); }
+  t.expect(got !== undefined, `${c} gives back \`undefined\`. Every block needs a \`return\`.`);
+  const g = String(got).trim();
+  t.expect(!/\$\{/.test(g), `${c} gives "${g}". Use backticks around the text, not quotes, so \`\${ }\` is filled in.`);
+  t.expect(!/\d\.\d/.test(g), `${c} gives "${g}": the hours have decimals. Round them down with \`Math.floor(total / 60)\`.`);
+  if (g !== want) {
+    const [gh, gm] = g.split(":");
+    let tip = "";
+    if (gm && gm.length === 1) tip = " The minutes need two digits: when `minutes` is less than 10, put a 0 in front.";
+    else if (Number(gh) >= 24) tip = " Hours wrap around after midnight: add `% 24` to the hours.";
+    else if (gh && gh.length === 2 && gh[0] === "0") tip = " Only the minutes get an extra 0, not the hours.";
+    t.fail(`${c} gives "${g}". It should give "${want}".${tip}`);
+  }
+}
+
+
+=== step p-episode-status
+title: Premiere, finale or regular? (harder)
+minutes: 12
+slot: gym
+template: gym
+practice: yes
+refs:
+--- explain
+This one has five cases, and three of them overlap. Before you write any code, take one episode and ask which labels fit it.
+
+Fleabag: 2 seasons of 6 episodes, numbered 1 to 12 across the show.
+
+- Episode 12 is the last of season 2, **and** the last of the whole show. The bigger news wins: "Series finale".
+- Episode 6 is the last of season 1: `6 % 6` is 0.
+- Episode 7 is the first of season 2: `7 % 6` is 1.
+
+Remember from Practice 23: `%` tells you where a number sits in a repeating pattern.
+--- task
+Write `episodeStatus(episode, perSeason, seasons)`. The show has `perSeason * seasons` episodes in total. Return:
+
+1. **"Not a real episode"** when `episode` is more than the total
+2. **"Series finale"** for the very last episode
+3. **"Season finale"** for the last episode of a season
+4. **"Season premiere"** for the first episode of a season
+5. **"Regular episode"** otherwise
+--- hint
+Make `const total = perSeason * seasons;` first. Then test in the order of the list: `episode > total`, `episode === total`, `episode % perSeason === 0`, `episode % perSeason === 1`, `else`.
+--- hint
+```js
+function episodeStatus(episode, perSeason, seasons) {
+  const total = perSeason * seasons;
+  if (episode > total) {
+    return "Not a real episode";
+  } else if (episode === total) {
+    return "Series finale";
+  } else if (episode % perSeason === 0) {
+    return "Season finale";
+  } else if (episode % perSeason === 1) {
+    return "Season premiere";
+  } else {
+    return "Regular episode";
+  }
+}
+```
+--- starter
+// Practice 35 (harder): what kind of episode is it?
+// Fleabag, 6 per season, 2 seasons: episodeStatus(6, 6, 2) should give "Season finale".
+function episodeStatus(episode, perSeason, seasons) {
+  // your code here
+}
+
+tryIt(episodeStatus, [1, 6, 2], "Season premiere");
+tryIt(episodeStatus, [3, 6, 2], "Regular episode");
+tryIt(episodeStatus, [6, 6, 2], "Season finale");
+tryIt(episodeStatus, [12, 6, 2], "Series finale");
+tryIt(episodeStatus, [13, 6, 2], "Not a real episode");
+--- solution
+// Practice 35 (harder): what kind of episode is it?
+// Fleabag, 6 per season, 2 seasons: episodeStatus(6, 6, 2) should give "Season finale".
+function episodeStatus(episode, perSeason, seasons) {
+  const total = perSeason * seasons;
+  if (episode > total) {
+    return "Not a real episode";
+  } else if (episode === total) {
+    return "Series finale";
+  } else if (episode % perSeason === 0) {
+    return "Season finale";
+  } else if (episode % perSeason === 1) {
+    return "Season premiere";
+  } else {
+    return "Regular episode";
+  }
+}
+
+tryIt(episodeStatus, [1, 6, 2], "Season premiere");
+tryIt(episodeStatus, [3, 6, 2], "Regular episode");
+tryIt(episodeStatus, [6, 6, 2], "Season finale");
+tryIt(episodeStatus, [12, 6, 2], "Series finale");
+tryIt(episodeStatus, [13, 6, 2], "Not a real episode");
+--- learned
+Five cases, with the strictest one tested before the ones it overlaps. Episode 12 is a season finale too, but "Series finale" comes first.
+--- summary
+Practice: five overlapping cases with `%`, strictest first.
+--- mistakes
+- "Season finale" tested before "Series finale", so the last episode is only a season finale.
+- `episode / perSeason === 0` instead of `%`.
+- Forgetting the total check, so episode 13 is called a premiere.
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Look for a missing bracket near the line it names.`);
+const f = t.get("episodeStatus");
+t.expect(typeof f === "function", "I can't find a function called `episodeStatus`. Press **Start again** to get the starting code back.");
+const norm = (s) => String(s).replace(/\s+/g, " ").trim().replace(/[.!]+$/, "").toLowerCase();
+const cases = [[1, 6, 2, "Season premiere"], [3, 6, 2, "Regular episode"], [6, 6, 2, "Season finale"], [7, 6, 2, "Season premiere"], [8, 6, 2, "Regular episode"], [12, 6, 2, "Series finale"], [13, 6, 2, "Not a real episode"], [1, 5, 1, "Season premiere"], [5, 5, 1, "Series finale"], [6, 5, 1, "Not a real episode"], [20, 10, 3, "Season finale"], [21, 10, 3, "Season premiere"]];
+for (const [e, p, s, want] of cases) {
+  const c = `\`episodeStatus(${e}, ${p}, ${s})\``;
+  let got;
+  try { got = f(e, p, s); } catch (err) { t.fail(`${c} crashed: ${err.message}`); }
+  t.expect(got !== undefined, `${c} gives back \`undefined\`. Every block needs a \`return\`.`);
+  if (norm(got) !== norm(want)) {
+    let tip = "";
+    if (want === "Series finale" && /season finale/i.test(String(got))) tip = " It's the last of its season, but also the last of the show: test \"Series finale\" (`episode === total`) before \"Season finale\".";
+    else if (want === "Not a real episode") tip = ` The show has ${p * s} episodes: test \`episode > total\` first.`;
+    else if (want === "Season finale") tip = ` \`${e} % ${p}\` is 0: that's the last episode of a season.`;
+    else if (want === "Season premiere") tip = ` \`${e} % ${p}\` is 1: that's the first episode of a season.`;
+    t.fail(`${c} gives ${JSON.stringify(got)}. It should give "${want}".${tip}`);
+  }
+}
+
+
+=== step p-compare-time
+title: How much longer? (harder)
+minutes: 12
+slot: gym
+template: gym
+practice: yes
+refs:
+--- explain
+The last exercise of the day: a sentence that changes shape depending on a comparison.
+
+When you subtract two numbers, the result can be negative. To say "5 less" instead of "-5 more", swap the subtraction in that case:
+
+```js
+function heightLine(nameA, cmA, nameB, cmB) {
+  if (cmA > cmB) {
+    return `${nameA} is ${cmA - cmB} cm taller than ${nameB}`;
+  } else if (cmA < cmB) {
+    return `${nameA} is ${cmB - cmA} cm shorter than ${nameB}`;
+  } else {
+    return `${nameA} and ${nameB} are the same height`;
+  }
+}
+```
+
+Each case subtracts in the order that gives a positive number.
+--- task
+Write `compareTime(nameA, hoursA, nameB, hoursB)`. It returns one of three sentences:
+
+- **"Friends takes 56 hours more than Breaking Bad"** (118 against 62)
+- **"Chernobyl takes 5 hours less than Band of Brothers"** (5 against 10)
+- **"The Wire and The Crown take the same time"** (60 and 60)
+
+The numbers in the sentences are always positive.
+--- hint
+Follow `heightLine`: `if (hoursA > hoursB)` with `${hoursA - hoursB}`, `else if (hoursA < hoursB)` with `${hoursB - hoursA}`, and an `else` for the same time.
+--- hint
+```js
+function compareTime(nameA, hoursA, nameB, hoursB) {
+  if (hoursA > hoursB) {
+    return `${nameA} takes ${hoursA - hoursB} hours more than ${nameB}`;
+  } else if (hoursA < hoursB) {
+    return `${nameA} takes ${hoursB - hoursA} hours less than ${nameB}`;
+  } else {
+    return `${nameA} and ${nameB} take the same time`;
+  }
+}
+```
+--- starter
+// Practice 36 (harder): compare how long two shows take, in a sentence.
+// compareTime("Friends", 118, "Breaking Bad", 62) should give
+// "Friends takes 56 hours more than Breaking Bad"
+function compareTime(nameA, hoursA, nameB, hoursB) {
+  // your code here
+}
+
+tryIt(compareTime, ["Friends", 118, "Breaking Bad", 62], "Friends takes 56 hours more than Breaking Bad");
+tryIt(compareTime, ["Chernobyl", 5, "Band of Brothers", 10], "Chernobyl takes 5 hours less than Band of Brothers");
+tryIt(compareTime, ["The Wire", 60, "The Crown", 60], "The Wire and The Crown take the same time");
+--- solution
+// Practice 36 (harder): compare how long two shows take, in a sentence.
+// compareTime("Friends", 118, "Breaking Bad", 62) should give
+// "Friends takes 56 hours more than Breaking Bad"
+function compareTime(nameA, hoursA, nameB, hoursB) {
+  if (hoursA > hoursB) {
+    return `${nameA} takes ${hoursA - hoursB} hours more than ${nameB}`;
+  } else if (hoursA < hoursB) {
+    return `${nameA} takes ${hoursB - hoursA} hours less than ${nameB}`;
+  } else {
+    return `${nameA} and ${nameB} take the same time`;
+  }
+}
+
+tryIt(compareTime, ["Friends", 118, "Breaking Bad", 62], "Friends takes 56 hours more than Breaking Bad");
+tryIt(compareTime, ["Chernobyl", 5, "Band of Brothers", 10], "Chernobyl takes 5 hours less than Band of Brothers");
+tryIt(compareTime, ["The Wire", 60, "The Crown", 60], "The Wire and The Crown take the same time");
+--- learned
+Three sentences, each built from the right subtraction. That's all 36 practice exercises: you can now write functions that calculate, decide and build text.
+--- summary
+Practice: a sentence that changes with a comparison, always with positive numbers.
+--- mistakes
+- `${hoursA - hoursB}` in every case, so the sentence says "-5 hours less".
+- The words "more" and "less" in the wrong blocks.
+- No case for equal times, so it says "0 hours less".
+--- check
+t.expect(!t.errors.length, `There's an error in the Console: "${t.errors[0]}". Look for a missing bracket near the line it names.`);
+const f = t.get("compareTime");
+t.expect(typeof f === "function", "I can't find a function called `compareTime`. Press **Start again** to get the starting code back.");
+const norm = (s) => String(s).replace(/\s+/g, " ").trim().replace(/[.!]+$/, "").toLowerCase();
+const cases = [["Friends", 118, "Breaking Bad", 62, "Friends takes 56 hours more than Breaking Bad"], ["Dark", 26, "Fleabag", 6, "Dark takes 20 hours more than Fleabag"], ["Chernobyl", 5, "Band of Brothers", 10, "Chernobyl takes 5 hours less than Band of Brothers"], ["Fleabag", 6, "The Office", 101, "Fleabag takes 95 hours less than The Office"], ["The Wire", 60, "The Crown", 60, "The Wire and The Crown take the same time"]];
+for (const [a, ha, b, hb, want] of cases) {
+  const c = `\`compareTime("${a}", ${ha}, "${b}", ${hb})\``;
+  let got;
+  try { got = f(a, ha, b, hb); } catch (e) { t.fail(`${c} crashed: ${e.message}`); }
+  t.expect(got !== undefined, ha === hb ? `${c} gives back \`undefined\`. Both take the same time: add a final \`else\` that returns the "same time" sentence.` : `${c} gives back \`undefined\`. Every block needs a \`return\`.`);
+  const g = String(got);
+  t.expect(!/\$\{/.test(g), `${c} gives "${g}". Use backticks around the text, not quotes, so \`\${ }\` is filled in.`);
+  if (norm(got) !== norm(want)) {
+    let tip = "";
+    if (/-\d/.test(g)) tip = " The number is negative. In this case subtract the other way round, so it's positive.";
+    else if (ha === hb) tip = " Both take the same time: add a final `else` with the \"same time\" sentence.";
+    else if (/more/.test(want) && /less/.test(g) || /less/.test(want) && /more/.test(g)) tip = " \"more\" and \"less\" are in the wrong blocks.";
+    t.fail(`${c} gives "${g}". It should give "${want}".${tip}`);
+  }
+}
 
 
 === step episode-code
