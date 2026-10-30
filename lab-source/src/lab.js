@@ -423,6 +423,7 @@ var RF=window.fetch&&window.fetch.bind(window);window.fetch=function(u,o){return
     teardownStep();
     if (parts[0] === "step" && STEPS[parts[1]]) return showStep(STEPS[parts[1]]);
     if (parts[0] === "guide") return showGuide(parts[1] ? +parts[1] : null);
+    if (parts[0] === "playground") return showPlayground(parts[1]);
     if (parts[0] === "day" && dayByN(+parts[1])) {
       const d = dayByN(+parts[1]);
       return parts[2] === "done" ? showDayDone(d) : showDay(d);
@@ -630,6 +631,7 @@ var RF=window.fetch&&window.fetch.bind(window);window.fetch=function(u,o){return
   let refresh = null;
   function teardownStep() {
     clearTimeout(refresh);
+    clearTimeout(pgTimer);
     disposeMonaco();
     current = { step: null, logs: [], errors: [] };
   }
@@ -835,6 +837,8 @@ var RF=window.fetch&&window.fetch.bind(window);window.fetch=function(u,o){return
   function getMonaco() {
     if (monacoNs !== null) return monacoNs;
     if (!window.LabMonaco) return (monacoNs = false);
+    // Monaco cancels its own pending work when an editor closes; that's not an error
+    window.addEventListener("unhandledrejection", (e) => { const r = e.reason; if (r && (r.name === "Canceled" || r.message === "Canceled")) e.preventDefault(); });
     try {
       const m = window.LabMonaco.load();
       const ts = m.languages.typescript;
@@ -1314,6 +1318,8 @@ declare function cors(): any;`;
         </ul>
         <p class="muted">On a Mac use Cmd instead of Ctrl, and Option instead of Alt.</p>
         <label class="switch"><input type="checkbox" id="simpleToggle" ${state.simpleEditor ? "checked" : ""}> Use the simple editor instead (no suggestions; better on slow computers)</label>
+        <h3>The Playground</h3>
+        <p>The <a href="#/playground" id="pgHelpLink">Playground</a> (top right) is a free code box: HTML, CSS and JavaScript with a live preview and the Console, but no steps and no checks. Try things there, or load one of the demos your teacher showed.</p>
         <h3>Your progress</h3>
         <p>Your code is saved in this browser automatically. To continue on another computer, save your progress to a file and open it there.</p>
         <div class="row">
@@ -1330,6 +1336,7 @@ declare function cors(): any;`;
     dlg.showModal();
     $("#closeHelp").onclick = () => dlg.close();
     $("#guideLink").onclick = () => dlg.close();
+    $("#pgHelpLink").onclick = () => dlg.close();
     $("#exportBtn").onclick = () => saveFile("showshelf-lab-progress.json", JSON.stringify(state, null, 1), "application/json");
     $("#importFile").onchange = async (e) => {
       const f = e.target.files[0];
@@ -1385,6 +1392,7 @@ declare function cors(): any;`;
     if (Lab.assets.posterSvg) Lab.assets.poster = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(Lab.assets.posterSvg);
     bridge.poster = Lab.assets.poster || null;
     $("#helpBtn").innerHTML = ICON.help + " Help";
+    $("#helpBtn").insertAdjacentHTML("beforebegin", '<a class="btn ghost" id="pgLink" href="#/playground" title="A free code box for trying things">Playground</a>');
     $("#helpBtn").addEventListener("click", openHelp);
     window.addEventListener("hashchange", route);
     route();

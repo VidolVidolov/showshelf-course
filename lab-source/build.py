@@ -168,7 +168,7 @@ def build_day(path):
             elif name == "solution-replace":
                 if "\n=>\n" not in "\n" + t + "\n":
                     raise LessonError(f"{path.name}: step {key}: solution-replace needs a line with only => between the old and the new text")
-                old, new = re.split(r"\n=>\n", "\n" + t + "\n", 1)
+                old, new = re.split(r"\n=>\n", "\n" + t + "\n", maxsplit=1)
                 s.setdefault("solutionReplace", []).append((old.strip("\n"), new.strip("\n")))
             else:
                 raise LessonError(f"{path.name}: step {key}: unknown section '{name}'")
@@ -243,7 +243,11 @@ def main():
     for name, fname in (("react", "react.min.js"), ("expressLite", "express-lite.js"), ("appCss", "app.css"), ("gymJs", "gym.js")):
         js_str = json.dumps((SRC / fname).read_text(encoding="utf-8")).replace("</", "<\\/")
         assets += f"Lab.assets.{name} = {js_str};\n"
-    scripts = [(SRC / f).read_text(encoding="utf-8") for f in ("lab.js", "data.js", "tvmaze-mock.js", "jsx.js")] + [assets] + day_js
+    lab_js = (SRC / "lab.js").read_text(encoding="utf-8")
+    marker = "  // ---------- test hooks"
+    assert marker in lab_js, "lab.js: test hooks marker not found"
+    lab_js = lab_js.replace(marker, (SRC / "playground.js").read_text(encoding="utf-8") + "\n" + marker, 1)
+    scripts = [lab_js] + [(SRC / f).read_text(encoding="utf-8") for f in ("data.js", "tvmaze-mock.js", "jsx.js", "playground-demos.js")] + [assets] + day_js
     monaco = SRC / "vendor" / "monaco.js"   # the VS Code editor; made by tools/build-monaco.js (optional)
     if monaco.exists():
         scripts.insert(0, monaco.read_text(encoding="utf-8"))

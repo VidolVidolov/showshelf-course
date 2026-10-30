@@ -10,6 +10,7 @@ Students build **ShowShelf**, a TV-show website with a watchlist ("My List"), in
 showshelf-course-final/
 ├── README.md                 this file: start here
 ├── showshelf-lab.html        the practice site for students (double-click it; works offline)
+├── playground.html           opens the Lab's Playground: a free code box for your live demos
 ├── index.html                a tiny page that opens showshelf-lab.html (for GitHub Pages)
 ├── teacher/
 │   └── day-01/ … day-11/
@@ -56,6 +57,37 @@ Give the afternoon teacher that day's `teacher-guide/day-NN-guide.pdf` and the h
 | 9 | The show page | A page per show (cast, seasons) and a My List page |
 | 10 | How real apps are built | A taste of React and of an Express server, inside the Lab |
 | 11 | Make it yours and publish | Their own site online, and a 2-minute demo |
+
+## The Playground: for your live demos
+
+Open `playground.html` (or **Playground** at the top right of the Lab). It's a free code box with the same VS Code editor, a live preview and the Console, but no steps and no checks.
+
+- **Setup** chooses what the page includes: a blank page; the ShowShelf styles and the 12 `shows`; React (with JSX); or the pretend Express server with a page that talks to it.
+- **Demos** loads ready-made code for each day (below). If you changed the code, it asks first.
+- **Code A− A+** makes the code bigger for the projector; **Preview − +** zooms the page.
+- **Code / Both / Preview** shows one side only, full width.
+- **Live** runs the page while you type. Switch it off for fetch demos and press **Run** (or Ctrl + Enter) when you're ready.
+- **Save file** downloads the page as one HTML file you can send to students.
+- Your code stays when you close the browser, and students can use the Playground too.
+
+| Day | Demo | Open it directly |
+|---|---|---|
+| Day 1 · HTML | A page about one show | `showshelf-lab.html#/playground/html-page` |
+| Day 1 · HTML | Tables, sections and details | `showshelf-lab.html#/playground/html-table` |
+| Day 2 · CSS | Rules, colours, classes and variables | `showshelf-lab.html#/playground/css-basics` |
+| Day 2 · CSS | The box model | `showshelf-lab.html#/playground/box-model` |
+| Day 3 · Layout | Flexbox: a header in a row | `showshelf-lab.html#/playground/flexbox` |
+| Day 3 · Layout | Grid and media queries | `showshelf-lab.html#/playground/grid` |
+| Day 4 · JavaScript | Console, variables, text on the page | `showshelf-lab.html#/playground/js-first` |
+| Day 5 · Functions | Functions, return and decisions | `showshelf-lab.html#/playground/functions` |
+| Day 6 · Lists | Arrays, objects, loops, filter and map | `showshelf-lab.html#/playground/lists` |
+| Day 7 · DOM and events | Cards from data, with a live search | `showshelf-lab.html#/playground/dom-cards` |
+| Day 7 · DOM and events | A click counter saved in localStorage | `showshelf-lab.html#/playground/click-storage` |
+| Day 8 · fetch and APIs | Search TVmaze with fetch | `showshelf-lab.html#/playground/fetch-search` |
+| Day 9 · The show page | One show with its cast and seasons | `showshelf-lab.html#/playground/show-details` |
+| Day 10 · React and servers | React: components, props and state | `showshelf-lab.html#/playground/react` |
+| Day 10 · React and servers | Express: a My List API and a page that uses it | `showshelf-lab.html#/playground/express` |
+| Day 11 · Make it yours | A dark mode button that remembers | `showshelf-lab.html#/playground/dark-mode` |
 
 ## How students get the Lab
 

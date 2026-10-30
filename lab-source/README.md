@@ -18,6 +18,8 @@ cp dist/showshelf-lab.html ../showshelf-lab.html
 |---|---|
 | `lessons/day01.lesson` … `day11.lesson` | The lessons: every step's explanation, task, hints, answer and check. Plain text; the format is described at the top of `build.py` and in `AUTHORING.md`. |
 | `src/lab.js`, `src/lab.css`, `src/shell.html` | The Lab itself: screens, preview, checks, editor |
+| `src/playground.js`, `src/playground-demos.js` | The Playground (`#/playground`) and its ready-made demos |
+| `src/gym.js` | The practice gym page used by the practice exercises (P1, P2, ...) |
 | `src/app.css` | The ShowShelf stylesheet used by the pages students build (Days 3–11) |
 | `src/data.js`, `src/tvmaze-mock.js` | The 12 sample shows and the offline TVmaze answers |
 | `src/jsx.js`, `src/express-lite.js`, `src/react.min.js` | JSX, the pretend Express server and React 19, for Day 10 |
